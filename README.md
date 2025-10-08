@@ -185,11 +185,6 @@ Meninjau aktivitas pengguna dan memastikan keamanan serta ketertiban data dalam 
 Deskripsi Peran:
 Pengguna merupakan individu yang menggunakan SportPedia untuk belajar dan mengenal berbagai cabang olahraga. Pengguna dapat mencari informasi, menonton video tutorial, mempelajari perlengkapan olahraga, serta berinteraksi dengan komunitas.
 
-Kategori Pengguna:
-
-Belum Terautentikasi: dapat menjelajahi pustaka olahraga, melihat detail olahraga, dan menonton preview video
-Sudah Terautentikasi: memiliki akses penuh untuk berinteraksi dan mempersonalisasi pengalaman belajar olahraga.
-
 Hak Akses & Kemampuan:
 Menjelajahi Pustaka Olahraga dan membaca panduan teori dasar.
 Menonton video tutorial yang disediakan dalam berbagai cabang olahraga.
@@ -197,4 +192,3 @@ Melihat Gear Guide untuk memahami alat dan perlengkapan yang dibutuhkan, termasu
 Menyimpan olahraga favorit (bookmark) dan melacak kemajuan belajar di Profil & Perjalanan Olahraga.
 Memberikan review atau rating pada video dan artikel.
 Berpartisipasi dalam Forum & Komunitas Pemula untuk berbagi pengalaman, bertanya, dan berdiskusi dengan pengguna lain.
-
