@@ -166,3 +166,9 @@ Modul ini berfungsi untuk menampilkan data pengguna, aktivitas yang telah dilaku
 | 5 | Forum & Komunitas | Ruang diskusi dan tanya jawab antar pengguna |
 | 6 | Profil & Perjalanan | Pelacakan perkembangan olahraga pengguna |
 
+---
+
+## 🧭 Sumber Initial Dataset  
+
+Wikipedia. Sebagai sumber utama tentang deskripsi cabang olahraga.
+
