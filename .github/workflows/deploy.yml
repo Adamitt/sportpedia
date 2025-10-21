@@ -19,6 +19,19 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
+      - name: Test PWS connection
+        env:
+          PWS_URL: ${{ secrets.PWS_URL }}
+        run: |
+          echo "Testing connection to PWS..."
+          if git ls-remote "$PWS_URL" >/dev/null 2>&1; then
+            echo "✅ Connection to PWS OK"
+          else
+            echo "❌ Connection failed. Probably wrong URL, password needs encoding, or repo not created yet."
+            git ls-remote "$PWS_URL" || true
+            exit 128
+          fi
+
       - name: Push to PWS
         env:
           PWS_URL: ${{ secrets.PWS_URL }}
