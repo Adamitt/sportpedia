@@ -89,18 +89,6 @@
         <!-- Progress Tracker -->
         <div class="progress-section">
             <h3>🏅 Progress Tracker</h3>
-            {% if progress_list %}
-                {% for p in progress_list %}
-                    <div class="progress-item">
-                        <h4>{{ p.olahraga_dipelajari }}</h4>
-                        {% if p.video_ditonton %}<p>🎥 Video: {{ p.video_ditonton }}</p>{% endif %}
-                        {% if p.artikel_dibaca %}<p>📚 Artikel: {{ p.artikel_dibaca }}</p>{% endif %}
-                        <p class="timestamp">Terakhir diperbarui: {{ p.tanggal_update|date:"d M Y, H:i" }}</p>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>Belum ada progress yang tercatat.</p>
-            {% endif %}
         </div>
 
         <hr>
@@ -108,17 +96,6 @@
         <!-- Riwayat Aktivitas -->
         <div class="activity-section">
             <h3>🕓 Riwayat Aktivitas</h3>
-            {% if aktivitas_list %}
-                {% for a in aktivitas_list %}
-                    <div class="activity-item">
-                        <h4>{{ a.aktivitas|title }}</h4>
-                        <p>{{ a.deskripsi }}</p>
-                        <p class="timestamp">{{ a.waktu|date:"d M Y, H:i" }}</p>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>Belum ada aktivitas tercatat.</p>
-            {% endif %}
         </div>
 
         <hr>

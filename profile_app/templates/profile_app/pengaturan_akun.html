@@ -11,7 +11,7 @@
             padding: 40px;
         }
         .container {
-            max-width: 700px;
+            max-width: 800px;
             margin: auto;
             background: white;
             padding: 30px;
@@ -20,105 +20,97 @@
         }
         h2 {
             text-align: center;
-            margin-bottom: 20px;
             color: #333;
         }
         form {
             display: flex;
             flex-direction: column;
+            margin-top: 25px;
         }
         label {
-            margin-top: 10px;
             font-weight: bold;
             color: #333;
+            margin-top: 15px;
         }
-        input, select, textarea {
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        textarea,
+        input[type="file"] {
             padding: 10px;
             margin-top: 5px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
         button {
-            margin-top: 20px;
-            padding: 10px;
+            margin-top: 25px;
+            padding: 12px;
             border: none;
             background-color: #007bff;
             color: white;
             border-radius: 5px;
             cursor: pointer;
+            font-weight: bold;
         }
         button:hover {
             background-color: #0056b3;
         }
-        .section {
-            margin-bottom: 30px;
-        }
         a {
-            text-decoration: none;
             color: #007bff;
+            text-decoration: none;
         }
         .back {
             display: block;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 30px;
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .profile-header img {
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Pengaturan Akun</h2>
-
-        <!-- Ubah Profil -->
-        <div class="section">
-            <h3>Ubah Profil</h3>
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <label for="foto_profil">Foto Profil</label>
-                <input type="file" id="foto_profil" name="foto_profil">
-
-                <label for="olahraga_favorit">Olahraga Favorit</label>
-                <input type="text" id="olahraga_favorit" name="olahraga_favorit" value="{{ profile.olahraga_favorit }}">
-
-                <label for="bio">Bio</label>
-                <textarea id="bio" name="bio" rows="3">{{ profile.bio }}</textarea>
-
-                <button type="submit" name="update_profile">Simpan Perubahan Profil</button>
-            </form>
+        <div class="profile-header">
+            {% if profile.foto_profil %}
+                <img src="{{ profile.foto_profil.url }}" alt="Foto Profil">
+            {% else %}
+                <img src="https://via.placeholder.com/120" alt="Foto Default">
+            {% endif %}
+            <h2>{{ user.username }}</h2>
+            <p>{{ user.email }}</p>
         </div>
 
-        <!-- Ubah Password -->
-        <div class="section">
-            <h3>Ubah Password</h3>
-            <form method="POST">
-                {% csrf_token %}
-                <label for="old_password">Password Lama</label>
-                <input type="password" id="old_password" name="old_password" required>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
 
-                <label for="new_password">Password Baru</label>
-                <input type="password" id="new_password" name="new_password" required>
+            <!-- Bagian User -->
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" required>
 
-                <label for="confirm_password">Konfirmasi Password Baru</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
+            <label for="password">Password baru (opsional)</label>
+            <input type="password" id="password" name="password" placeholder="Biarkan kosong jika tidak ingin mengubah">
 
-                <button type="submit" name="update_password">Ubah Password</button>
-            </form>
-        </div>
+            <!-- Bagian Profil -->
+            <label for="foto_profil">Foto Profil</label>
+            <input type="file" id="foto_profil" name="foto_profil">
 
-        <!-- Preferensi Tampilan -->
-        <div class="section">
-            <h3>Preferensi Tampilan</h3>
-            <form method="POST">
-                {% csrf_token %}
-                <label for="tema">Tema Tampilan</label>
-                <select id="tema" name="tema">
-                    <option value="terang" {% if profile.tema == "terang" %}selected{% endif %}>Terang</option>
-                    <option value="gelap" {% if profile.tema == "gelap" %}selected{% endif %}>Gelap</option>
-                    <option value="otomatis" {% if profile.tema == "otomatis" %}selected{% endif %}>Otomatis</option>
-                </select>
+            <label for="olahraga_favorit">Olahraga Favorit</label>
+            <input type="text" id="olahraga_favorit" name="olahraga_favorit"
+                   value="{{ profile.olahraga_favorit|default:'' }}">
 
-                <button type="submit" name="update_tampilan">Simpan Preferensi</button>
-            </form>
-        </div>
+            <label for="preferensi">Preferensi</label>
+            <textarea id="preferensi" name="preferensi" rows="3">{{ profile.preferensi|default:'' }}</textarea>
+
+            <button type="submit">💾 Simpan Perubahan</button>
+        </form>
 
         <a href="{% url 'profile_page' %}" class="back">← Kembali ke Profil</a>
     </div>
