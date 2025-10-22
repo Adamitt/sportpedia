@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}SportPedia — Sports Library{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto mt-8">
+  <h1 class="text-3xl font-bold text-blue-900 mb-6">Sports Library</h1>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for sport in sports %}
+      <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+        <div class="p-5">
+          <h2 class="text-xl font-semibold text-gray-800 mb-2">{{ sport.name }}</h2>
+          <p class="text-sm text-gray-600 line-clamp-3 mb-3">{{ sport.description }}</p>
+
+          <div class="text-sm text-gray-700 space-y-1">
+            <p><strong>Kategori:</strong> {{ sport.category }}</p>
+            <p><strong>Tingkat:</strong> {{ sport.difficulty }}</p>
+          </div>
+
+          <a href="{% url 'sportlibrary:sport_detail' sport.id %}">
+             class="inline-block mt-4 text-blue-700 font-medium hover:underline">
+             Lihat Detail →
+          </a>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-gray-500">Belum ada olahraga yang terdaftar.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

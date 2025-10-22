@@ -1,0 +1,545 @@
+[
+  {
+    "id": 1,
+    "name": "Bulu Tangkis",
+    "category": "Indoor",
+    "difficulty": "Pemula",
+    "description": "Olahraga raket cepat yang melatih refleks, kelincahan, dan daya tahan tubuh.",
+    "history": "Bulu tangkis modern berkembang di Inggris pada abad ke-19, terinspirasi dari permainan kuno Poona di India.",
+    "rules": [
+      "Permainan dimulai dengan servis dari area kanan.",
+      "Pertandingan berlangsung hingga 21 poin.",
+      "Jika skor 20-20, pemain harus menang dengan selisih dua poin.",
+      "Tidak boleh memukul shuttlecock dua kali berturut-turut."
+    ],
+    "techniques": [
+      "Cara memegang raket (forehand & backhand).",
+      "Footwork dasar dan posisi siap.",
+      "Serve pendek dan panjang.",
+      "Smash dan netting untuk menyerang."
+    ],
+    "benefits": [
+      "Melatih koordinasi mata dan tangan.",
+      "Meningkatkan kebugaran jantung.",
+      "Meningkatkan fokus dan refleks cepat."
+    ],
+    "popular_countries": ["Indonesia", "China", "Denmark", "Korea Selatan"],
+    "video_ids": [1, 2, 3],
+    "gear_ids": [1, 2, 3],
+    "tags": ["racket", "refleks", "indoor", "kompetitif"]
+  },
+  {
+    "id": 2,
+    "name": "Yoga",
+    "category": "Indoor",
+    "difficulty": "Pemula",
+    "description": "Latihan pikiran dan tubuh yang menggabungkan postur, pernapasan, dan meditasi.",
+    "history": "Yoga berasal dari India kuno lebih dari 5000 tahun lalu sebagai bagian dari praktik spiritual dan kesehatan.",
+    "rules": [
+      "Lakukan di tempat yang tenang dan nyaman.",
+      "Fokus pada pernapasan dalam dan stabil.",
+      "Jangan memaksakan gerakan tubuh di luar batas."
+    ],
+    "techniques": [
+      "Pernapasan Pranayama.",
+      "Pose dasar: Mountain, Warrior, dan Downward Dog.",
+      "Relaksasi dengan meditasi singkat."
+    ],
+    "benefits": [
+      "Meningkatkan fleksibilitas tubuh.",
+      "Menurunkan stres dan kecemasan.",
+      "Meningkatkan kualitas tidur."
+    ],
+    "popular_countries": ["India", "Amerika Serikat", "Indonesia", "Thailand"],
+    "video_ids": [4, 5],
+    "gear_ids": [4, 5],
+    "tags": ["relaksasi", "mental health", "fleksibilitas", "indoor"]
+  },
+  {
+    "id": 3,
+    "name": "Tenis",
+    "category": "Outdoor",
+    "difficulty": "Menengah",
+    "description": "Olahraga raket yang dimainkan satu lawan satu atau dua lawan dua di lapangan dengan net di tengah.",
+    "history": "Tenis modern berkembang dari permainan Prancis abad ke-12 bernama ‘jeu de paume’.",
+    "rules": [
+      "Setiap pertandingan terdiri dari set, dan setiap set dari game.",
+      "Skor dihitung dengan sistem 15-30-40-game.",
+      "Bola harus melewati net dan masuk ke area lawan tanpa keluar garis."
+    ],
+    "techniques": [
+      "Forehand dan backhand stroke.",
+      "Serve atas dan slice.",
+      "Footwork menyilang dan split step."
+    ],
+    "benefits": [
+      "Meningkatkan kekuatan otot tangan dan kaki.",
+      "Melatih fokus dan strategi bermain.",
+      "Meningkatkan daya tahan fisik."
+    ],
+    "popular_countries": ["Amerika Serikat", "Spanyol", "Australia", "Swiss"],
+    "video_ids": [6, 7],
+    "gear_ids": [6, 7, 8],
+    "tags": ["racket", "outdoor", "strategi", "kompetitif"]
+  },
+  {
+    "id": 4,
+    "name": "Renang",
+    "category": "Indoor",
+    "difficulty": "Pemula",
+    "description": "Olahraga air yang melatih seluruh tubuh dan meningkatkan daya tahan kardiovaskular.",
+    "history": "Renang sudah dikenal sejak zaman Mesir kuno dan menjadi olahraga Olimpiade pada tahun 1896.",
+    "rules": [
+      "Setiap gaya memiliki teknik start dan finish berbeda.",
+      "Tidak boleh menyentuh dasar kolam selama lomba.",
+      "Mengikuti gaya yang sesuai dengan kategori (bebas, punggung, dada, kupu-kupu)."
+    ],
+    "techniques": [
+      "Pernapasan ritmis.",
+      "Gerakan kaki flutter kick dan frog kick.",
+      "Posisi streamline untuk mengurangi hambatan air."
+    ],
+    "benefits": [
+      "Menguatkan otot seluruh tubuh.",
+      "Meningkatkan kapasitas paru-paru.",
+      "Membantu rehabilitasi cedera sendi."
+    ],
+    "popular_countries": ["Australia", "Amerika Serikat", "Jepang", "Hungaria"],
+    "video_ids": [8, 9],
+    "gear_ids": [9, 10],
+    "tags": ["aqua", "cardio", "olympic", "full-body"]
+  },
+  {
+    "id": 5,
+    "name": "Panahan",
+    "category": "Outdoor",
+    "difficulty": "Menengah",
+    "description": "Olahraga ketepatan yang menggunakan busur untuk menembakkan anak panah ke sasaran.",
+    "history": "Awalnya digunakan untuk berburu dan perang di Mesir dan Mongolia kuno, kini menjadi olahraga ketangkasan.",
+    "rules": [
+      "Setiap pemanah mendapat jumlah anak panah tertentu per ronde.",
+      "Skor dihitung berdasarkan kedekatan dengan pusat target.",
+      "Tidak boleh menembak tanpa aba-aba wasit."
+    ],
+    "techniques": [
+      "Posisi berdiri stabil (stance).",
+      "Tarikan tali (draw) dan bidikan (aim).",
+      "Pelepasan panah yang halus (release)."
+    ],
+    "benefits": [
+      "Meningkatkan fokus dan ketenangan.",
+      "Melatih koordinasi mata dan tangan.",
+      "Meningkatkan keseimbangan tubuh."
+    ],
+    "popular_countries": ["Korea Selatan", "Turki", "Indonesia", "Amerika Serikat"],
+    "video_ids": [10, 11],
+    "gear_ids": [11, 12],
+    "tags": ["focus", "precision", "outdoor", "archery"]
+  },
+  {
+    "id": 6,
+    "name": "Lari",
+    "category": "Outdoor",
+    "difficulty": "Pemula",
+    "description": "Olahraga paling dasar yang melatih kekuatan kardiovaskular dan stamina tubuh.",
+    "history": "Sudah ada sejak zaman prasejarah, digunakan manusia untuk berburu dan bertahan hidup.",
+    "rules": [
+      "Gunakan sepatu dengan sol empuk.",
+      "Pemanasan minimal 5 menit sebelum mulai.",
+      "Jaga kecepatan konstan di awal dan akhir."
+    ],
+    "techniques": [
+      "Postur tubuh tegak dan rileks.",
+      "Ayunan tangan alami.",
+      "Atur napas dengan ritme langkah."
+    ],
+    "benefits": [
+      "Meningkatkan kesehatan jantung.",
+      "Membakar kalori secara efektif.",
+      "Mengurangi stres dan memperbaiki mood."
+    ],
+    "popular_countries": ["Kenya", "Ethiopia", "Jepang", "Indonesia"],
+    "video_ids": [12, 13],
+    "gear_ids": [13, 14],
+    "tags": ["outdoor", "stamina", "cardio", "simpel"]
+  },
+  {
+    "id": 7,
+    "name": "Basket",
+    "category": "Indoor",
+    "difficulty": "Menengah",
+    "description": "Olahraga tim yang menggunakan bola untuk mencetak poin ke keranjang lawan.",
+    "history": "Diciptakan oleh James Naismith pada 1891 di Amerika Serikat.",
+    "rules": [
+      "Setiap tim terdiri dari 5 pemain di lapangan.",
+      "Permainan berlangsung 4 kuarter masing-masing 10 menit.",
+      "Tidak boleh berjalan tanpa dribble (traveling)."
+    ],
+    "techniques": [
+      "Dribble dengan kontrol bola.",
+      "Lay-up dan shooting dasar.",
+      "Passing dan positioning dalam tim."
+    ],
+    "benefits": [
+      "Melatih kerja sama tim.",
+      "Meningkatkan koordinasi tubuh.",
+      "Membakar banyak kalori."
+    ],
+    "popular_countries": ["Amerika Serikat", "Spanyol", "Filipina", "Indonesia"],
+    "video_ids": [14, 15],
+    "gear_ids": [15, 16],
+    "tags": ["teamwork", "indoor", "refleks", "kompetitif"]
+  },
+  {
+    "id": 8,
+    "name": "Futsal",
+    "category": "Indoor",
+    "difficulty": "Menengah",
+    "description": "Varian sepak bola yang dimainkan di lapangan kecil dengan lima pemain per tim.",
+    "history": "Dikembangkan di Uruguay pada 1930-an untuk dimainkan di dalam ruangan.",
+    "rules": [
+      "Durasi pertandingan 2x20 menit.",
+      "Bola tidak boleh keluar arena.",
+      "Tidak ada offside."
+    ],
+    "techniques": [
+      "Kontrol bola cepat.",
+      "Passing pendek dan akurat.",
+      "Rotasi posisi antar pemain."
+    ],
+    "benefits": [
+      "Meningkatkan refleks dan ketangkasan.",
+      "Melatih teamwork dan strategi cepat.",
+      "Menguatkan otot kaki."
+    ],
+    "popular_countries": ["Brasil", "Spanyol", "Indonesia", "Portugal"],
+    "video_ids": [16, 17],
+    "gear_ids": [17, 18],
+    "tags": ["football", "indoor", "tim", "refleks"]
+  },
+  {
+    "id": 9,
+    "name": "Bersepeda",
+    "category": "Outdoor",
+    "difficulty": "Pemula",
+    "description": "Aktivitas mengayuh sepeda untuk olahraga, transportasi, atau rekreasi.",
+    "history": "Sepeda modern pertama dibuat oleh Karl von Drais pada tahun 1817 di Jerman.",
+    "rules": [
+      "Gunakan helm dan pelindung lutut.",
+      "Hindari jalan licin atau berlumpur.",
+      "Gunakan lampu saat malam hari."
+    ],
+    "techniques": [
+      "Posisi duduk ergonomis.",
+      "Perpindahan gigi (gear shifting) yang halus.",
+      "Pengaturan kecepatan dan pengereman."
+    ],
+    "benefits": [
+      "Menguatkan kaki dan lutut.",
+      "Menurunkan berat badan.",
+      "Menurunkan risiko penyakit jantung."
+    ],
+    "popular_countries": ["Belanda", "Denmark", "Indonesia", "Jepang"],
+    "video_ids": [18, 19],
+    "gear_ids": [19, 20],
+    "tags": ["outdoor", "cardio", "transportasi", "fun"]
+  },
+  {
+    "id": 10,
+    "name": "Tenis Meja",
+    "category": "Indoor",
+    "difficulty": "Pemula",
+    "description": "Versi mini tenis yang dimainkan di atas meja menggunakan bet dan bola kecil.",
+    "history": "Berasal dari Inggris akhir abad ke-19 dan menjadi olahraga Olimpiade sejak 1988.",
+    "rules": [
+      "Permainan dimulai dengan servis silang.",
+      "Pemain hanya boleh memukul bola sekali.",
+      "Poin didapat jika lawan gagal mengembalikan bola."
+    ],
+    "techniques": [
+      "Grip shakehand dan penhold.",
+      "Push, chop, dan topspin.",
+      "Positioning dan footwork pendek."
+    ],
+    "benefits": [
+      "Meningkatkan refleks dan fokus.",
+      "Melatih koordinasi tangan dan mata.",
+      "Dapat dimainkan di ruang kecil."
+    ],
+    "popular_countries": ["China", "Korea Selatan", "Jerman", "Swedia"],
+    "video_ids": [20, 21],
+    "gear_ids": [21, 22],
+    "tags": ["refleks", "indoor", "table tennis", "speed"]
+  },
+  {
+    "id": 11,
+    "name": "Voli",
+    "category": "Indoor",
+    "difficulty": "Menengah",
+    "description": "Olahraga tim yang dimainkan oleh dua tim beranggotakan enam orang, memukul bola melewati net agar jatuh di area lawan.",
+    "history": "Diciptakan oleh William G. Morgan pada tahun 1895 di Amerika Serikat sebagai alternatif olahraga basket yang lebih ringan.",
+    "rules": [
+      "Setiap tim terdiri dari enam pemain di lapangan.",
+      "Pertandingan dimenangkan oleh tim yang mencapai 25 poin dengan selisih 2 poin.",
+      "Pemain tidak boleh menyentuh net atau melakukan double touch."
+    ],
+    "techniques": [
+      "Serve atas dan bawah.",
+      "Passing dengan forearm.",
+      "Blocking dan spike dasar."
+    ],
+    "benefits": [
+      "Melatih refleks dan koordinasi tubuh.",
+      "Meningkatkan kekuatan otot tangan dan kaki.",
+      "Menumbuhkan kerja sama tim."
+    ],
+    "popular_countries": ["Brasil", "Italia", "Jepang", "Indonesia"],
+    "video_ids": [22, 23],
+    "gear_ids": [23, 24],
+    "tags": ["tim", "refleks", "spike", "indoor"]
+  },
+  {
+    "id": 12,
+    "name": "Panjat Tebing",
+    "category": "Outdoor",
+    "difficulty": "Lanjutan",
+    "description": "Olahraga ekstrem yang menantang kekuatan, keseimbangan, dan fokus dengan memanjat dinding atau tebing alam.",
+    "history": "Bermula dari Eropa pada abad ke-19 sebagai latihan pendakian gunung, kini menjadi olahraga kompetitif internasional.",
+    "rules": [
+      "Gunakan alat pengaman sesuai standar.",
+      "Tidak boleh menerima bantuan fisik dari luar.",
+      "Waktu dan rute menjadi faktor penilaian utama."
+    ],
+    "techniques": [
+      "Grip dan foot placement.",
+      "Teknik belay dan rappel.",
+      "Body positioning dan kontrol keseimbangan."
+    ],
+    "benefits": [
+      "Menguatkan otot lengan dan core.",
+      "Melatih fokus dan perencanaan langkah.",
+      "Meningkatkan keberanian dan ketahanan mental."
+    ],
+    "popular_countries": ["Prancis", "Jepang", "Korea Selatan", "Indonesia"],
+    "video_ids": [24, 25],
+    "gear_ids": [25, 26],
+    "tags": ["outdoor", "ekstrem", "climbing", "fokus"]
+  },
+  {
+    "id": 13,
+    "name": "Muay Thai",
+    "category": "Indoor",
+    "difficulty": "Menengah",
+    "description": "Seni bela diri dari Thailand yang menggunakan tinju, siku, lutut, dan tendangan.",
+    "history": "Berasal dari seni bertarung kuno Thailand yang disebut Muay Boran, berkembang menjadi olahraga profesional pada abad ke-20.",
+    "rules": [
+      "Pertandingan berlangsung 3–5 ronde dengan durasi 3 menit per ronde.",
+      "Dilarang menyerang bagian belakang kepala.",
+      "Menang dengan poin atau knockout."
+    ],
+    "techniques": [
+      "Jab, cross, hook, dan uppercut.",
+      "Tendangan low kick dan teep.",
+      "Clinching dan knee strike."
+    ],
+    "benefits": [
+      "Meningkatkan refleks dan ketahanan tubuh.",
+      "Menguatkan otot inti dan kaki.",
+      "Melatih disiplin dan kontrol diri."
+    ],
+    "popular_countries": ["Thailand", "Indonesia", "Belanda", "Amerika Serikat"],
+    "video_ids": [26, 27],
+    "gear_ids": [27, 28],
+    "tags": ["bela diri", "combat", "fitness", "indoor"]
+  },
+  {
+    "id": 14,
+    "name": "Golf",
+    "category": "Outdoor",
+    "difficulty": "Menengah",
+    "description": "Olahraga presisi yang menuntut ketenangan dan teknik dalam memukul bola ke lubang di lapangan.",
+    "history": "Berasal dari Skotlandia pada abad ke-15 dan menjadi olahraga global dengan turnamen besar seperti PGA Tour.",
+    "rules": [
+      "Tujuannya adalah memasukkan bola ke lubang dengan pukulan sesedikit mungkin.",
+      "Tidak boleh mengubah kondisi alami lapangan.",
+      "Setiap hole memiliki par yang menentukan standar pukulan."
+    ],
+    "techniques": [
+      "Grip dan stance dasar.",
+      "Swing penuh dan putting.",
+      "Kontrol arah dan kekuatan pukulan."
+    ],
+    "benefits": [
+      "Melatih fokus dan kesabaran.",
+      "Menurunkan stres melalui aktivitas luar ruangan.",
+      "Meningkatkan koordinasi dan keseimbangan tubuh."
+    ],
+    "popular_countries": ["Skotlandia", "Amerika Serikat", "Jepang", "Korea Selatan"],
+    "video_ids": [28, 29],
+    "gear_ids": [29, 30],
+    "tags": ["presisi", "outdoor", "fokus", "relaksasi"]
+  },
+  {
+    "id": 15,
+    "name": "Selancar",
+    "category": "Outdoor",
+    "difficulty": "Lanjutan",
+    "description": "Olahraga air yang dilakukan dengan berdiri di atas papan untuk menaklukkan ombak laut.",
+    "history": "Berakar dari budaya Polinesia dan Hawaii, kini menjadi simbol gaya hidup pantai dan kebebasan.",
+    "rules": [
+      "Harus memprioritaskan peselancar pertama di ombak.",
+      "Tidak boleh menyerobot jalur ombak orang lain.",
+      "Gunakan leash untuk keamanan papan."
+    ],
+    "techniques": [
+      "Pop-up dari posisi berbaring ke berdiri.",
+      "Paddle dengan ritme yang efisien.",
+      "Mengontrol arah di atas ombak (carving)."
+    ],
+    "benefits": [
+      "Melatih keseimbangan dan refleks tubuh.",
+      "Meningkatkan kekuatan bahu dan core.",
+      "Meningkatkan mental fokus dan koneksi dengan alam."
+    ],
+    "popular_countries": ["Hawaii", "Australia", "Bali (Indonesia)", "Brasil"],
+    "video_ids": [30, 31],
+    "gear_ids": [31, 32],
+    "tags": ["surfing", "air", "outdoor", "extreme"]
+  },
+  {
+    "id": 16,
+    "name": "Pencak Silat",
+    "category": "Indoor",
+    "difficulty": "Menengah",
+    "description": "Seni bela diri tradisional Nusantara yang menggabungkan teknik serangan, pertahanan, dan nilai spiritual.",
+    "history": "Telah berkembang ratusan tahun di Asia Tenggara, menjadi warisan budaya Indonesia yang diakui UNESCO pada 2019.",
+    "rules": [
+      "Pertandingan dinilai dari teknik serangan, tangkisan, dan keseimbangan.",
+      "Dilarang menyerang area vital secara berlebihan.",
+      "Setiap ronde berlangsung 2 menit."
+    ],
+    "techniques": [
+      "Kuda-kuda dasar.",
+      "Pukulan, tendangan, dan sapuan.",
+      "Gerakan elak dan tangkapan."
+    ],
+    "benefits": [
+      "Mengembangkan disiplin dan mental tangguh.",
+      "Meningkatkan refleks dan kekuatan tubuh.",
+      "Memperkenalkan nilai budaya dan sportivitas."
+    ],
+    "popular_countries": ["Indonesia", "Malaysia", "Brunei Darussalam", "Singapura"],
+    "video_ids": [32, 33],
+    "gear_ids": [33, 34],
+    "tags": ["bela diri", "tradisional", "indoor", "budaya"]
+  },
+  {
+    "id": 17,
+    "name": "Baseball",
+    "category": "Outdoor",
+    "difficulty": "Menengah",
+    "description": "Olahraga tim yang dimainkan dengan memukul bola menggunakan tongkat dan berlari mengelilingi base.",
+    "history": "Berasal dari Amerika Serikat pada abad ke-18 dan menjadi olahraga nasional di sana.",
+    "rules": [
+      "Tim terdiri dari sembilan pemain.",
+      "Permainan berlangsung sembilan inning.",
+      "Pemain mencetak poin dengan kembali ke home base."
+    ],
+    "techniques": [
+      "Pitching dan batting dasar.",
+      "Base running dan catching.",
+      "Koordinasi tim dalam fielding."
+    ],
+    "benefits": [
+      "Melatih refleks dan kekuatan tangan.",
+      "Meningkatkan kerja sama dan strategi tim.",
+      "Menumbuhkan disiplin dan konsistensi."
+    ],
+    "popular_countries": ["Amerika Serikat", "Jepang", "Kuba", "Korea Selatan"],
+    "video_ids": [34, 35],
+    "gear_ids": [35, 36],
+    "tags": ["tim", "bat", "outdoor", "refleks"]
+  },
+  {
+    "id": 18,
+    "name": "Skateboard",
+    "category": "Outdoor",
+    "difficulty": "Lanjutan",
+    "description": "Olahraga keseimbangan dan trik di atas papan beroda yang populer di kalangan anak muda.",
+    "history": "Berkembang di California tahun 1950-an oleh peselancar yang ingin meniru gerakan selancar di darat.",
+    "rules": [
+      "Gunakan pelindung kepala, siku, dan lutut.",
+      "Dilarang mengganggu pemain lain di area skatepark.",
+      "Nilai berdasarkan gaya dan kompleksitas trik."
+    ],
+    "techniques": [
+      "Ollie dan kickflip dasar.",
+      "Balance dan drop-in di half-pipe.",
+      "Kontrol kecepatan dan arah dengan tubuh."
+    ],
+    "benefits": [
+      "Meningkatkan keseimbangan dan koordinasi.",
+      "Melatih kreativitas dan ekspresi diri.",
+      "Meningkatkan kepercayaan diri melalui progres trik."
+    ],
+    "popular_countries": ["Amerika Serikat", "Brasil", "Jepang", "Indonesia"],
+    "video_ids": [36, 37],
+    "gear_ids": [37, 38],
+    "tags": ["ekstrem", "urban", "outdoor", "trik"]
+  },
+  {
+    "id": 19,
+    "name": "Calisthenics",
+    "category": "Outdoor",
+    "difficulty": "Menengah",
+    "description": "Latihan menggunakan berat badan sendiri untuk membangun kekuatan, keseimbangan, dan mobilitas.",
+    "history": "Berakar dari latihan fisik militer Yunani kuno, kini populer sebagai bentuk street workout modern.",
+    "rules": [
+      "Gunakan bentuk tubuh sempurna, hindari momentum berlebih.",
+      "Lakukan pemanasan sebelum latihan intens.",
+      "Konsistensi dan progres bertahap sangat penting."
+    ],
+    "techniques": [
+      "Push-up, pull-up, dan dip.",
+      "Front lever dan muscle-up dasar.",
+      "Handstand dan planche progression."
+    ],
+    "benefits": [
+      "Membangun kekuatan alami tubuh.",
+      "Meningkatkan fleksibilitas dan kontrol gerak.",
+      "Tidak memerlukan alat mahal."
+    ],
+    "popular_countries": ["Amerika Serikat", "Prancis", "Indonesia", "Rusia"],
+    "video_ids": [38, 39],
+    "gear_ids": [39, 40],
+    "tags": ["street", "bodyweight", "fitness", "outdoor"]
+  },
+  {
+    "id": 20,
+    "name": "Wall Climbing Indoor",
+    "category": "Indoor",
+    "difficulty": "Menengah",
+    "description": "Versi dalam ruangan dari panjat tebing dengan dinding buatan dan jalur berwarna.",
+    "history": "Diperkenalkan pada 1980-an sebagai alternatif aman untuk latihan panjat tebing alam.",
+    "rules": [
+      "Gunakan tali dan harness yang sesuai.",
+      "Ikuti jalur sesuai warna pegangannya.",
+      "Tidak boleh memegang pegangan di luar rute."
+    ],
+    "techniques": [
+      "Teknik belay dan bouldering.",
+      "Gerakan reach dan dynamic move.",
+      "Footwork presisi dan perencanaan rute."
+    ],
+    "benefits": [
+      "Meningkatkan kekuatan genggaman dan keseimbangan.",
+      "Melatih fokus dan ketekunan.",
+      "Memberikan tantangan fisik dan mental yang menyenangkan."
+    ],
+    "popular_countries": ["Jepang", "Prancis", "Korea Selatan", "Indonesia"],
+    "video_ids": [40, 41],
+    "gear_ids": [41, 42],
+    "tags": ["indoor", "climbing", "keseimbangan", "fokus"]
+  }
+]
+
