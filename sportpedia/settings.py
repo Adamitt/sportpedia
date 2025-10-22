@@ -18,6 +18,8 @@ load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 # Quick-start development settings - unsuitable for production
@@ -43,9 +45,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main',
+    'mainPage',
     'gearguide',
     'sportlibrary',
+
 ]
 
 MIDDLEWARE = [
@@ -56,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'mainPage.middleware.PageHitMiddleware' ##
 ]
 
 ROOT_URLCONF = 'sportpedia.urls'
@@ -63,7 +67,7 @@ ROOT_URLCONF = 'sportpedia.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,6 +78,13 @@ TEMPLATES = [
         },
     },
 ]
+
+TRACKED_VIEWS = {
+    'sportlibrary:sport_detail',   # contoh: halaman detail olahraga (sejarah padel dsb.)
+    'gearguide:detail',            # contoh: halaman detail perlengkapan
+    'videos:detail',               # contoh: halaman detail video
+    'forum:thread_detail',         # contoh: detail thread forum
+}
 
 WSGI_APPLICATION = 'sportpedia.wsgi.application'
 
@@ -146,3 +157,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Redirect to home page after login
+LOGIN_REDIRECT_URL = '/'
