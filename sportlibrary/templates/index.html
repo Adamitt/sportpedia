@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <!-- Filter & Search -->
+    <div class="flex flex-col md:flex-row justify-between mb-6 items-center gap-4">
+        <form method="get" class="flex flex-wrap gap-2 items-center">
+            <!-- Filter Kategori -->
+            <select name="category" class="border rounded px-2 py-1">
+                <option value="">Semua Kategori</option>
+                {% for key, value in categories %}
+                    <option value="{{ key }}" {% if selected_category == key %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Filter Difficulty -->
+            <select name="difficulty" class="border rounded px-2 py-1">
+                <option value="">Semua Tingkat Kesulitan</option>
+                {% for key, value in difficulties %}
+                    <option value="{{ key }}" {% if selected_difficulty == key %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Search -->
+            <input type="text" name="search" placeholder="Cari olahraga..." value="{{ search_query }}" class="border rounded px-2 py-1">
+            <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600">Filter</button>
+        </form>
+    </div>
+
+    <!-- Daftar Olahraga -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {% for sport in sports %}
+            <div class="border rounded shadow p-4 flex flex-col justify-between hover:shadow-lg transition">
+                <!-- Header: Nama + Bookmark -->
+                <div class="flex justify-between items-start mb-2">
+                    <h2 class="text-lg font-semibold">{{ sport.name }}</h2>
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'sportlibrary:toggle_bookmark' sport.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="text-xl">
+                                {% if sport.id in bookmarked_ids %}
+                                    <span class="text-yellow-500">★</span>
+                                {% else %}
+                                    <span class="text-gray-300">☆</span>
+                                {% endif %}
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+
+                <!-- Kategori & Difficulty -->
+                <p class="text-gray-600 text-sm mb-2">{{ sport.category|title }} | {{ sport.difficulty|title }}</p>
+
+                <!-- Deskripsi Singkat -->
+                <p class="text-gray-700 text-sm mb-4 line-clamp-3">{{ sport.description }}</p>
+
+                <!-- Tombol Aksi -->
+                <div class="mt-auto flex gap-2">
+                    <a href="{% url 'sportlibrary:sport_detail' sport.id %}" class="flex-1 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-center text-sm">Lihat Detail</a>
+                    <a href="{% url 'sportlibrary:video_list' sport.id %}" class="flex-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-center text-sm">Video</a>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-gray-500 col-span-full">Tidak ada olahraga yang ditemukan.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-6 flex justify-center">
+        <nav class="flex gap-2">
+            {% if sports.has_previous %}
+                <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_difficulty %}difficulty={{ selected_difficulty }}&{% endif %}{% if search_query %}search={{ search_query }}&{% endif %}page={{ sports.previous_page_number }}" class="px-3 py-1 border rounded hover:bg-gray-200">Previous</a>
+            {% endif %}
+
+            {% for num in sports.paginator.page_range %}
+                {% if sports.number == num %}
+                    <span class="px-3 py-1 border rounded bg-blue-500 text-white">{{ num }}</span>
+                {% else %}
+                    <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_difficulty %}difficulty={{ selected_difficulty }}&{% endif %}{% if search_query %}search={{ search_query }}&{% endif %}page={{ num }}" class="px-3 py-1 border rounded hover:bg-gray-200">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if sports.has_next %}
+                <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_difficulty %}difficulty={{ selected_difficulty }}&{% endif %}{% if search_query %}search={{ search_query }}&{% endif %}page={{ sports.next_page_number }}" class="px-3 py-1 border rounded hover:bg-gray-200">Next</a>
+            {% endif %}
+        </nav>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sport Library{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <!-- Navbar -->
+    <header class="bg-white shadow">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="{% url 'sportlibrary:index' %}" class="text-xl font-bold text-blue-600">Sport Library</a>
+            <nav class="flex items-center gap-4">
+                <a href="{% url 'sportlibrary:index' %}" class="hover:text-blue-500">Beranda</a>
+                <a href="{% url 'sportlibrary:popular_sports' %}" class="hover:text-blue-500">Populer</a>
+                
+                {% if user.is_authenticated %}
+                    <a href="{% url 'sportlibrary:bookmark_list' %}" class="hover:text-blue-500">Bookmark</a>
+                    <a href="{% url 'logout' %}" class="hover:text-red-500">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="hover:text-green-500">Login</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="container mx-auto px-4 py-6">
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="p-2 mb-2 rounded {{ message.tags }} bg-blue-100 text-blue-800">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        <!-- Konten spesifik halaman akan muncul di sini -->
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white shadow mt-8">
+        <div class="container mx-auto px-4 py-4 text-center text-gray-600 text-sm">
+            &copy; 2025 Sport Library. All rights reserved.
+        </div>
+    </footer>
+
+</body>
+</html>
