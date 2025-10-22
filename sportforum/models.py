@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils.text import slugify
 from django.contrib.auth.models import User
 
-# 🏷️ 1. Kategori Olahraga
+# Kategori Olahraga
 class SportCategory(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True)
@@ -12,7 +12,7 @@ class SportCategory(models.Model):
         return self.name
 
 
-# 🧵 2. Forum Post / Topik Diskusi
+# Forum Post / Topik Diskusi
 class ForumPost(models.Model):
     sport = models.ForeignKey(SportCategory, on_delete=models.CASCADE, related_name='posts')
     title = models.CharField(max_length=150)
@@ -40,7 +40,7 @@ class ForumPost(models.Model):
         return self.likes.count()
 
 
-# 💬 3. Reply / Komentar Diskusi
+# Reply / Komentar Diskusi
 class Reply(models.Model):
     post = models.ForeignKey(ForumPost, on_delete=models.CASCADE, related_name='replies')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -51,7 +51,7 @@ class Reply(models.Model):
         return f"Reply by {self.user} on {self.post}"
 
 
-# 🏷️ 4. Tag (untuk kategorisasi tambahan)
+# Tag (untuk kategorisasi tambahan)
 class Tag(models.Model):
     name = models.CharField(max_length=30, unique=True)
     slug = models.SlugField(unique=True, blank=True)

@@ -8,7 +8,7 @@ from django.template.context_processors import csrf
 from django.contrib.auth.decorators import login_required
 
 from sportforum.models import SportCategory, ForumPost, Reply, Tag
-from sportforum.forms import 
+from sportforum.forms import ReplyForm, ForumPostForm
 
 
 # Daftar kategori olahraga
