@@ -36,4 +36,4 @@ def saved_sports(request):
         all_sports = json.load(file)
     
     context = {"all_sports_json": json.dumps(all_sports)}
-    return render(request, 'sportlibrary/saved.html', context)
+    return render(request, 'bookmarklist.html', context)
