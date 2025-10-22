@@ -7,7 +7,7 @@ class Gear(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     description = models.TextField()
-    required = models.BooleanField(default=True)  # apakah alat wajib atau opsional
+    required = models.BooleanField(default=True)  
     image = models.URLField(blank=True, null=True)  # link gambar alat (opsional)
     price_range = models.CharField(max_length=50, blank=True, null=True)  # contoh: "Rp300.000 – Rp800.000"
     ecommerce_link = models.URLField(blank=True, null=True)  # link rekomendasi e-commerce
