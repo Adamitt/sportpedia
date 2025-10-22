@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pengaturan Akun - Sportpedia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select, textarea {
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Pengaturan Akun</h2>
+
+        <!-- Ubah Profil -->
+        <div class="section">
+            <h3>Ubah Profil</h3>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="foto_profil">Foto Profil</label>
+                <input type="file" id="foto_profil" name="foto_profil">
+
+                <label for="olahraga_favorit">Olahraga Favorit</label>
+                <input type="text" id="olahraga_favorit" name="olahraga_favorit" value="{{ profile.olahraga_favorit }}">
+
+                <label for="bio">Bio</label>
+                <textarea id="bio" name="bio" rows="3">{{ profile.bio }}</textarea>
+
+                <button type="submit" name="update_profile">Simpan Perubahan Profil</button>
+            </form>
+        </div>
+
+        <!-- Ubah Password -->
+        <div class="section">
+            <h3>Ubah Password</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <label for="old_password">Password Lama</label>
+                <input type="password" id="old_password" name="old_password" required>
+
+                <label for="new_password">Password Baru</label>
+                <input type="password" id="new_password" name="new_password" required>
+
+                <label for="confirm_password">Konfirmasi Password Baru</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+
+                <button type="submit" name="update_password">Ubah Password</button>
+            </form>
+        </div>
+
+        <!-- Preferensi Tampilan -->
+        <div class="section">
+            <h3>Preferensi Tampilan</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <label for="tema">Tema Tampilan</label>
+                <select id="tema" name="tema">
+                    <option value="terang" {% if profile.tema == "terang" %}selected{% endif %}>Terang</option>
+                    <option value="gelap" {% if profile.tema == "gelap" %}selected{% endif %}>Gelap</option>
+                    <option value="otomatis" {% if profile.tema == "otomatis" %}selected{% endif %}>Otomatis</option>
+                </select>
+
+                <button type="submit" name="update_tampilan">Simpan Preferensi</button>
+            </form>
+        </div>
+
+        <a href="{% url 'profile_page' %}" class="back">← Kembali ke Profil</a>
+    </div>
+</body>
+</html>
