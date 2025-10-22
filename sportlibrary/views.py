@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 def show_sports(request):
-    base_dir = Path(__file__).resolve().parent.parent.parent
+    base_dir = Path(__file__).resolve().parent.parent
     data_path = base_dir / 'database' / 'sports.json'
 
     with open(data_path, 'r', encoding='utf-8') as file:
@@ -14,7 +14,7 @@ def show_sports(request):
 
 
 def sport_detail(request, sport_id):
-    base_dir = Path(__file__).resolve().parent.parent.parent
+    base_dir = Path(__file__).resolve().parent.parent
     data_path = base_dir / 'database' / 'sports.json'
 
     with open(data_path, 'r', encoding='utf-8') as file:
@@ -27,3 +27,13 @@ def sport_detail(request, sport_id):
 
     context = {"sport": sport}
     return render(request, 'sportlibrary/detail.html', context)
+
+def saved_sports(request):
+    base_dir = Path(__file__).resolve().parent.parent
+    data_path = base_dir / 'database' / 'sports.json'
+    
+    with open(data_path, 'r', encoding='utf-8') as file:
+        all_sports = json.load(file)
+    
+    context = {"all_sports_json": json.dumps(all_sports)}
+    return render(request, 'sportlibrary/saved.html', context)
