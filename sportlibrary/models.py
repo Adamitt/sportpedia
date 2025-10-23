@@ -13,8 +13,5 @@ class Sport(models.Model):
     popular_countries = models.JSONField(default=list)
     tags = models.JSONField(default=list)
 
-    # ⚠️ Ini penting banget: pastikan related_name = "gear_relations"
-    gears = models.ManyToManyField("gearguide.Gear", related_name="gear_relations")
-
     def __str__(self):
         return self.name

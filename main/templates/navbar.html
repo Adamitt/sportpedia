@@ -1,19 +1,19 @@
 {% load static %}
 <nav class="bg-white shadow-md sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-6 lg:px-12">
-    
+
     <!-- 🔹 Row Atas: Logo + Search Bar + Auth Buttons -->
     <div class="flex items-center justify-between py-4 border-b border-gray-100">
       
-      <!-- Logo -->
-      <div class="flex items-center gap-3">
-        <img src="{% static 'images/logo1.png' %}" alt="SportPedia Logo" class="w-14 h-14 object-contain">
-        <h1 class="text-2xl font-extrabold text-blue-900">
-          SPORT<span class="text-red-700">PEDIA</span>
+      <!-- Logo (klik → ke home) -->
+      <a href="/" class="flex items-center gap-3 group">
+        <img src="{% static 'images/logo1.png' %}" alt="SportPedia Logo" class="w-14 h-14 object-contain transition-transform duration-300 group-hover:scale-105">
+        <h1 class="text-2xl font-extrabold text-blue-900 group-hover:text-blue-800 transition-colors duration-300">
+          SPORT<span class="text-red-700 group-hover:text-red-600">PEDIA</span>
         </h1>
-      </div>
+      </a>
 
-      <!-- Search Bar (Tengah) -->
+      <!-- Search Bar -->
       <div class="hidden md:flex flex-grow max-w-2xl mx-8">
         <form action="/search/" method="get" class="w-full relative">
           <input 
@@ -30,7 +30,7 @@
         </form>
       </div>
 
-      <!-- Auth Buttons (Kanan) -->
+      <!-- Auth Buttons -->
       <div class="flex items-center gap-4">
         <a href="/login/" class="text-blue-900 font-semibold hover:text-blue-700 transition-colors duration-200">Sign in</a>
         <a href="/register/" class="bg-blue-900 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-800 transition-colors duration-200 shadow-md">Sign up</a>
@@ -39,10 +39,24 @@
 
     <!-- 🔹 Row Bawah: Menu Navigasi -->
     <div class="flex justify-center gap-10 py-3 text-base font-semibold text-gray-800">
-      <a href="/sportlibrary/" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Sports Library</a>
-      <a href="/community/" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Community</a>
-      <a href="/gearguide/" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Gear Guide</a>
-      <a href="/videos/" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Video Gallery</a>
+      {% with request.path as path %}
+        <a href="/sportlibrary/" 
+           class="pb-1 border-b-4 transition-all duration-200 {% if '/sportlibrary/' in path %}border-blue-900 text-blue-900{% else %}border-transparent hover:border-blue-900 hover:text-blue-900{% endif %}">
+          Sports Library
+        </a>
+        <a href="/community/" 
+           class="pb-1 border-b-4 transition-all duration-200 {% if '/community/' in path %}border-blue-900 text-blue-900{% else %}border-transparent hover:border-blue-900 hover:text-blue-900{% endif %}">
+          Community
+        </a>
+        <a href="/gearguide/" 
+           class="pb-1 border-b-4 transition-all duration-200 {% if '/gearguide/' in path %}border-blue-900 text-blue-900{% else %}border-transparent hover:border-blue-900 hover:text-blue-900{% endif %}">
+          Gear Guide
+        </a>
+        <a href="/videos/" 
+           class="pb-1 border-b-4 transition-all duration-200 {% if '/videos/' in path %}border-blue-900 text-blue-900{% else %}border-transparent hover:border-blue-900 hover:text-blue-900{% endif %}">
+          Video Gallery
+        </a>
+      {% endwith %}
     </div>
 
   </div>
