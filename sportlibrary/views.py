@@ -1,6 +1,9 @@
 from django.shortcuts import render
 import json
 from pathlib import Path
+from django.urls import reverse #
+from metrics.utils import bump_view #
+
 
 def show_sports(request):
     base_dir = Path(__file__).resolve().parent.parent
@@ -26,6 +29,13 @@ def sport_detail(request, sport_id):
         return render(request, "404.html", status=404)
 
     context = {"sport": sport}
+    ##
+    key   = f"sportjson:{sport_id}"
+    url   = reverse('sportlibrary:sport_detail', kwargs={'sport_id': sport_id})
+    title = sport.get('name') or f"Sport #{sport_id}"
+    image = sport.get('image') or sport.get('thumbnail') or ""
+    bump_view(key, title=title, url=url, category="Library", image=image, request=request)
+
     return render(request, 'sportlibrary/detail.html', context)
 
 def saved_sports(request):
