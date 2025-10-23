@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil Pengguna - Sportpedia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .profile-header {
+            text-align: center;
+        }
+        .profile-header img {
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+        }
+        .profile-section {
+            margin-top: 25px;
+        }
+        .label {
+            font-weight: bold;
+            color: #333;
+        }
+        .value {
+            color: #555;
+            margin-bottom: 10px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .progress-section, .activity-section {
+            margin-top: 30px;
+        }
+        .progress-item, .activity-item {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-left: 5px solid #007bff;
+        }
+        .progress-item h4, .activity-item h4 {
+            margin: 0;
+            color: #007bff;
+        }
+        .timestamp {
+            font-size: 0.9em;
+            color: #888;
+        }
+        hr {
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Profil -->
+        <div class="profile-header">
+            {% if profile.foto_profil %}
+                <img src="{{ profile.foto_profil.url }}" alt="Foto Profil">
+            {% else %}
+                <img src="https://via.placeholder.com/120" alt="Foto Default">
+            {% endif %}
+            <h2>{{ user.username }}</h2>
+            <p>{{ user.email }}</p>
+        </div>
+
+        <!-- Info Dasar -->
+        <div class="profile-section">
+            <p><span class="label">Olahraga Favorit:</span> <span class="value">{{ profile.olahraga_favorit|default:"Belum diatur" }}</span></p>
+            <p><span class="label">Preferensi:</span> <span class="value">{{ profile.preferensi|default:"Belum ada preferensi" }}</span></p>
+        </div>
+
+        <hr>
+
+        <!-- Progress Tracker -->
+        <div class="progress-section">
+            <h3>🏅 Progress Tracker</h3>
+        </div>
+
+        <hr>
+
+        <!-- Riwayat Aktivitas -->
+        <div class="activity-section">
+            <h3>🕓 Riwayat Aktivitas</h3>
+        </div>
+
+        <hr>
+        <p style="text-align:center;"><a href="{% url 'logout' %}">Logout</a></p>
+        <a href="{% url 'pengaturan_akun' %}">⚙️ Pengaturan Akun</a>
+    </div>
+</body>
+</html>

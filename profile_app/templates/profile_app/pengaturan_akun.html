@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pengaturan Akun - Sportpedia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-top: 25px;
+        }
+        label {
+            font-weight: bold;
+            color: #333;
+            margin-top: 15px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        textarea,
+        input[type="file"] {
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 25px;
+            padding: 12px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .profile-header img {
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="profile-header">
+            {% if profile.foto_profil %}
+                <img src="{{ profile.foto_profil.url }}" alt="Foto Profil">
+            {% else %}
+                <img src="https://via.placeholder.com/120" alt="Foto Default">
+            {% endif %}
+            <h2>{{ user.username }}</h2>
+            <p>{{ user.email }}</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Bagian User -->
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" required>
+
+            <label for="password">Password baru (opsional)</label>
+            <input type="password" id="password" name="password" placeholder="Biarkan kosong jika tidak ingin mengubah">
+
+            <!-- Bagian Profil -->
+            <label for="foto_profil">Foto Profil</label>
+            <input type="file" id="foto_profil" name="foto_profil">
+
+            <label for="olahraga_favorit">Olahraga Favorit</label>
+            <input type="text" id="olahraga_favorit" name="olahraga_favorit"
+                   value="{{ profile.olahraga_favorit|default:'' }}">
+
+            <label for="preferensi">Preferensi</label>
+            <textarea id="preferensi" name="preferensi" rows="3">{{ profile.preferensi|default:'' }}</textarea>
+
+            <button type="submit">💾 Simpan Perubahan</button>
+        </form>
+
+        <a href="{% url 'profile_page' %}" class="back">← Kembali ke Profil</a>
+    </div>
+</body>
+</html>

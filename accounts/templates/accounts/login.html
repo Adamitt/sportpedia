@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Sportpedia</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Username:</label><br>
+        <input type="text" name="username"><br>
+        <label>Password:</label><br>
+        <input type="password" name="password"><br><br>
+        <button type="submit">Login</button>
+    </form>
+    <p>Belum punya akun? <a href="{% url 'register' %}">Register di sini</a></p>
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+</body>
+</html>

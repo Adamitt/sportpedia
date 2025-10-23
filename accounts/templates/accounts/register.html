@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - Sportpedia</title>
+</head>
+<body>
+    <h2>Register</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Username:</label><br>
+        <input type="text" name="username"><br>
+        <label>Email:</label><br>
+        <input type="email" name="email"><br>
+        <label>Password:</label><br>
+        <input type="password" name="password1"><br>
+        <label>Konfirmasi Password:</label><br>
+        <input type="password" name="password2"><br><br>
+        <button type="submit">Daftar</button>
+    </form>
+    <p>Sudah punya akun? <a href="{% url 'login' %}">Login di sini</a></p>
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+</body>
+</html>
