@@ -264,7 +264,7 @@
         <span id="toastMessage" class="font-medium text-gray-800"></span>
     </div>
 
-    <script>
+    {% comment %} <script>
         // All sports data from Django
         const allSportsData = JSON.parse('{{ all_sports_json|escapejs }}');
 
@@ -410,6 +410,79 @@
                 closeModal();
             }
         });
-    </script>
+    </script> {% endcomment %}
+
+<script>
+    const allSportsData = JSON.parse('{{ all_sports_json|escapejs }}');
+
+    async function fetchSavedSports() {
+        const res = await fetch("{% url 'sportlibrary:get_saved_sports' %}");
+        if (!res.ok) return [];
+        return await res.json();
+    }
+
+    async function toggleSave(sportId) {
+        await fetch(`/sportlibrary/toggle/${sportId}/`, {
+            method: 'POST',
+            headers: {'X-CSRFToken': getCookie('csrftoken')}
+        });
+        renderSavedSports();
+    }
+
+    // CSRF helper
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    async function renderSavedSports() {
+        const savedSports = await fetchSavedSports();
+        const grid = document.getElementById('savedSportsGrid');
+        const emptyState = document.getElementById('emptyState');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+
+        if (savedSports.length === 0) {
+            grid.innerHTML = '';
+            emptyState.classList.remove('hidden');
+            clearAllBtn.classList.add('hidden');
+            updateStats([], allSportsData);
+            return;
+        }
+
+        emptyState.classList.add('hidden');
+        clearAllBtn.classList.remove('hidden');
+
+        const savedSportsData = savedSports.map(saved =>
+            allSportsData.find(s => String(s.id) === String(saved.id))
+        ).filter(Boolean);
+
+        grid.innerHTML = savedSportsData.map(sport => createSportCard(sport)).join('');
+        updateStats(savedSports, allSportsData);
+    }
+
+    function updateStats(savedSports, allSports) {
+        document.getElementById('savedCount').textContent = savedSports.length;
+        document.getElementById('indoorCount').textContent =
+            savedSports.filter(s => s.category === 'Indoor').length;
+        document.getElementById('outdoorCount').textContent =
+            savedSports.filter(s => s.category === 'Outdoor').length;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderSavedSports();
+    });
+</script>
+
+
 </body>
 </html>

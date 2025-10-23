@@ -22,7 +22,11 @@
 <body class="bg-gray-50 text-gray-900">
 
     <!-- ✅ Navbar -->
-    {% include 'navbar.html' %}
+    {% if user.is_authenticated %}
+        {% include 'navbar_user.html' %}
+    {% else %}
+        {% include 'navbar.html' %}
+    {% endif %}
 
         <!-- BENAR ✅ -->
     <main>

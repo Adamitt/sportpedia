@@ -180,7 +180,6 @@ def add_gear(request):
             gear = form.save(commit=False)
             gear.owner = request.user
             gear.save()
-            messages.success(request, "✅ Gear baru berhasil ditambahkan!")
             return redirect("gearguide:show_all_gears")
     else:
         form = GearForm()
@@ -191,7 +190,6 @@ def add_gear(request):
 def delete_gear(request, gear_id):
     gear = get_object_or_404(Gear, id=gear_id)
     if hasattr(gear, "owner") and gear.owner != request.user:
-        messages.error(request, "❌ Kamu tidak punya izin untuk menghapus gear ini.")
         return redirect("gearguide:show_all_gears")
 
     name = gear.name

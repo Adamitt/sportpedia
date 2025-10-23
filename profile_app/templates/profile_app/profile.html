@@ -1,212 +1,98 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Profil Pengguna - SportPedia</title>
-  <style>
-    body {
-      font-family: 'Inter', Arial, sans-serif;
-      background: linear-gradient(135deg, #f0f4ff, #fafbff);
-      margin: 0;
-      padding: 40px 16px;
-    }
+{% extends 'base.html' %}
+{% load static %}
 
-    .container {
-      max-width: 850px;
-      margin: auto;
-      background: white;
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-      animation: fadeIn 0.5s ease-in-out;
-    }
+{% block title %}Profil Pengguna — Sportpedia{% endblock %}
 
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(10px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-
-    .profile-header {
-      text-align: center;
-      border-bottom: 2px solid #f0f0f0;
-      padding-bottom: 20px;
-      margin-bottom: 30px;
-    }
-
-    .profile-header img {
-      border-radius: 50%;
-      width: 130px;
-      height: 130px;
-      object-fit: cover;
-      border: 4px solid #e5ecff;
-      box-shadow: 0 0 10px rgba(30, 64, 175, 0.1);
-    }
-
-    .profile-header h2 {
-      margin-top: 15px;
-      font-size: 1.8rem;
-      color: #1e3a8a;
-    }
-
-    .profile-header p {
-      color: #64748b;
-      margin: 4px 0;
-      font-size: 0.95rem;
-    }
-
-    .profile-section {
-      background: #f8faff;
-      border: 1px solid #e0e7ff;
-      padding: 20px 25px;
-      border-radius: 12px;
-      margin-bottom: 25px;
-    }
-
-    .profile-section h3 {
-      color: #1e3a8a;
-      margin-bottom: 15px;
-    }
-
-    .label {
-      font-weight: 600;
-      color: #334155;
-    }
-
-    .value {
-      color: #475569;
-      margin-left: 8px;
-    }
-
-    .progress-section, .activity-section {
-      margin-top: 30px;
-    }
-
-    .progress-item, .activity-item {
-      background: #f9fafc;
-      border-radius: 10px;
-      padding: 12px 18px;
-      margin-bottom: 10px;
-      border-left: 5px solid #2563eb;
-    }
-
-    .progress-item h4, .activity-item h4 {
-      margin: 0;
-      color: #2563eb;
-    }
-
-    .timestamp {
-      font-size: 0.85em;
-      color: #94a3b8;
-    }
-
-    hr {
-      margin: 35px 0;
-      border: none;
-      border-top: 1px solid #e2e8f0;
-    }
-
-    .footer-links {
-      text-align: center;
-      margin-top: 30px;
-    }
-
-    .footer-links a {
-      display: inline-block;
-      margin: 6px 10px;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.25s;
-    }
-
-    .logout-link {
-      background-color: #ef4444;
-      color: white;
-    }
-
-    .logout-link:hover {
-      background-color: #dc2626;
-    }
-
-    .settings-link {
-      background-color: #1e3a8a;
-      color: white;
-    }
-
-    .settings-link:hover {
-      background-color: #1d4ed8;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    
+{% block content %}
+<section class="bg-gradient-to-b from-gray-50 via-white to-white py-16">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <!-- Header Profil -->
-    <div class="profile-header">
+    <div class="flex flex-col items-center text-center">
       {% if profile.foto_profil %}
-        <img src="{{ profile.foto_profil.url }}" alt="Foto Profil">
+        <img src="{{ profile.foto_profil.url }}" alt="Foto Profil"
+             class="w-32 h-32 rounded-full object-cover shadow-md border-4 border-white">
       {% else %}
-        <img src="https://via.placeholder.com/120" alt="Foto Default">
+        <img src="https://via.placeholder.com/120" alt="Foto Default"
+             class="w-32 h-32 rounded-full object-cover shadow-md border-4 border-white">
       {% endif %}
-      <h2>{{ user.username }}</h2>
-      <p>{{ user.email }}</p>
-      <p><strong>Bergabung sejak:</strong> {{ profile.tanggal_gabung|date:"j F Y" }}</p>
+      <h2 class="mt-4 text-3xl font-extrabold text-gray-900">{{ user.username }}</h2>
+      <p class="text-gray-500">{{ user.email }}</p>
     </div>
 
     <!-- Info Dasar -->
-    <div class="profile-section">
-      <h3>🏋️‍♀️ Informasi Dasar</h3>
-      <p><span class="label">Olahraga Favorit:</span><span class="value">{{ profile.olahraga_favorit|default:"Belum diatur" }}</span></p>
-      <p><span class="label">Preferensi:</span><span class="value">{{ profile.preferensi|default:"Belum ada preferensi" }}</span></p>
+    <div class="mt-10 bg-white rounded-2xl shadow-md p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">🧭 Informasi Dasar</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <p><span class="font-medium text-gray-700">Olahraga Favorit:</span> 
+           <span class="text-gray-600">{{ profile.olahraga_favorit|default:"Belum diatur" }}</span></p>
+        <p><span class="font-medium text-gray-700">Preferensi:</span>
+           <span class="text-gray-600">{{ profile.preferensi|default:"Belum ada preferensi" }}</span></p>
+      </div>
+
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href="{% url 'pengaturan_akun' %}" 
+           class="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:opacity-90 transition">
+           ⚙️ Pengaturan Akun
+        </a>
+        <a href="{% url 'accounts:logout' %}" 
+           class="px-5 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition">
+           🚪 Logout
+        </a>
+      </div>
     </div>
 
     <!-- Progress Tracker -->
-    <div class="progress-section">
-      <h3>🏅 Progress Tracker</h3>
-      {% if profile.progress %}
-        {% for key, value in profile.progress.items %}
-          <div class="progress-item">
-            <h4>{{ key|title }}</h4>
-            <p>{{ value }}</p>
-          </div>
+    <div class="mt-10 bg-white rounded-2xl shadow-md p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">📊 Progress Tracker</h3>
+
+    {% if progress %}
+        <div class="space-y-5">
+        {% for p in progress %}
+            <div class="p-4 bg-gray-50 rounded-xl">
+            <div class="flex justify-between items-center mb-2">
+                <h4 class="font-semibold text-gray-800">{{ p.sport.name }}</h4>
+                <span class="text-sm text-gray-600 font-medium">
+                {% if p.completed %}✅ 100%{% else %}{{ p.percent }}%{% endif %}
+                </span>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div class="h-3 bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-500"
+                    style="width: {{ p.percent }}%;">
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-500 mt-1">
+                {{ p.time_spent|floatformat:0 }} / 240 detik
+            </p>
+            </div>
         {% endfor %}
-      {% else %}
-        <p class="text-gray-500">Belum ada progress yang tercatat.</p>
-      {% endif %}
+        </div>
+    {% else %}
+        <p class="text-gray-500 italic">Belum ada progress yang tercatat.</p>
+    {% endif %}
     </div>
 
-    <hr>
+
 
     <!-- Riwayat Aktivitas -->
-    <div class="activity-section">
-      <h3>🕓 Riwayat Aktivitas</h3>
-      {% if profile.articles_read %}
-        {% for article in profile.articles_read %}
-          <div class="activity-item">
-            <h4>📘 {{ article }}</h4>
-            <p class="timestamp">Baru-baru ini dibaca</p>
-          </div>
-        {% endfor %}
-      {% elif profile.videos_watched %}
-        {% for video in profile.videos_watched %}
-          <div class="activity-item">
-            <h4>🎥 {{ video }}</h4>
-            <p class="timestamp">Baru ditonton</p>
-          </div>
-        {% endfor %}
+    <div class="mt-10 bg-white rounded-2xl shadow-md p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">🕓 Riwayat Aktivitas</h3>
+      {% if aktivitas %}
+        <div class="space-y-3">
+          {% for act in aktivitas %}
+            <div class="bg-gray-50 p-3 rounded-xl">
+              <h4 class="font-medium text-indigo-600">{{ act.judul }}</h4>
+              <p class="text-gray-600 text-sm">{{ act.deskripsi }}</p>
+              <p class="text-xs text-gray-400 mt-1">{{ act.timestamp|date:"d M Y, H:i" }}</p>
+            </div>
+          {% endfor %}
+        </div>
       {% else %}
-        <p class="text-gray-500">Belum ada aktivitas.</p>
+        <p class="text-gray-500 italic">Belum ada aktivitas yang tercatat.</p>
       {% endif %}
     </div>
-
-    <hr>
-
-    <!-- Footer Links -->
-    <div class="footer-links">
-      <a href="{% url 'pengaturan_akun' %}" class="settings-link">⚙️ Pengaturan Akun</a>
-      <a href="{% url 'logout' %}" class="logout-link">🚪 Logout</a>
-    </div>
   </div>
-</body>
-</html>
+</section>
+{% endblock %}
