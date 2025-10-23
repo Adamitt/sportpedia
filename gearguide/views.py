@@ -18,21 +18,17 @@ def show_gear_detail(request, gear_id):
     return render(request, "gearguide/gear_detail.html", context)
 
 def show_all_gears(request):
-    # 1️⃣ Ambil dari database
     db_gears = list(Gear.objects.all().select_related('sport'))
 
-    # 2️⃣ Ambil dari JSON
     base_dir = Path(__file__).resolve().parent.parent.parent
     data_path = base_dir / 'database' / 'gears.json'
     with open(data_path, 'r', encoding='utf-8') as file:
         json_gears = json.load(file)
 
-    # 3️⃣ Gabungkan keduanya (samakan struktur biar aman)
     combined_gears = []
 
-    # Convert JSON items ke format dictionary standar
+    # JSON items
     for g in json_gears:
-        # ⭐ Ambil nama sport dari database berdasarkan sport_id
         sport_name = "Unknown"
         sport_id = g.get("sport_id")
         if sport_id:
@@ -41,12 +37,9 @@ def show_all_gears(request):
                 sport_name = sport_obj.name
             except Sport.DoesNotExist:
                 sport_name = g.get("sport", "Unknown")
-        else:
-            sport_name = g.get("sport", "Unknown")
-        
         combined_gears.append({
             "id": g.get("id"),
-            "sport": sport_name,  # ⭐ Gunakan nama sport, bukan ID
+            "sport": sport_name,
             "name": g.get("name"),
             "function": g.get("function"),
             "description": g.get("description"),
@@ -58,13 +51,13 @@ def show_all_gears(request):
             "buy_link": g.get("buy_link", ""),
             "tags": g.get("tags", []),
             "image": g.get("image", ""),
-            "is_from_db": False  # ⭐ Tandai ini dari JSON
+            "is_from_db": False,
         })
 
-    # Convert DB items ke format serupa
+    # DB items
     for g in db_gears:
         combined_gears.append({
-            "id": g.id,  # ⭐ Gunakan integer ID langsung
+            "id": g.id,
             "sport": g.sport.name if g.sport else "Unknown",
             "name": g.name,
             "function": g.function,
@@ -77,37 +70,45 @@ def show_all_gears(request):
             "buy_link": g.ecommerce_link,
             "tags": g.tags or [],
             "image": g.image or "",
-            "is_from_db": True  # ⭐ Tandai ini dari database (bisa dihapus)
+            "is_from_db": True,
         })
 
-    # 4️⃣ Filter berdasarkan query
+    # 🔹 Ambil filter dari query
     sport_filter = request.GET.get('sport')
     level_filter = request.GET.get('level')
+    source_filter = request.GET.get('source')  # 🆕 "db" / "json" / "all"
 
+    # Filter jenis sport
     if sport_filter:
         combined_gears = [
             g for g in combined_gears
             if sport_filter.lower() in str(g["sport"]).lower()
         ]
 
+    # Filter level
     if level_filter:
         combined_gears = [
             g for g in combined_gears
             if g.get("level", "").lower() == level_filter.lower()
         ]
 
-    # 5️⃣ Ambil semua jenis sport unik buat filter dropdown
+    # 🔹 Filter sumber data
+    if source_filter == "db":
+        combined_gears = [g for g in combined_gears if g["is_from_db"]]
+    elif source_filter == "json":
+        combined_gears = [g for g in combined_gears if not g["is_from_db"]]
+
     sports = sorted(set(str(g["sport"]) for g in combined_gears if g.get("sport")))
-    
-    # 6️⃣ Ambil semua sport dari database untuk edit modal
     all_sports = Sport.objects.all().order_by('name')
 
     return render(request, "gearguide/gearguide.html", {
         "title": "Gear Guide",
         "gears": combined_gears,
         "sports": sports,
-        "all_sports": all_sports,  # ⭐ Untuk dropdown edit modal
+        "all_sports": all_sports,
+        "source_filter": source_filter or "all",  # 🔹 kirim ke template
     })
+
 
 def card_details(request, gear_id):
     """
@@ -175,7 +176,10 @@ def add_gear(request):
     if request.method == "POST":
         form = GearForm(request.POST)
         if form.is_valid():
-            form.save()
+            gear = form.save(commit=False)
+            if request.user.is_authenticated:
+                gear.owner = request.user  # 🆕 simpan user yang login
+            gear.save()
             messages.success(request, "✅ Gear baru berhasil ditambahkan!")
             return redirect("gearguide:show_all_gears")
     else:
@@ -275,3 +279,4 @@ def edit_gear_ajax(request, gear_id):
         "ok": False,
         "errors": errors_dict
     }, status=400)
+

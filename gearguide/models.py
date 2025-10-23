@@ -1,6 +1,7 @@
 from django.db import models
 from sportlibrary.models import Sport
 import uuid
+from django.contrib.auth.models import User
 
 
 class Gear(models.Model):
@@ -30,6 +31,7 @@ class Gear(models.Model):
     materials = models.JSONField(blank=True, null=True, default=list)
     care_tips = models.TextField(blank=True, null=True)
     tags = models.JSONField(blank=True, null=True, default=list)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="gears")
 
     class Meta:
         ordering = ['name']
