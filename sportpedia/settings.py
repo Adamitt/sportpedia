@@ -68,7 +68,7 @@ ROOT_URLCONF = 'sportpedia.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'sportpedia' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
