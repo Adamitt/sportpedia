@@ -1,0 +1,161 @@
+<script>
+  // --- Ambil CSRF token dari cookie ---
+  window.openEditModal = function(gearId) {
+  console.log("🧩 openEditModal gearId =", gearId);
+
+  // kalau gearId itu angka (berarti dari JSON), langsung tolak
+  if (!isNaN(gearId)) {
+    // showToast("❌ Gear bawaan sistem tidak bisa diedit.", "error");
+    return;
+  }
+
+  // lanjut fetch ke server
+  fetch(`/gearguide/get-gear-json/${gearId}/`, {
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+        .then(response => {
+        console.log("🧩 [DEBUG] Fetch status:", response.status);
+        if (!response.ok) throw new Error('Gagal memuat data gear.');
+        return response.json();
+        })
+        .then(json => {
+        console.log("🧩 [DEBUG] JSON response received:", json);
+
+        // pastikan struktur response sesuai
+        if (!json || !json.ok || !json.data) {
+            console.error("🧩 [DEBUG] Invalid JSON format:", json);
+            throw new Error("Data tidak valid atau kosong.");
+        }
+
+        const data = json.data;
+        console.log("🧩 [DEBUG] Parsed data:", data);
+
+        // deteksi sumber
+        const isFromDB = !!data.ecommerce_link || data.source === "DB";
+        console.log("🧩 [DEBUG] Source:", isFromDB ? "DB" : "JSON");
+
+        // prefill form
+        document.getElementById('edit-gear-id').value = data.id || '';
+        document.getElementById('edit-name').value = data.name || '';
+
+        const sportSelect = document.getElementById('edit-sport');
+        if (data.sport_id && sportSelect.querySelector(`option[value="${data.sport_id}"]`)) {
+            sportSelect.value = data.sport_id;
+        } else {
+            sportSelect.value = '';
+        }
+
+        document.getElementById('edit-level').value = data.level || 'beginner';
+        document.getElementById('edit-description').value = data.description || '';
+        document.getElementById('edit-price').value = data.price_range || '';
+        document.getElementById('edit-buy').value = data.ecommerce_link || data.buy_link || '';
+        document.getElementById('edit-tags').value = data.tags_text || (data.tags ? data.tags.join(', ') : '');
+        document.getElementById('edit-function').value = data.function || '';
+        document.getElementById('edit-brands').value = data.recommended_brands_text || (data.recommended_brands ? data.recommended_brands.join(', ') : '');
+        document.getElementById('edit-materials').value = data.materials_text || (data.materials ? data.materials.join(', ') : '');
+        document.getElementById('edit-image').value = data.image || '';
+        document.getElementById('edit-care').value = data.care_tips || '';
+
+        if (errMsg) errMsg.classList.add('hidden');
+
+        // 🚨 Debug apakah modal ketemu
+        if (!editModal) {
+            console.error("🧩 [DEBUG] editModal element not found!");
+            return;
+        }
+
+        console.log("🧩 [DEBUG] Showing modal now!");
+        editModal.classList.remove('hidden');
+        })
+        .catch(error => {
+        console.error("🧩 [DEBUG] Error caught in openEditModal:", error);
+        // showToast(error.message || '❌ Gagal memuat data gear', 'error');
+        });
+    };
+
+  // --- Tutup modal ---
+  window.closeEditModal = function() {
+    const editModal = document.getElementById('editModal');
+    const editForm = document.getElementById('editGearForm');
+    const errMsg = document.getElementById('edit-error');
+    
+    editModal.classList.add('hidden');
+    if (editForm) editForm.reset();
+    if (errMsg) errMsg.classList.add('hidden');
+  }
+
+  // --- Submit form (AJAX POST) ---
+  document.addEventListener('DOMContentLoaded', function() {
+    const editForm = document.getElementById('editGearForm');
+    const errMsg = document.getElementById('edit-error');
+    
+    if (!editForm) {
+      console.error('Form editGearForm tidak ditemukan!');
+      return;
+    }
+
+    editForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      console.log('Form submitted!'); // Debug
+
+      const gearId = document.getElementById('edit-gear-id').value;
+      const formData = new FormData(editForm);
+
+      console.log('Submitting gear ID:', gearId); // Debug
+
+      fetch(`/gearguide/edit-gear-ajax/${gearId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+      })
+        .then(response => {
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            return response.text().then(text => {
+              console.error('Response is not JSON:', text);
+              throw new Error('Server error. Check console.');
+            });
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Response data:', data); // Debug
+          
+          if (data.ok) {
+            // showToast(data.message, 'success');
+            closeEditModal();
+            setTimeout(() => location.reload(), 1000);
+          } else {
+            const firstError = data.errors ? Object.values(data.errors)[0][0] : 'Validasi gagal';
+            showToast(firstError, 'error');
+            if (errMsg) {
+              errMsg.querySelector('p').textContent = firstError;
+              errMsg.classList.remove('hidden');
+            }
+          }
+        })
+        .catch((error) => {
+          console.error('Fetch error:', error);
+        //   showToast(error.message || '❌ Terjadi kesalahan', 'error');
+          if (errMsg) {
+            errMsg.querySelector('p').textContent = error.message || 'Terjadi kesalahan jaringan.';
+            errMsg.classList.remove('hidden');
+          }
+        });
+    });
+  });
+
+  // Close modal when clicking outside
+  document.addEventListener('DOMContentLoaded', function() {
+    const editModal = document.getElementById('editModal');
+    
+    editModal?.addEventListener('click', function(e) {
+      if (e.target === editModal) {
+        closeEditModal();
+      }
+    });
+  });
+</script>

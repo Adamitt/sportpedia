@@ -1,0 +1,92 @@
+{% load static %}
+<nav class="bg-white shadow-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 lg:px-12">
+
+    <!-- 🔹 Row Atas: Logo + Search Bar + Auth Buttons -->
+    <div class="flex items-center justify-between py-4 border-b border-gray-100">
+      
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-3 group">
+        <img src="{% static 'images/logo1.png' %}" alt="SportPedia Logo" class="w-14 h-14 object-contain transition-transform duration-300 group-hover:scale-105">
+        <h1 class="text-2xl font-extrabold text-blue-900 group-hover:text-blue-800 transition-colors duration-300">
+          SPORT<span class="text-red-700 group-hover:text-red-600">PEDIA</span>
+        </h1>
+      </a>
+
+      <!-- Search Bar -->
+      <div class="hidden md:flex flex-grow max-w-2xl mx-8">
+        <form action="/search/" method="get" class="w-full relative">
+          <input 
+            type="text" 
+            name="q"
+            placeholder="Cari olahraga, perlengkapan, atau video..." 
+            class="w-full border border-gray-300 rounded-full px-5 py-2.5 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 shadow-sm"
+          >
+          <button type="submit" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-700 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- Profile Section (atas kanan) -->
+      <div class="flex items-center gap-4">
+        {% if request.user.is_authenticated %}
+          <a href="/profile/" class="flex items-center gap-3 group hover:opacity-90 transition">
+  {% if request.user.profile.foto_profil %}
+    <img src="{{ request.user.profile.foto_profil }}" alt="Profile" class="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-sm group-hover:ring-2 group-hover:ring-blue-300 transition">
+  {% else %}
+    <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold">
+      {{ request.user.username|first|upper }}
+    </div>
+  {% endif %}
+  <div class="hidden md:flex flex-col leading-tight">
+    <span class="text-gray-900 font-medium group-hover:text-blue-900 transition">{{ request.user.first_name|default:request.user.username|title }}</span>
+    <span class="text-gray-500 text-sm">{{ request.user.email|default:"(no email)" }}</span>
+  </div>
+</a>
+        {% else %}
+          <a href="{% url 'login' %}" class="text-blue-900 font-semibold hover:text-blue-700 transition">Log in</a>
+          <a href="{% url 'register' %}" class="bg-blue-900 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-800 transition shadow-md">Sign up</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- 🔹 Row Bawah: Menu Navigasi -->
+    <div class="flex justify-center md:justify-between items-center flex-wrap gap-6 py-3 text-base font-semibold text-gray-800">
+
+      <!-- Left Menu Links -->
+      <div class="flex justify-center gap-10">
+        {% with request.path as path %}
+          <a href="/sportlibrary/" 
+             class="pb-1 border-b-4 transition-all duration-200 {% if '/sportlibrary/' in path %}border-blue-900 text-blue-900{% else %}border-transparent hover:border-blue-900 hover:text-blue-900{% endif %}">
+            Sports Library
+          </a>
+          <a href="/community/" 
+             class="pb-1 border-b-4 transition-all duration-200 {% if '/community/' in path %}border-blue-900 text-blue-900{% else %}border-transparent hover:border-blue-900 hover:text-blue-900{% endif %}">
+            Community
+          </a>
+          <a href="/gearguide/" 
+             class="pb-1 border-b-4 transition-all duration-200 {% if '/gearguide/' in path %}border-blue-900 text-blue-900{% else %}border-transparent hover:border-blue-900 hover:text-blue-900{% endif %}">
+            Gear Guide
+          </a>
+          <a href="/videos/" 
+             class="pb-1 border-b-4 transition-all duration-200 {% if '/videos/' in path %}border-blue-900 text-blue-900{% else %}border-transparent hover:border-blue-900 hover:text-blue-900{% endif %}">
+            Video Gallery
+          </a>
+        {% endwith %}
+      </div>
+
+      <!-- 🚪 Logout Button di kanan -->
+      {% if request.user.is_authenticated %}
+      <a href="{% url 'logout' %}" 
+         class="text-red-600 border-2 border-red-500 px-5 py-2 rounded-lg font-semibold hover:bg-red-500 hover:text-white transition-all duration-200">
+        Logout
+      </a>
+      {% endif %}
+
+    </div>
+
+  </div>
+</nav>

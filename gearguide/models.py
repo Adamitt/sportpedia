@@ -1,11 +1,12 @@
 from django.db import models
 from sportlibrary.models import Sport
 import uuid
+from django.contrib.auth.models import User
 
 
 class Gear(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name="gears")
+    id = models.AutoField(primary_key=True)
+    sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name="gear_items")  # Ganti `related_name`
 
     name = models.CharField(max_length=100)
     function = models.TextField(blank=True, null=True)
@@ -16,7 +17,6 @@ class Gear(models.Model):
     price_range = models.CharField(max_length=50, blank=True, null=True)
     ecommerce_link = models.URLField(blank=True, null=True)
 
-    # Level pengguna / kesulitan
     level = models.CharField(
         max_length=50,
         choices=[
@@ -27,11 +27,17 @@ class Gear(models.Model):
         default='beginner'
     )
 
-    # Data tambahan (gunakan JSONField biar bisa list)
     recommended_brands = models.JSONField(blank=True, null=True, default=list)
     materials = models.JSONField(blank=True, null=True, default=list)
     care_tips = models.TextField(blank=True, null=True)
     tags = models.JSONField(blank=True, null=True, default=list)
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='gears',
+        null=True,
+        blank=True
+    )
 
     class Meta:
         ordering = ['name']
@@ -41,7 +47,6 @@ class Gear(models.Model):
     def __str__(self):
         return f"{self.name} - {self.sport.name}"
 
-    # Helper (buat AJAX atau JSON)
     def to_dict(self):
         return {
             "id": str(self.id),
@@ -55,3 +60,4 @@ class Gear(models.Model):
             "buy_link": self.ecommerce_link,
             "image": self.image,
         }
+

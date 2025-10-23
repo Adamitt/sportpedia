@@ -1,60 +1,156 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100">
-  
-  <!-- Hero Section -->
-  <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white py-16 shadow-xl">
-    <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
-      <h1 class="text-5xl font-extrabold mb-4 tracking-tight">
-        🏆 Gear Guide
-      </h1>
-      <p class="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-        Temukan perlengkapan olahraga terbaik untuk setiap level. Dari pemula hingga profesional, kami punya rekomendasi yang tepat untuk performa maksimal Anda.
-      </p>
-      <div class="mt-6 flex items-center justify-center gap-8 text-sm">
-        <div class="flex items-center gap-2">
-          <span class="text-3xl">✓</span>
-          <span>Rekomendasi Terpercaya</span>
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-blue-50">
+  <!-- Hero Section - Enhanced with Gradient Fade -->
+  <div class="relative text-white overflow-hidden -mt-0">
+    <!-- Animated Gradient Background with Fade to Bottom -->
+    <div class="absolute inset-0 bg-gradient-to-br from-red-600 via-blue-800 to-indigo-950"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-gray-50"></div>
+    
+    <!-- Subtle Pattern Overlay -->
+    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
+    
+    <!-- Floating Particles Effect -->
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute top-20 left-10 w-2 h-2 bg-white rounded-full opacity-40 animate-float"></div>
+      <div class="absolute top-40 right-20 w-3 h-3 bg-purple-300 rounded-full opacity-30 animate-float-delayed"></div>
+      <div class="absolute bottom-32 left-1/4 w-2 h-2 bg-blue-300 rounded-full opacity-40 animate-float-slow"></div>
+      <div class="absolute top-60 right-1/3 w-2 h-2 bg-white rounded-full opacity-30 animate-float"></div>
+    </div>
+
+<!-- Floating Filter Menu -->
+<div class="hidden md:flex fixed top-1/2 left-3 -translate-y-1/2
+    bg-white/60 backdrop-blur-md border border-blue-100 shadow-md
+    rounded-xl z-50 p-2 flex-col gap-2 scale-90">
+
+  <!-- All Gears Button -->
+  <a href="?view=all" class="group relative flex items-center justify-center h-10 w-10 rounded-lg transition-all duration-200
+    {% if view_filter == 'all' %}
+      bg-blue-800 text-white shadow-inner
+    {% else %}
+      bg-blue-100 text-blue-800 hover:bg-blue-200
+    {% endif %}">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+    </svg>
+    <div class="absolute left-full ml-3 px-2 py-1 bg-gray-800 text-white text-xs font-medium rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+      All Gears
+    </div>
+  </a>
+
+  <!-- Your Gears Button -->
+  <a href="?view=your" class="group relative flex items-center justify-center h-10 w-10 rounded-lg transition-all duration-200
+    {% if view_filter == 'your' %}
+      bg-blue-900 text-white shadow-inner
+    {% else %}
+      bg-blue-50 text-blue-800 hover:bg-blue-200
+    {% endif %}">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <div class="absolute left-full ml-3 px-2 py-1 bg-gray-800 text-white text-xs font-medium rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+      Your Gears
+    </div>
+  </a>
+</div>
+
+
+    <!-- Hero Content -->
+    <div class="relative pt-24 pb-32 px-6 lg:px-8">
+      <div class="max-w-6xl mx-auto">
+        <!-- Main Title with Modern Typography -->
+        <div class="text-center mb-8">
+          <div class="inline-block mb-4">
+            <span class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium border border-white/20">
+              <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              Premium Sports Equipment
+            </span>
+          </div>
+          <h1 class="text-6xl md:text-7xl lg:text-8xl font-black mb-6 tracking-tight">
+            <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-100 to-purple-200 animate-gradient">
+              Gear Guide
+            </span>
+          </h1>
+          <div class="h-1 w-24 mx-auto bg-gradient-to-r from-transparent via-white to-transparent rounded-full mb-8"></div>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-3xl">✓</span>
-          <span>Harga Transparan</span>
+
+        <!-- Subtitle with Better Spacing -->
+        <p class="text-xl md:text-2xl text-blue-50 max-w-3xl mx-auto leading-relaxed text-center mb-12 font-light">
+          Discover premium sports gear curated for every athlete. From beginners to professionals, find equipment that matches your ambition.
+        </p>
+
+        <!-- Feature Pills with Modern Design -->
+        <div class="flex flex-wrap items-center justify-center gap-4 mb-12">
+          <div class="group flex items-center gap-3 px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-green-400/20">
+              <svg class="w-5 h-5 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <span class="font-semibold text-white">Expert Reviews</span>
+          </div>
+          <div class="group flex items-center gap-3 px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-400/20">
+              <svg class="w-5 h-5 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+              </svg>
+            </div>
+            <span class="font-semibold text-white">Best Prices</span>
+          </div>
+          <div class="group flex items-center gap-3 px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-purple-400/20">
+              <svg class="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <span class="font-semibold text-white">Fast Delivery</span>
+          </div>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-3xl">✓</span>
-          <span>Link Pembelian Resmi</span>
+
+        <!-- CTA Button with Modern Design -->
+        <div class="text-center">
+          <a href="{% url 'gearguide:add_gear' %}" class="group inline-flex items-center gap-3 bg-white text-gray-900 px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-white/20 transition-all duration-300 transform hover:scale-105">
+            <svg class="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>Add New Gear</span>
+            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </a>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-    
-    <!-- Filter Section -->
-    <div class="bg-white rounded-2xl shadow-lg p-8 mb-12 border border-gray-100">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <!-- Filter Section - Improved Spacing -->
+    <div class="bg-white rounded-3xl shadow-xl p-8 mb-12 border border-gray-100 hover:shadow-2xl transition-all duration-300">
       <div class="flex items-center justify-between mb-6">
         <div>
-          <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <svg class="w-7 h-7 text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-            </svg>
-            Filter Perlengkapan
+          <h2 class="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <div class="w-10 h-10 flex items-center justify-center bg-blue-100 rounded-xl">
+              <svg class="w-6 h-6 text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+              </svg>
+            </div>
+            Filter Gear
           </h2>
-          <p class="text-gray-600 text-sm mt-1">Pilih kategori yang sesuai dengan kebutuhan Anda</p>
+          <p class="text-gray-600 text-sm md:text-base mt-2 ml-13">Find exactly what you're looking for</p>
         </div>
-        <a href="/gearguide/" class="text-blue-900 hover:text-blue-700 font-semibold text-sm flex items-center gap-2 transition-colors">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <a href="/gearguide/" class="text-blue-900 hover:text-blue-700 font-semibold text-sm md:text-base flex items-center gap-2 transition-colors group">
+          <svg class="w-5 h-5 group-hover:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
-          Reset Filter
+          Reset
         </a>
       </div>
 
-      <form method="get" class="flex flex-wrap gap-4">
-        <div class="flex-1 min-w-[200px]">
-          <label class="block text-sm font-semibold text-gray-700 mb-2">Jenis Olahraga</label>
-          <select name="sport" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-50 hover:bg-white">
-            <option value="">Semua Olahraga</option>
+      <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Sport Type</label>
+          <select name="sport" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-50 hover:bg-white shadow-sm">
+            <option value="">All Sports</option>
             {% for sport in sports %}
               <option value="{{ sport|lower }}" {% if request.GET.sport == sport|lower %}selected{% endif %}>
                 {{ sport }}
@@ -63,22 +159,22 @@
           </select>
         </div>
 
-        <div class="flex-1 min-w-[200px]">
-          <label class="block text-sm font-semibold text-gray-700 mb-2">Level Keahlian</label>
-          <select name="level" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-50 hover:bg-white">
-            <option value="">Semua Level</option>
-            <option value="Pemula" {% if request.GET.level == "Pemula" %}selected{% endif %}>🌱 Pemula</option>
-            <option value="Menengah" {% if request.GET.level == "Menengah" %}selected{% endif %}>⭐ Menengah</option>
-            <option value="Profesional" {% if request.GET.level == "Profesional" %}selected{% endif %}>🏆 Profesional</option>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Skill Level</label>
+          <select name="level" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-50 hover:bg-white shadow-sm">
+            <option value="">All Levels</option>
+            <option value="Pemula" {% if request.GET.level == "Pemula" %}selected{% endif %}>🌱 Beginner</option>
+            <option value="Menengah" {% if request.GET.level == "Menengah" %}selected{% endif %}>⭐ Intermediate</option>
+            <option value="Profesional" {% if request.GET.level == "Profesional" %}selected{% endif %}>🏆 Professional</option>
           </select>
         </div>
 
         <div class="flex items-end">
-          <button type="submit" class="bg-gradient-to-r from-blue-900 to-blue-800 text-white px-8 py-3 rounded-xl font-semibold hover:from-blue-800 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center gap-2">
+          <button type="submit" class="w-full bg-gradient-to-r from-blue-900 to-indigo-900 text-white px-8 py-3 rounded-xl font-semibold hover:from-blue-800 hover:to-indigo-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
-            Cari Gear
+            Find Gear
           </button>
         </div>
       </form>
@@ -86,31 +182,31 @@
 
     <!-- Results Info -->
     {% if gears %}
-      <div class="mb-8 flex items-center justify-between">
-        <p class="text-gray-700 font-medium">
-          Menampilkan <span class="text-blue-900 font-bold">{{ gears|length }}</span> perlengkapan
-          {% if request.GET.sport %} untuk <span class="text-blue-900 font-bold">{{ request.GET.sport|title }}</span>{% endif %}
+      <div class="mb-10 flex items-center justify-between">
+        <p class="text-gray-700 font-medium text-lg">
+          Showing <span class="text-blue-900 font-bold">{{ gears|length }}</span> gear items
+          {% if request.GET.sport %} for <span class="text-blue-900 font-bold">{{ request.GET.sport|title }}</span>{% endif %}
           {% if request.GET.level %} level <span class="text-blue-900 font-bold">{{ request.GET.level }}</span>{% endif %}
         </p>
       </div>
 
       <!-- Gear Cards Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {% for gear in gears %}
           {% include "gearguide/gear_card.html" with gear=gear %}
         {% endfor %}
       </div>
     {% else %}
       <!-- Empty State -->
-      <div class="text-center py-20">
-        <div class="inline-block p-8 bg-white rounded-3xl shadow-lg">
-          <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="text-center py-24">
+        <div class="inline-block p-10 bg-white rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-300">
+          <svg class="w-28 h-28 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
           </svg>
-          <h3 class="text-2xl font-bold text-gray-900 mb-2">Belum Ada Perlengkapan</h3>
-          <p class="text-gray-600 mb-6">Coba ubah filter atau pilih kategori lain</p>
-          <a href="/gearguide/" class="inline-block bg-blue-900 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-800 transition-colors shadow-md">
-            Lihat Semua Gear
+          <h3 class="text-3xl font-bold text-gray-900 mb-3">No Gear Found</h3>
+          <p class="text-gray-600 mb-6 text-lg">Try adjusting the filters or exploring other categories</p>
+          <a href="/gearguide/" class="inline-block bg-gradient-to-r from-blue-900 to-indigo-900 text-white px-8 py-3 rounded-full font-semibold hover:from-blue-800 hover:to-indigo-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+            Explore All Gear
           </a>
         </div>
       </div>
@@ -118,14 +214,85 @@
   </div>
 
   <!-- Info Banner -->
-  <div class="bg-gradient-to-r from-indigo-900 to-blue-900 text-white py-12 mt-16">
-    <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
-      <h3 class="text-3xl font-bold mb-4">Butuh Bantuan Memilih?</h3>
-      <p class="text-blue-100 mb-6 text-lg">Tim kami siap membantu Anda menemukan gear yang sempurna untuk kebutuhan Anda</p>
-      <a href="/community/" class="inline-block bg-white text-blue-900 px-8 py-3 rounded-xl font-bold hover:bg-gray-100 transition-all shadow-lg transform hover:scale-105">
-        Tanya Komunitas
+  <div class="bg-gradient-to-r from-indigo-900 via-blue-900 to-purple-900 text-white py-16 mt-20 relative overflow-hidden">
+    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1512941937669-8bf2e7d22cd9?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-10"></div>
+    <div class="relative max-w-7xl mx-auto px-6 lg:px-8 text-center">
+      <h3 class="text-4xl font-bold mb-4">Need Help Choosing?</h3>
+      <p class="text-blue-100 mb-8 text-xl leading-relaxed">
+        Our community is here to guide you in finding the perfect gear for your needs
+      </p>
+      <a href="/community/" class="inline-block bg-white text-indigo-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+        Ask the Community
       </a>
     </div>
   </div>
 </div>
+
+{% include 'gearguide/modal.html' %}
+{% include 'gearguide/edit_script.html' %}
+
+<style>
+  @import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
+  
+  @keyframes gradient {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+  
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 3s ease infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px);
+      opacity: 0.4;
+    }
+    50% {
+      transform: translateY(-20px) translateX(10px);
+      opacity: 0.6;
+    }
+  }
+  
+  @keyframes float-delayed {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px);
+      opacity: 0.3;
+    }
+    50% {
+      transform: translateY(-30px) translateX(-15px);
+      opacity: 0.5;
+    }
+  }
+  
+  @keyframes float-slow {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px);
+      opacity: 0.4;
+    }
+    50% {
+      transform: translateY(-15px) translateX(20px);
+      opacity: 0.6;
+    }
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-float-delayed {
+    animation: float-delayed 8s ease-in-out infinite;
+    animation-delay: 1s;
+  }
+  
+  .animate-float-slow {
+    animation: float-slow 10s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+</style>
 {% endblock %}
