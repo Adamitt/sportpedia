@@ -166,13 +166,3 @@ Modul ini berfungsi untuk menampilkan data pengguna, aktivitas yang telah dilaku
 | 5 | Forum & Komunitas | Ruang diskusi dan tanya jawab antar pengguna |
 | 6 | Profil & Perjalanan | Pelacakan perkembangan olahraga pengguna |
 
----
-
-## 🧭 Sumber Initial Dataset  
-
-Wikipedia. Sebagai sumber utama tentang deskripsi cabang olahraga.
-
---- 
-
-## Link figma
-Link figma : https://www.figma.com/design/8EefBJOriHpUdaWKzYXzsz/Sportpedia?node-id=0-1&t=3s0Bh9IsCShGBRHh-1

@@ -166,13 +166,29 @@ Modul ini berfungsi untuk menampilkan data pengguna, aktivitas yang telah dilaku
 | 5 | Forum & Komunitas | Ruang diskusi dan tanya jawab antar pengguna |
 | 6 | Profil & Perjalanan | Pelacakan perkembangan olahraga pengguna |
 
----
+🧩 Role atau Peran Pengguna dalam Aplikasi SportPedia
+1. Admin 🧑‍💻👨‍💻
 
-## 🧭 Sumber Initial Dataset  
+Deskripsi Peran:
+Admin bertugas mengelola seluruh konten dan data di aplikasi SportPedia agar informasi yang tersedia selalu akurat, relevan, dan mudah dipahami pengguna. Admin memastikan pengalaman pengguna berjalan lancar dengan menjaga kualitas materi edukasi olahraga.
 
-Wikipedia. Sebagai sumber utama tentang deskripsi cabang olahraga.
+Tanggung Jawab & Hak Akses:
+Menambahkan, memperbarui, dan menghapus data olahraga pada Pustaka Olahraga (Sport Library).
+Mengunggah dan mengelola video tutorial di Galeri Video Tutorial.
+Memasukkan dan memperbarui data perlengkapan olahraga di Gear Guide, termasuk deskripsi alat, rentang harga, dan rekomendasi merek.
+Mengelola dan memoderasi diskusi pada Forum & Komunitas Pemula untuk menjaga interaksi yang positif.
+Mengatur tampilan Beranda & Navigasi Utama, seperti menampilkan olahraga populer, konten unggulan, dan highlight mingguan.
+Meninjau aktivitas pengguna dan memastikan keamanan serta ketertiban data dalam sistem.
 
---- 
+2. Pengguna 👥 (User)
 
-## Link figma
-Link figma : https://www.figma.com/design/8EefBJOriHpUdaWKzYXzsz/Sportpedia?node-id=0-1&t=3s0Bh9IsCShGBRHh-1
+Deskripsi Peran:
+Pengguna merupakan individu yang menggunakan SportPedia untuk belajar dan mengenal berbagai cabang olahraga. Pengguna dapat mencari informasi, menonton video tutorial, mempelajari perlengkapan olahraga, serta berinteraksi dengan komunitas.
+
+Hak Akses & Kemampuan:
+Menjelajahi Pustaka Olahraga dan membaca panduan teori dasar.
+Menonton video tutorial yang disediakan dalam berbagai cabang olahraga.
+Melihat Gear Guide untuk memahami alat dan perlengkapan yang dibutuhkan, termasuk rekomendasi produk.
+Menyimpan olahraga favorit (bookmark) dan melacak kemajuan belajar di Profil & Perjalanan Olahraga.
+Memberikan review atau rating pada video dan artikel.
+Berpartisipasi dalam Forum & Komunitas Pemula untuk berbagi pengalaman, bertanya, dan berdiskusi dengan pengguna lain.

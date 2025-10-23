@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+<div class="gear-list">
+  {% for gear in gears %}
+    <div class="gear-card">
+      <h3>{{ gear.name }}</h3>
+      <p>{{ gear.description }}</p>
+      {% if gear.image %}
+        <img src="{{ gear.image }}" alt="{{ gear.name }}" width="200">
+      {% endif %}
+      {% if gear.price_range %}
+        <p><strong>Harga:</strong> {{ gear.price_range }}</p>
+      {% endif %}
+      {% if gear.ecommerce_link %}
+        <a href="{{ gear.ecommerce_link }}" target="_blank">Lihat di Toko</a>
+      {% endif %}
+    </div>
+  {% empty %}
+    <p>Belum ada perlengkapan untuk olahraga ini.</p>
+  {% endfor %}
+</div>
+{% endblock %}

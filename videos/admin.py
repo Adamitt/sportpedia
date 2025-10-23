@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Sport, Video, VideoRating, Comment, VideoLike, VideoBookmark
+from .models import Video, VideoRating, Comment, VideoLike, VideoBookmark
 
 
 @admin.register(Video)
