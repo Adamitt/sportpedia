@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function(){
       itemCount = json.items?.length || 0;
 
       if(itemCount === 0){
-        track.innerHTML = `<p class="text-center w-full text-gray-500">Tidak ada testimoni.</p>`;
+        track.innerHTML = `<p class="text-center w-full text-gray-500">Jadi orang pertama yang memberi testimoni Sportpedia!</p>`;
         prevBtn.classList.add('t-arrow-disabled');
         nextBtn.classList.add('t-arrow-disabled');
         return;
