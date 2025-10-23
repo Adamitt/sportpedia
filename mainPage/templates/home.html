@@ -716,32 +716,65 @@
 
   </div>
 </section>
-
 <!-- QUICK NAV -->
 <section id="quick-nav" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t scroll-mt-24">
   <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 text-center">
+
+    <!-- 🏅 Sports Library -->
     <div class="quick-nav-card p-6">
       <img src="{% static 'images/sportlibrary.png' %}" alt="Sports Library" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" />
-      <p class="text-sm text-gray-600 mb-4">Explore sports fundamentals — history, rules, and beginner guides.</p>
-      <a href="/library/" class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white relative z-0">Sports Library</a>
+      <p class="text-sm text-gray-600 mb-4">
+        Explore sports fundamentals — history, rules, and beginner guides.
+      </p>
+      <a href="{% url 'sportlibrary:show_sports' %}" 
+         class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 
+                px-4 py-2 font-medium hover:text-white hover:bg-blue-800 transition-colors duration-200">
+        Sports Library
+      </a>
     </div>
+
+    <!-- 👥 Community -->
     <div class="quick-nav-card p-6">
       <img src="{% static 'images/community.png' %}" alt="Community" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" />
-      <p class="text-sm text-gray-600 mb-4">A space to share tips, stories, and motivation with fellow sports lovers.</p>
-      <a href="/forum/" class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white relative z-0">Community</a>
+      <p class="text-sm text-gray-600 mb-4">
+        A space to share tips, stories, and motivation with fellow sports lovers.
+      </p>
+      <a href="/forum/" 
+         class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 
+                px-4 py-2 font-medium hover:text-white hover:bg-blue-800 transition-colors duration-200">
+        Community
+      </a>
     </div>
+
+    <!-- ⚙️ Gear Guide -->
     <div class="quick-nav-card p-6">
       <img src="{% static 'images/gearguide.png' %}" alt="Gear Guide" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" />
-      <p class="text-sm text-gray-600 mb-4">Find the right equipment for your game, choose, and play smarter.</p>
-      <a href="/gear/" class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white relative z-0">Gear Guide</a>
+      <p class="text-sm text-gray-600 mb-4">
+        Find the right equipment for your game, choose, and play smarter.
+      </p>
+      <a href="{% url 'gearguide:show_all_gears' %}" 
+         class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 
+                px-4 py-2 font-medium hover:text-white hover:bg-blue-800 transition-colors duration-200">
+        Gear Guide
+      </a>
     </div>
+
+    <!-- 🎥 Video Gallery -->
     <div class="quick-nav-card p-6">
       <img src="{% static 'images/video.png' %}" alt="Video Gallery" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" />
-      <p class="text-sm text-gray-600 mb-4">Learn visually with step-by-step sports tutorials for every level.</p>
-      <a href="/videos/" class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white relative z-0">Video Gallery</a>
+      <p class="text-sm text-gray-600 mb-4">
+        Learn visually with step-by-step sports tutorials for every level.
+      </p>
+      <a href="/videos/" 
+         class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 
+                px-4 py-2 font-medium hover:text-white hover:bg-blue-800 transition-colors duration-200">
+        Video Gallery
+      </a>
     </div>
+
   </div>
 </section>
+
 
 <!-- TESTIMONIALS -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
