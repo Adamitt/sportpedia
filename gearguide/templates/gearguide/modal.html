@@ -1,0 +1,138 @@
+<div id="editModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+  <div class="flex items-center justify-center min-h-screen px-4">
+    <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeEditModal()"></div>
+    
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-auto my-8 z-10">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200">
+        <h3 class="text-2xl font-bold text-gray-900">✏️ Edit Gear</h3>
+        <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form id="editGearForm" class="p-6">
+        {% csrf_token %}
+        <input type="hidden" name="gear_id" id="edit-gear-id">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Nama -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Gear *</label>
+            <input id="edit-name" name="name" required
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+
+          <!-- Sport/Kategori -->
+        <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Olahraga *</label>
+        <select id="edit-sport" name="sport" required
+                class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="">Pilih Kategori</option>
+            {% for s in all_sports %}
+            <option value="{{ s.id }}">{{ s.name }}</option>
+            {% endfor %}
+        </select>
+        </div>
+
+          <!-- Level -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Level *</label>
+            <select id="edit-level" name="level" required
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="beginner">Pemula</option>
+              <option value="intermediate">Menengah</option>
+              <option value="advanced">Lanjutan</option>
+            </select>
+          </div>
+
+          <!-- Harga -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Harga</label>
+            <input id="edit-price" name="price_range" placeholder="Rp 500.000 - Rp 1.000.000"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+
+          <!-- Deskripsi -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi</label>
+            <textarea id="edit-description" name="description" rows="3"
+                      class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+          </div>
+
+          <!-- Function -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Fungsi</label>
+            <input id="edit-function" name="function"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+
+          <!-- Brands -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Brand Rekomendasi</label>
+            <input id="edit-brands" name="recommended_brands" placeholder="Nike, Adidas, Puma"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <p class="text-xs text-gray-500 mt-1">Pisahkan dengan koma</p>
+          </div>
+
+          <!-- Materials -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Material</label>
+            <input id="edit-materials" name="materials" placeholder="Kulit, Mesh, Rubber"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <p class="text-xs text-gray-500 mt-1">Pisahkan dengan koma</p>
+          </div>
+
+          <!-- Link Beli -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Link Beli</label>
+            <input id="edit-buy" name="ecommerce_link" type="url" placeholder="https://tokopedia.com/..."
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+
+          <!-- Image URL -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">URL Gambar</label>
+            <input id="edit-image" name="image" type="url" placeholder="https://example.com/image.jpg"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+
+          <!-- Care Tips -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Tips Perawatan</label>
+            <textarea id="edit-care" name="care_tips" rows="2"
+                      class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+          </div>
+
+          <!-- Tags -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Tags</label>
+            <input id="edit-tags" name="tags" placeholder="premium, outdoor, waterproof"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <p class="text-xs text-gray-500 mt-1">Pisahkan dengan koma</p>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="edit-error" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p class="text-sm text-red-600 font-medium"></p>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-6 flex justify-end gap-3">
+          <button type="button" onclick="closeEditModal()"
+                  class="px-6 py-2.5 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+            Batal
+          </button>
+          <button type="submit"
+                  class="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md">
+            💾 Simpan Perubahan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

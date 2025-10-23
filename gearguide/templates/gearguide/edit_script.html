@@ -1,0 +1,125 @@
+<script>
+  // --- Ambil CSRF token dari cookie ---
+  function getCookie(name) {
+    let value = `; ${document.cookie}`;
+    let parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+  const csrftoken = getCookie('csrftoken');
+
+  // --- Element referensi ---
+  const editModal = document.getElementById('editModal');
+  const editForm = document.getElementById('editGearForm');
+  const errMsg = document.getElementById('edit-error');
+
+  // --- Buka modal & prefill data lewat AJAX GET ---
+  window.openEditModal = function(gearId) {
+    fetch(`/gearguide/api/gear/${gearId}/`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+      .then(response => {
+        if (!response.ok) throw new Error('Gagal memuat data gear.');
+        return response.json();
+      })
+      .then(({ ok, data }) => {
+        if (!ok) throw new Error('Data tidak valid.');
+
+        // Isi field modal dari data JSON
+        document.getElementById('edit-gear-id').value = data.id;
+        document.getElementById('edit-name').value = data.name || '';
+        document.getElementById('edit-sport').value = data.sport_id || '';
+        const sportSelect = document.getElementById('edit-sport');
+        if (data.sport_id && sportSelect.querySelector(`option[value="${data.sport_id}"]`)) {
+        sportSelect.value = data.sport_id;
+        } else {
+        sportSelect.value = '';
+        }
+        document.getElementById('edit-level').value = data.level || 'beginner';
+        document.getElementById('edit-description').value = data.description || '';
+        document.getElementById('edit-price').value = data.price_range || '';
+        document.getElementById('edit-buy').value = data.ecommerce_link || '';
+        document.getElementById('edit-tags').value = data.tags_text || '';
+        document.getElementById('edit-function').value = data.function || '';
+        document.getElementById('edit-brands').value = data.recommended_brands_text || '';
+        document.getElementById('edit-materials').value = data.materials_text || '';
+        document.getElementById('edit-image').value = data.image || '';
+        document.getElementById('edit-care').value = data.care_tips || '';
+
+        errMsg.classList.add('hidden');
+        editModal.classList.remove('hidden');
+      })
+      .catch(error => {
+        alert(error.message || 'Terjadi kesalahan saat memuat data gear.');
+      });
+  }
+
+  // --- Tutup modal ---
+  window.closeEditModal = function() {
+    editModal.classList.add('hidden');
+    editForm.reset();
+    errMsg.classList.add('hidden');
+  }
+
+  // --- Submit form (AJAX POST) ---
+  editForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const gearId = document.getElementById('edit-gear-id').value;
+    const formData = new FormData(editForm);
+
+    // Debug: log form data
+    console.log('Submitting gear ID:', gearId);
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ': ' + pair[1]);
+    }
+
+    fetch(`/gearguide/api/gear/${gearId}/edit/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: formData
+    })
+      .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        // Check if response is actually JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          return response.text().then(text => {
+            console.error('Response is not JSON:', text);
+            throw new Error('Server tidak mengembalikan JSON. Cek console untuk detail.');
+          });
+        }
+        
+        return response.json();
+      })
+      .then(({ ok, data, errors }) => {
+        if (!ok) {
+          console.error('Validation errors:', errors);
+          const firstError = errors ? Object.values(errors)[0][0] : 'Validasi gagal';
+          errMsg.querySelector('p').textContent = firstError;
+          errMsg.classList.remove('hidden');
+          return;
+        }
+
+        // Reload halaman untuk update tampilan
+        alert('✅ Gear berhasil diperbarui!');
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error('Fetch error:', error);
+        errMsg.querySelector('p').textContent = error.message || 'Terjadi kesalahan jaringan.';
+        errMsg.classList.remove('hidden');
+      });
+  });
+
+  // Close modal when clicking outside
+  editModal?.addEventListener('click', function(e) {
+    if (e.target === editModal) {
+      closeEditModal();
+    }
+  });
+</script>

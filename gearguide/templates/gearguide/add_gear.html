@@ -1,43 +1,284 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+{% if messages %}
+  <div class="max-w-lg mx-auto mt-4">
+    {% for message in messages %}
+      <div class="p-3 mb-4 text-green-700 bg-green-100 rounded-lg border border-green-300 font-medium">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-16 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
     
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-900 to-indigo-700 px-8 py-6">
-      <h2 class="text-2xl font-bold text-white tracking-wide">Tambah Gear Baru</h2>
-      <p class="text-indigo-200 text-sm mt-1">Isi detail perlengkapan olahraga dengan lengkap dan akurat.</p>
-    </div>
+    <!-- Back Button -->
+    <a href="{% url 'gearguide:add_gear' %}" 
+       class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-blue-600 mb-6 transition-colors group">
+      <svg class="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Kembali
+    </a>
 
-    <!-- Form -->
-    <div class="px-8 py-8">
-      <form method="POST" class="space-y-6">
-        {% csrf_token %}
-
-        <!-- RENDER TIAP FIELD DENGAN STYLE -->
-        {% for field in form %}
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1">{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}
-            <p class="text-sm text-red-500 mt-1">{{ field.errors|striptags }}</p>
-          {% endif %}
+    <!-- Main Card -->
+    <div class="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden backdrop-blur-sm">
+      
+      <!-- Header with Icon -->
+      <div class="relative bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 px-8 py-10">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full -ml-24 -mb-24"></div>
+        
+        <div class="relative flex items-center">
+          <div class="bg-white bg-opacity-20 backdrop-blur-sm p-4 rounded-2xl mr-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-white tracking-tight">Tambah Gear Baru</h1>
+            <p class="text-blue-100 text-sm mt-2 font-medium">Lengkapi informasi perlengkapan olahraga Anda dengan detail</p>
+          </div>
         </div>
-        {% endfor %}
+      </div>
 
-        <!-- Tombol Aksi -->
-        <div class="flex justify-end pt-6 border-t border-gray-200">
-          <a href="{% url 'gearguide:add_gear' %}" 
-             class="text-gray-600 hover:text-blue-800 font-medium px-5 py-2.5 rounded-lg transition-colors">
-            Batal
-          </a>
-          <button type="submit"
-            class="ml-3 bg-blue-900 text-white px-6 py-2.5 rounded-lg shadow hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none transition-all">
-            Simpan Gear
-          </button>
-        </div>
-      </form>
+      <!-- Form Container -->
+      <div class="px-8 py-10">
+        <form method="POST" class="space-y-8">
+          {% csrf_token %}
+
+          <!-- Info Banner -->
+          <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+            <div class="flex">
+              <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+              <p class="ml-3 text-sm text-blue-700 font-medium">Pastikan semua field diisi dengan benar untuk hasil terbaik</p>
+            </div>
+          </div>
+
+          <!-- Section 1: Basic Info -->
+          <div class="space-y-6">
+            <div class="flex items-center mb-4">
+              <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm">
+                📋 Informasi Dasar
+              </div>
+            </div>
+
+            <!-- Sport -->
+            <div class="relative">
+              <label class="block text-sm font-bold text-gray-800 mb-2.5 flex items-center">
+                <span class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2">1</span>
+                Jenis Olahraga
+                <span class="text-red-500 ml-1">*</span>
+              </label>
+              <div class="relative group">
+                {{ form.sport }}
+                <div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-0 group-focus-within:opacity-10 blur-xl transition-opacity rounded-lg"></div>
+              </div>
+            </div>
+
+            <!-- Name -->
+            <div class="relative">
+              <label class="block text-sm font-bold text-gray-800 mb-2.5 flex items-center">
+                <span class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2">2</span>
+                Nama Gear
+                <span class="text-red-500 ml-1">*</span>
+              </label>
+              <div class="relative group">
+                {{ form.name }}
+                <div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-0 group-focus-within:opacity-10 blur-xl transition-opacity rounded-lg"></div>
+              </div>
+            </div>
+
+            <!-- Level -->
+            <div class="relative">
+              <label class="block text-sm font-bold text-gray-800 mb-2.5 flex items-center">
+                <span class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2">3</span>
+                Level Pengguna
+                <span class="text-red-500 ml-1">*</span>
+              </label>
+              <div class="relative group">
+                {{ form.level }}
+                <div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-0 group-focus-within:opacity-10 blur-xl transition-opacity rounded-lg"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Details -->
+          <div class="space-y-6">
+            <div class="flex items-center mb-4">
+              <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-lg font-bold text-sm">
+                📝 Detail Produk
+              </div>
+            </div>
+
+            <!-- Function -->
+            <div class="relative">
+              <label class="block text-sm font-bold text-gray-800 mb-2.5 flex items-center">
+                <span class="bg-gradient-to-r from-purple-600 to-pink-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2">4</span>
+                Fungsi Gear
+              </label>
+              {{ form.function }}
+            </div>
+
+            <!-- Description -->
+            <div class="relative">
+              <label class="block text-sm font-bold text-gray-800 mb-2.5 flex items-center">
+                <span class="bg-gradient-to-r from-purple-600 to-pink-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2">5</span>
+                Deskripsi Lengkap
+              </label>
+              {{ form.description }}
+            </div>
+
+            <!-- Price Range -->
+            <div class="relative">
+              <label class="block text-sm font-bold text-gray-800 mb-2.5 flex items-center">
+                <span class="bg-gradient-to-r from-purple-600 to-pink-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2">6</span>
+                Rentang Harga
+              </label>
+              {{ form.price_range }}
+            </div>
+          </div>
+
+          <!-- Section 3: Informasi Tambahan -->
+          <div class="space-y-6 pt-10">
+            <div class="flex items-center mb-4">
+              <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm">
+                🧩 Informasi Tambahan
+              </div>
+            </div>
+
+            <!-- Image -->
+            <div class="relative">
+              <label class="block text-sm font-bold text-gray-800 mb-2.5 flex items-center">
+                <span class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2">7</span>
+                URL Gambar Produk
+              </label>
+              {{ form.image }}
+            </div>
+
+            <!-- Recommended Brands -->
+            <div class="relative">
+              <label class="block text-sm font-bold text-gray-800 mb-2.5 flex items-center">
+                <span class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2">8</span>
+                Brand Rekomendasi
+              </label>
+              {{ form.recommended_brands }}
+            </div>
+
+            <!-- Materials -->
+            <div class="relative">
+              <label class="block text-sm font-bold text-gray-800 mb-2.5 flex items-center">
+                <span class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2">9</span>
+                Material Gear
+              </label>
+              {{ form.materials }}
+            </div>
+
+            <!-- Care Tips -->
+            <div class="relative">
+              <label class="block text-sm font-bold text-gray-800 mb-2.5 flex items-center">
+                <span class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2">10</span>
+                Tips Perawatan
+              </label>
+              {{ form.care_tips }}
+            </div>
+
+            <!-- Buy Link -->
+            <div class="relative">
+              <label class="block text-sm font-bold text-gray-800 mb-2.5 flex items-center">
+                <span class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2">11</span>
+                Link Pembelian
+              </label>
+              {{ form.ecommerce_link }}
+            </div>
+
+            <!-- Tags -->
+            <div class="relative">
+              <label class="block text-sm font-bold text-gray-800 mb-2.5 flex items-center">
+                <span class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2">12</span>
+                Tag / Kategori Gear
+              </label>
+              {{ form.tags }}
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center justify-between pt-8 border-t-2 border-gray-100">
+            <a href="{% url 'gearguide:add_gear' %}" 
+               class="inline-flex items-center px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all group">
+              <svg class="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              Batal
+            </a>
+            
+            <button type="submit"
+              class="inline-flex items-center px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transform hover:-translate-y-0.5 transition-all group">
+              <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              Simpan Gear
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Footer Note -->
+      <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-8 py-4 border-t border-gray-100">
+        <p class="text-xs text-gray-600 text-center flex items-center justify-center">
+          <svg class="w-4 h-4 mr-1.5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          Data Anda akan tersimpan dengan aman
+        </p>
+      </div>
     </div>
   </div>
 </div>
+
+<style>
+input[type="text"], input[type="number"], input[type="email"], input[type="url"], textarea, select {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  background-color: #ffffff;
+}
+input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="url"]:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background-color: #ffffff;
+}
+input[type="text"]:hover, input[type="number"]:hover, input[type="email"]:hover, input[type="url"]:hover, textarea:hover, select:hover {
+  border-color: #9ca3af;
+}
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+input[type="checkbox"], input[type="radio"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid #d1d5db;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+input[type="checkbox"]:checked, input[type="radio"]:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+input.error, textarea.error, select.error { border-color: #ef4444; }
+input:disabled, textarea:disabled, select:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+</style>
 {% endblock %}
