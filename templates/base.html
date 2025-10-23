@@ -22,7 +22,11 @@
 <body class="bg-gray-50 text-gray-900">
 
     <!-- ✅ Navbar -->
-    {% include 'navbar.html' %}
+    {% if user.is_authenticated %}
+        {% include 'navbar_user.html' %}
+    {% else %}
+        {% include 'navbar.html' %}
+    {% endif %}
 
     <!-- ✅ Main content block -->
     <main class="max-w-7xl mx-auto px-6 py-8">

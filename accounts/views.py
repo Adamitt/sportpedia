@@ -11,7 +11,7 @@ def register(request):
             user = form.save()
             UserProfile.objects.create(user=user)
             messages.success(request, 'Akun berhasil dibuat! Silakan login.')
-            return redirect('login')
+            return redirect('accounts:login')
     else:
         form = RegisterForm()
     return render(request, 'accounts/register.html', {'form': form})
@@ -33,4 +33,4 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('accounts:login')

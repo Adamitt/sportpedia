@@ -1,0 +1,92 @@
+{% load static %}
+<nav class="bg-white shadow-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 lg:px-12">
+
+    <!-- 🔹 Row Atas: Logo + Search Bar + Profile Menu -->
+    <div class="flex items-center justify-between py-4 border-b border-gray-100">
+
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <img src="{% static 'images/logo1.png' %}" alt="SportPedia Logo" class="w-14 h-14 object-contain">
+        <h1 class="text-2xl font-extrabold text-blue-900">
+          SPORT<span class="text-red-700">PEDIA</span>
+        </h1>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="hidden md:flex flex-grow max-w-2xl mx-8">
+        <form action="/search/" method="get" class="w-full relative">
+          <input 
+            type="text" 
+            name="q"
+            placeholder="Cari olahraga, perlengkapan, atau video..." 
+            class="w-full border border-gray-300 rounded-full px-5 py-2.5 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 shadow-sm"
+          >
+          <button type="submit" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-700 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- 🔹 Profile Dropdown (klik versi) -->
+      <div class="relative">
+        <button id="profileButton" class="flex items-center gap-3 focus:outline-none">
+          {% if user.userprofile.foto_profil %}
+            <img src="{{ user.userprofile.foto_profil.url }}" alt="Foto Profil"
+                 class="w-10 h-10 rounded-full object-cover border border-gray-300">
+          {% else %}
+            <img src="https://via.placeholder.com/40" alt="Default Profil"
+                 class="w-10 h-10 rounded-full object-cover border border-gray-300">
+          {% endif %}
+          <span class="font-semibold text-gray-800 hidden sm:block">{{ user.username }}</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600 transition-transform duration-200" id="dropdownArrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        <!-- Dropdown menu -->
+        <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg ring-1 ring-black/5 py-2 z-50">
+          <a href="{% url 'profile_page' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">👤 Profil Saya</a>
+          <a href="{% url 'pengaturan_akun' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">⚙️ Pengaturan Akun</a>
+          <div class="border-t border-gray-100 my-1"></div>
+          <a href="{% url 'accounts:logout' %}" class="block px-4 py-2 text-red-600 hover:bg-red-50">🚪 Keluar</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🔹 Row Bawah: Menu Navigasi -->
+    <div class="flex justify-center gap-10 py-3 text-base font-semibold text-gray-800">
+      <a href="/sportlibrary/" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Sports Library</a>
+      <a href="/community/" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Community</a>
+      <a href="/gearguide/" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Gear Guide</a>
+      <a href="/videos/" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Video Gallery</a>
+    </div>
+
+  </div>
+</nav>
+
+<!-- 🔹 Script Dropdown -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const profileButton = document.getElementById("profileButton");
+  const dropdownMenu = document.getElementById("dropdownMenu");
+  const dropdownArrow = document.getElementById("dropdownArrow");
+
+  if (profileButton && dropdownMenu) {
+    profileButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle("hidden");
+      dropdownArrow.classList.toggle("rotate-180");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!profileButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.classList.add("hidden");
+        dropdownArrow.classList.remove("rotate-180");
+      }
+    });
+  }
+});
+</script>

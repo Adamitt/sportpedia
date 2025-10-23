@@ -11,7 +11,8 @@
     "materials": ["Carbon Graphite", "Steel Shaft"],
     "care_tips": "Simpan di tas raket, hindari suhu ekstrem, ganti senar bila kendur.",
     "buy_link": "https://tokopedia.com/gear/raket-badminton-yonex",
-    "tags": ["racket", "badminton", "gear", "lightweight"]
+    "tags": ["racket", "badminton", "gear", "lightweight"],
+    "image": "https://img.id.my-best.com/product_images/25b02cbe401ceaff0ce1bb4feb76a653.jpeg?ixlib=rails-4.3.1&q=70&lossless=0&w=800&h=800&fit=clip&s=5cdf4b4fa911e5fbb1ed29aad31304e6"
   },
   {
     "id": 2,
@@ -25,7 +26,8 @@
     "materials": ["Goose Feather", "Nylon Skirt", "Cork Base"],
     "care_tips": "Hindari lembap berlebih dan simpan di tabung tertutup.",
     "buy_link": "https://shopee.co.id/shuttlecock-premium",
-    "tags": ["badminton", "feather", "light", "official"]
+    "tags": ["badminton", "feather", "light", "official"],
+    "image": "https://us.yonex.com/cdn/shop/collections/LG7_N_A_0933.jpg?v=1740017753"
   },
   {
     "id": 3,
@@ -39,7 +41,8 @@
     "materials": ["Rubber Sole", "Mesh Fabric"],
     "care_tips": "Gunakan kaus kaki tipis, bersihkan sol secara rutin.",
     "buy_link": "https://tokopedia.com/sepatu-badminton-yonex",
-    "tags": ["indoor", "grip", "footwear"]
+    "tags": ["indoor", "grip", "footwear"],
+    "image": "https://down-id.img.susercontent.com/file/id-11134207-7r98u-lr7bdl71d3o98b"
   },
   {
     "id": 4,
@@ -53,7 +56,8 @@
     "materials": ["PVC", "Natural Rubber"],
     "care_tips": "Cuci ringan dengan air sabun, keringkan tergantung.",
     "buy_link": "https://shopee.co.id/yoga-mat-premium",
-    "tags": ["yoga", "mat", "relax", "anti-slip"]
+    "tags": ["yoga", "mat", "relax", "anti-slip"],
+    "image": "https://images-cdn.ubuy.co.id/63d7e78f05f8fe4fe34a6186-yoga-mat-innhom-yoga-mats-for-women-1-3.jpg"
   },
   {
     "id": 5,
@@ -67,7 +71,8 @@
     "materials": ["EVA Foam"],
     "care_tips": "Lap dengan kain lembap setelah digunakan.",
     "buy_link": "https://tokopedia.com/yoga-block-eva",
-    "tags": ["support", "stretch", "pose"]
+    "tags": ["support", "stretch", "pose"],
+    "image": "https://cdn11.bigcommerce.com/s-2bqdh/images/stencil/1280x1280/products/267/4804/Sunshine-Yoga-3-Yoga-Block-3-x-6-x-9-10-Pack_4031__26940.1703086144.jpg?c=2"
   },
   {
     "id": 6,
@@ -81,7 +86,8 @@
     "materials": ["Carbon Graphite", "Aluminium"],
     "care_tips": "Gunakan grip kering, simpan di tas tertutup.",
     "buy_link": "https://tokopedia.com/tennis-racket-wilson",
-    "tags": ["tennis", "racket", "outdoor"]
+    "tags": ["tennis", "racket", "outdoor"],
+    "image": "https://img.lazcdn.com/g/p/1bd7650698c69b1dd170bda19d6b2ce4.jpg_720x720q80.jpg"
   },
   {
     "id": 7,
@@ -95,7 +101,8 @@
     "materials": ["Rubber Core", "Felt Cover"],
     "care_tips": "Simpan di wadah bertekanan tertutup.",
     "buy_link": "https://shopee.co.id/bola-tenis-wilson",
-    "tags": ["tennis", "ball", "outdoor"]
+    "tags": ["tennis", "ball", "outdoor"],
+    "image": "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full//catalog-image/92/MTA-144008603/brd-44261_-ecer-bola-tenis-tennis-ball-bola-kasti-merk-random_full01-6a5a222b.jpg"
   },
   {
     "id": 8,
@@ -109,7 +116,8 @@
     "materials": ["Rubber", "Mesh Upper"],
     "care_tips": "Keringkan setelah digunakan di lapangan basah.",
     "buy_link": "https://tokopedia.com/sepatu-tenis-nike",
-    "tags": ["tennis", "footwear", "grip"]
+    "tags": ["tennis", "footwear", "grip"],
+    "image": "https://contents.mediadecathlon.com/p2763962/k$692c89661213585e501c3d9b19ab89d5/sepatu-tenis-pria-court-ff3-biru-asics-8939550.jpg"
   },
   {
     "id": 9,
@@ -123,7 +131,8 @@
     "materials": ["Polycarbonate Lens", "Silicone Strap"],
     "care_tips": "Jangan sentuh bagian dalam lensa, bilas dengan air bersih.",
     "buy_link": "https://tokopedia.com/kacamata-renang-speedo",
-    "tags": ["swim", "aqua", "protection"]
+    "tags": ["swim", "aqua", "protection"],
+    "image": "https://contents.mediadecathlon.com/p1733032/k$fcc836fc5a697721189cc16932cf420b/kacamata-renang-anak-nabaiji-xbase-100-s-lensa-clear-pink-coral-nabaiji-8589233.jpg?f=1920x0&format=auto"
   },
   {
     "id": 10,
@@ -137,7 +146,8 @@
     "materials": ["Silicone", "Latex"],
     "care_tips": "Bilas dan keringkan setelah digunakan.",
     "buy_link": "https://shopee.co.id/swimcap-silicone",
-    "tags": ["swim", "cap", "aqua"]
+    "tags": ["swim", "cap", "aqua"],
+    "image": "https://nwscdn.com/media/catalog/product/cache/h400xw400/s/w/swimming-cap-main.jpg"
   },
   {
     "id": 11,
@@ -151,7 +161,8 @@
     "materials": ["Fiberglass", "Wood Core"],
     "care_tips": "Simpan dalam case kering dan hindari menekan tali saat tidak digunakan.",
     "buy_link": "https://tokopedia.com/bow-recurve-samick",
-    "tags": ["archery", "outdoor", "precision"]
+    "tags": ["archery", "outdoor", "precision"],
+    "image": "https://media.istockphoto.com/id/1150342801/id/foto/modern-senyawa-berburu-busur-dan-panah-terisolasi-di-atas-putih.jpg?s=1024x1024&w=is&k=20&c=y_YAOA_C-Yt_UfrIt_xR_BW1OlolNgMfxKCt9htEYdU="
   },
   {
     "id": 12,
@@ -165,7 +176,8 @@
     "materials": ["Carbon Fiber", "Aluminium Shaft"],
     "care_tips": "Cek lurusnya batang secara rutin.",
     "buy_link": "https://shopee.co.id/anak-panah-carbon",
-    "tags": ["archery", "arrow", "outdoor"]
+    "tags": ["archery", "arrow", "outdoor"],
+    "image": "https://allawnarchery.com/wp-content/uploads/2022/05/Ramin-Prem-Hijau-Hitam-1-1.png"
   },
   {
     "id": 13,
@@ -179,7 +191,8 @@
     "materials": ["Foam Sole", "Mesh Upper"],
     "care_tips": "Gunakan hanya untuk lari, jangan dicuci mesin.",
     "buy_link": "https://tokopedia.com/sepatu-lari-nike",
-    "tags": ["running", "footwear", "outdoor"]
+    "tags": ["running", "footwear", "outdoor"],
+    "image": "https://contents.mediadecathlon.com/p2694599/k$3a45aa9c5d26b4898d14ea393802ca01/sepatu-lari-anak-kiprun-k500-grip-trail-cross-hitam-hijau-kiprun-8800255.jpg"
   },
   {
     "id": 14,
@@ -193,7 +206,8 @@
     "materials": ["Silicone Band", "Aluminium Case"],
     "care_tips": "Isi daya setelah digunakan, hindari benturan keras.",
     "buy_link": "https://shopee.co.id/smartwatch-sport",
-    "tags": ["running", "tracker", "digital"]
+    "tags": ["running", "tracker", "digital"],
+    "image": "https://images-cdn.ubuy.co.id/6563baa35d2bfd3a8803111f-smart-watch-fits-for-android-and-iphone.jpg"
   },
   {
     "id": 15,
@@ -207,7 +221,8 @@
     "materials": ["Synthetic Leather", "Rubber Core"],
     "care_tips": "Jangan dipakai di permukaan kasar.",
     "buy_link": "https://tokopedia.com/bola-basket-molten",
-    "tags": ["basket", "ball", "grip"]
+    "tags": ["basket", "ball", "grip"],
+    "image": "https://contents.mediadecathlon.com/p2705060/k$e642b79972b47644e9b2f2f1f8b16fd0/bola-basket-size-6-fiba-bt500-touch-orange-tarmak-8648079.jpg?f=1920x0&format=auto"
   },
   {
     "id": 16,
@@ -221,7 +236,8 @@
     "materials": ["Mesh", "Foam Cushion"],
     "care_tips": "Keringkan alami setelah permainan.",
     "buy_link": "https://shopee.co.id/sepatu-basket-nike",
-    "tags": ["basket", "footwear", "jump"]
+    "tags": ["basket", "footwear", "jump"],
+    "image": "https://img.ncrsport.com/img/storage/large/DD6959-160-1.jpg"
   },
   {
     "id": 17,
@@ -235,7 +251,8 @@
     "materials": ["Polyurethane", "Foam Layer"],
     "care_tips": "Jangan ditendang di luar ruangan.",
     "buy_link": "https://tokopedia.com/bola-futsal-mikasa",
-    "tags": ["futsal", "ball", "indoor"]
+    "tags": ["futsal", "ball", "indoor"],
+    "image": "https://contents.mediadecathlon.com/p2398774/k$634458764fb2abb73ea3cba7d405cd2b/bola-futsal-ukuran-4-diameter-63-cm-merah-putih-kipsta-8773833.jpg?f=1920x0&format=auto"
   },
   {
     "id": 18,
@@ -249,7 +266,8 @@
     "materials": ["Rubber", "Synthetic Leather"],
     "care_tips": "Jangan digunakan di jalanan.",
     "buy_link": "https://shopee.co.id/sepatu-futsal-specs",
-    "tags": ["futsal", "indoor", "footwear"]
+    "tags": ["futsal", "indoor", "footwear"],
+    "image": "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_2000,h_2000/global/108606/01/sv01/fnd/IDN/fmt/png/Sepatu-Futsal-FUTURE-8-PLAY-IT-Unisex"
   },
   {
     "id": 19,
@@ -263,7 +281,8 @@
     "materials": ["Aluminium Alloy", "Hydraulic Brake"],
     "care_tips": "Bersihkan rantai dan lumasi setiap minggu.",
     "buy_link": "https://tokopedia.com/sepeda-polygon",
-    "tags": ["cycling", "outdoor", "gear"]
+    "tags": ["cycling", "outdoor", "gear"],
+    "image": "https://trexsporting.com/images/products/87-17-bDwq5XV.jpg"
   },
   {
     "id": 20,
@@ -277,7 +296,8 @@
     "materials": ["EPS Foam", "Polycarbonate Shell"],
     "care_tips": "Ganti helm setiap 3 tahun.",
     "buy_link": "https://shopee.co.id/helm-sepeda-giro",
-    "tags": ["cycling", "safety", "helmet"]
+    "tags": ["cycling", "safety", "helmet"],
+    "image": "https://contents.mediadecathlon.com/p2392082/k$40b6a599e92456e3b6dc38dc94f258fa/helm-sepeda-gunung-expl-50-hitam-rockrider-8530112.jpg?f=1920x0&format=auto"
   },
   {
     "id": 21,
@@ -291,7 +311,8 @@
     "materials": ["Wood", "Rubber"],
     "care_tips": "Lap dengan kain lembap, jangan terkena panas langsung.",
     "buy_link": "https://tokopedia.com/bet-tenis-meja-butterfly",
-    "tags": ["pingpong", "racket", "indoor"]
+    "tags": ["pingpong", "racket", "indoor"],
+    "image": "https://contents.mediadecathlon.com/p2724645/k$897137ef918fefe64aa799541d087496/bet-tenis-meja-tahan-lama-ppr-100-pongori-8817592.jpg"
   },
   {
     "id": 22,
@@ -305,7 +326,8 @@
     "materials": ["Celluloid", "Plastic"],
     "care_tips": "Simpan di tempat kering dan tertutup.",
     "buy_link": "https://shopee.co.id/bola-tenis-meja-dhs",
-    "tags": ["pingpong", "ball", "indoor"]
+    "tags": ["pingpong", "ball", "indoor"],
+    "image": "https://siplah.blibli.com/data/images/SDST-0063-00126/53618259-0d89-48c6-b8e5-4684f8331382.jpg"
   },
   {
     "id": 23,
@@ -319,7 +341,8 @@
     "materials": ["Synthetic Leather", "Rubber Bladder"],
     "care_tips": "Simpan di suhu ruangan dan jaga tekanan angin.",
     "buy_link": "https://tokopedia.com/bola-voli-mikasa",
-    "tags": ["volleyball", "indoor", "team"]
+    "tags": ["volleyball", "indoor", "team"],
+    "image": "https://siplah.blibli.com/data/images/SSHA-0076-00020/5591ee66-4f57-46f2-871b-e8c8ef703fbd.jpg"
   },
   {
     "id": 24,
@@ -333,7 +356,8 @@
     "materials": ["Elastic Fabric", "Memory Foam"],
     "care_tips": "Cuci dengan tangan dan keringkan alami.",
     "buy_link": "https://shopee.co.id/kneepad-voli-asics",
-    "tags": ["protection", "volleyball", "gear"]
+    "tags": ["protection", "volleyball", "gear"],
+    "image": "https://down-id.img.susercontent.com/file/id-11134201-7r990-lmj9azevjgkhcb"
   },
   {
     "id": 25,
@@ -347,7 +371,8 @@
     "materials": ["Rubber Sole", "Leather Upper"],
     "care_tips": "Hindari air dan panas berlebih.",
     "buy_link": "https://tokopedia.com/sepatu-climbing-scarpa",
-    "tags": ["climbing", "outdoor", "grip"]
+    "tags": ["climbing", "outdoor", "grip"],
+    "image": "https://contents.mediadecathlon.com/p1966272/k$6b37d4eb3cc340f89c7ea9674e570b40/sepatu-panjat-tebing-anak-abu-abu-hijau-simond-8240895.jpg"
   },
   {
     "id": 26,
@@ -361,7 +386,8 @@
     "materials": ["Nylon Webbing", "Aluminium Buckle"],
     "care_tips": "Periksa keausan secara berkala.",
     "buy_link": "https://shopee.co.id/harness-panjat-petzl",
-    "tags": ["climbing", "safety", "outdoor"]
+    "tags": ["climbing", "safety", "outdoor"],
+    "image": "https://contents.mediadecathlon.com/p2607437/sq/k$f84a807297c289d5b8ee542b7444b592/harness-climbing-dan-mountaineering-klimb-black-simond-8830117.jpg?f=480x480&format=auto"
   },
   {
     "id": 27,
@@ -375,7 +401,8 @@
     "materials": ["Synthetic Leather", "High-Density Foam"],
     "care_tips": "Jemur di tempat teduh setelah digunakan.",
     "buy_link": "https://tokopedia.com/sarung-tinju-fairtex",
-    "tags": ["combat", "boxing", "protection"]
+    "tags": ["combat", "boxing", "protection"],
+    "image": "https://id.adidascombatsports.com/wp-content/uploads/2022/06/adiTP300-Red-White-11-scaled.jpg"
   },
   {
     "id": 28,
@@ -389,7 +416,8 @@
     "materials": ["Cotton", "Elastic Band"],
     "care_tips": "Cuci ringan dengan air dingin.",
     "buy_link": "https://shopee.co.id/handwrap-everlast",
-    "tags": ["boxing", "protection", "muaythai"]
+    "tags": ["boxing", "protection", "muaythai"],
+    "image": "https://id.adidascombatsports.com/wp-content/uploads/2022/02/adiBP03-HandWrap-Blue-01-min-scaled-1.jpg"
   },
   {
     "id": 29,
@@ -403,7 +431,8 @@
     "materials": ["Graphite Shaft", "Titanium Head"],
     "care_tips": "Simpan dalam tas golf dan bersihkan kepala stik setelah digunakan.",
     "buy_link": "https://tokopedia.com/stick-golf-callaway",
-    "tags": ["golf", "precision", "outdoor"]
+    "tags": ["golf", "precision", "outdoor"],
+    "image": "https://contents.mediadecathlon.com/p1632613/k$b7220e60147e7e5569036bd79e61d8bb/set-stick-golf-anak-inesis-8-10-tahun-right-handed-isi-4-club-inesis-8519908.jpg?f=1920x0&format=auto"
   },
   {
     "id": 30,
@@ -417,7 +446,8 @@
     "materials": ["Urethane Cover", "Rubber Core"],
     "care_tips": "Lap bersih setelah digunakan di rumput basah.",
     "buy_link": "https://shopee.co.id/bola-golf-titleist",
-    "tags": ["golf", "ball", "outdoor"]
+    "tags": ["golf", "ball", "outdoor"],
+    "image": "https://contents.mediadecathlon.com/p1328539/k$444089164c3bfb40538787ec620ae2cf/bola-golf-lembut-500-x12-putih-inesis-8489444.jpg?f=1920x0&format=auto"
   },
   {
     "id": 31,
@@ -431,7 +461,8 @@
     "materials": ["Fiberglass", "Polyurethane Foam"],
     "care_tips": "Jangan dibiarkan di bawah matahari langsung.",
     "buy_link": "https://tokopedia.com/surfboard-bali",
-    "tags": ["surf", "water", "outdoor"]
+    "tags": ["surf", "water", "outdoor"],
+    "image": "https://contents.mediadecathlon.com/p2574595/k$57510750924252e1f77c6720dcd021a6/papan-selancar-busa-6-surfboard-500-kuning-olaian-8783787.jpg"
   },
   {
     "id": 32,
@@ -445,7 +476,8 @@
     "materials": ["Polyurethane Cord", "Velcro Strap"],
     "care_tips": "Bilas dengan air tawar setelah berselancar.",
     "buy_link": "https://shopee.co.id/leash-surfing-fcs",
-    "tags": ["surf", "safety", "ocean"]
+    "tags": ["surf", "safety", "ocean"],
+    "image": "https://surfsupwarehouse.co.nz/wp-content/uploads/2024/02/NSP-Surf-Leash-Blue-Angle.webp"
   },
   {
     "id": 33,
@@ -459,7 +491,8 @@
     "materials": ["Cotton", "Polyester Blend"],
     "care_tips": "Cuci dengan air dingin dan setrika ringan.",
     "buy_link": "https://tokopedia.com/seragam-silat",
-    "tags": ["silat", "traditional", "uniform"]
+    "tags": ["silat", "traditional", "uniform"],
+    "image": "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full//84/MTA-4401524/gap_gap_seragam_silat_anak_-_hitam_full02_l8tvw1y9.jpg"
   },
   {
     "id": 34,
@@ -473,7 +506,8 @@
     "materials": ["Cotton Twill"],
     "care_tips": "Cuci manual agar warna tidak pudar.",
     "buy_link": "https://shopee.co.id/sabuk-silat",
-    "tags": ["silat", "belt", "tradisi"]
+    "tags": ["silat", "belt", "tradisi"],
+    "image": "https://www.balifightgear.com/wp-content/uploads/2024/08/Feed-NEW-BFG-19-850x850.jpg"
   },
   {
     "id": 35,
@@ -487,7 +521,8 @@
     "materials": ["Aluminium", "Wood"],
     "care_tips": "Simpan di tempat kering.",
     "buy_link": "https://tokopedia.com/bat-baseball-easton",
-    "tags": ["baseball", "bat", "outdoor"]
+    "tags": ["baseball", "bat", "outdoor"],
+    "image": "https://contents.mediadecathlon.com/p1915013/k$68fc765926665a46ef4b8cd12893655d/tongkat-bat-baseball-anak-anak-alumunium-ba150-29-atau-32-hitam-kipsta-8617022.jpg"
   },
   {
     "id": 36,
@@ -501,7 +536,8 @@
     "materials": ["Leather", "Padding Foam"],
     "care_tips": "Gunakan minyak glove untuk menjaga kelenturan.",
     "buy_link": "https://shopee.co.id/glove-baseball",
-    "tags": ["baseball", "glove", "outdoor"]
+    "tags": ["baseball", "glove", "outdoor"],
+    "image": "https://contents.mediadecathlon.com/p2704403/k$c3648f3cd3e1f46094de8628e573a35b/sarung-tangan-baseball-anak-right-hand-throw-ba100-cokelat-biru-kipsta-8771319.jpg?f=1920x0&format=auto"
   },
   {
     "id": 37,
@@ -515,7 +551,8 @@
     "materials": ["Maple Wood", "Polyurethane Wheels"],
     "care_tips": "Ganti bearing bila roda macet.",
     "buy_link": "https://tokopedia.com/skateboard-element",
-    "tags": ["skate", "urban", "board"]
+    "tags": ["skate", "urban", "board"],
+    "image": "https://contents.mediadecathlon.com/p2828811/k$8bdc94c63e5fc72eb0026c779e9b742b/skateboard-dewasa-cp100-fsc-complete-uk-8-decathlon-8912344.jpg"
   },
   {
     "id": 38,
@@ -529,7 +566,8 @@
     "materials": ["ABS Shell", "EPS Foam"],
     "care_tips": "Ganti jika retak setelah benturan.",
     "buy_link": "https://shopee.co.id/helm-skate",
-    "tags": ["skate", "helmet", "safety"]
+    "tags": ["skate", "helmet", "safety"],
+    "image": "https://contents.mediadecathlon.com/p2606850/k$67641862ae8c67c6dde32170c499e448/helm-skating-inline-skateboarding-scootering-mf500-hitam-biru-oxelo-8552048.jpg?f=1920x0&format=auto"
   },
   {
     "id": 39,
@@ -543,7 +581,8 @@
     "materials": ["Steel Tube", "Foam Grip"],
     "care_tips": "Pastikan terpasang kuat sebelum digunakan.",
     "buy_link": "https://tokopedia.com/pullup-bar",
-    "tags": ["calisthenics", "fitness", "indoor"]
+    "tags": ["calisthenics", "fitness", "indoor"],
+    "image": "https://contents.mediadecathlon.com/p2720132/k$76d3883763ff88d1446684625996ae62/pull-up-bar-yang-dapat-dikunci-70-cm-corength-8588490.jpg"
   },
   {
     "id": 40,
@@ -557,7 +596,8 @@
     "materials": ["Latex", "Elastic Rubber"],
     "care_tips": "Jangan diregangkan melebihi batas elastisitas.",
     "buy_link": "https://shopee.co.id/resistance-band",
-    "tags": ["calisthenics", "stretch", "training"]
+    "tags": ["calisthenics", "stretch", "training"],
+    "image": "https://contents.mediadecathlon.com/p2698459/k$dd011f6275e84031b9a4e7d314569f94/resistance-band-glute-band-medium-22-kg-31-cm-corength-8829913.jpg"
   },
   {
     "id": 41,
@@ -571,7 +611,8 @@
     "materials": ["Nylon", "Polyester"],
     "care_tips": "Hindari gesekan dengan tepi tajam.",
     "buy_link": "https://tokopedia.com/tali-panjat-petzl",
-    "tags": ["climbing", "safety", "indoor"]
+    "tags": ["climbing", "safety", "indoor"],
+    "image": "https://contents.mediadecathlon.com/p2982318/k$2acf45ca4f4d892d0bf3a249f4d704a7/tali-prusik-pemanjatan-3-mm-x-10-m-orange-simond-8174619.jpg"
   },
   {
     "id": 42,
@@ -585,6 +626,7 @@
     "materials": ["Fleece Lining", "Polyester"],
     "care_tips": "Kosongkan sisa kapur setelah digunakan.",
     "buy_link": "https://shopee.co.id/chalk-bag-blackdiamond",
-    "tags": ["climbing", "accessory", "indoor"]
+    "tags": ["climbing", "accessory", "indoor"],
+    "image": "https://contents.mediadecathlon.com/p2384518/k$8186cc29e6a31946482bc6ffba79ecda/climbing-chalk-bag-edge-yellow-simond-8756562.jpg"
   }
 ]
