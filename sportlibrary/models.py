@@ -17,6 +17,7 @@ class Sport(models.Model):
     popular_countries = models.JSONField(default=list)
     tags = models.JSONField(default=list)
 
+    # Tetap pertahankan M2M ini karena sudah dipakai tim (hindari pecah kompatibilitas)
     gears = models.ManyToManyField("gearguide.Gear", related_name="gear_relations")
 
     def __str__(self):

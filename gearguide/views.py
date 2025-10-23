@@ -1,3 +1,6 @@
+from django.urls import reverse #
+from metrics.utils import bump_view #
+from django.conf import settings #
 import json
 from pathlib import Path
 from uuid import UUID
@@ -13,6 +16,19 @@ from django.contrib.auth.decorators import login_required
 
 def show_gear_detail(request, gear_id):
     gear = get_object_or_404(Gear, id=gear_id)
+
+    # ✅ catat view (gear dari DB)
+    key = f"gear:{gear.id}"
+    url = reverse("gearguide:card_details", kwargs={"gear_id": str(gear.id)})
+    bump_view(
+        key,
+        title=gear.name,
+        url=url,
+        category="Gear Guide",
+        image=(gear.image or ""),
+        request=request,
+    )
+
     context = {
         "title": gear.name,
         "gear": gear,
@@ -29,6 +45,10 @@ def show_all_gears(request):
     if data_path.exists():
         with open(data_path, 'r', encoding='utf-8') as file:
             json_gears = json.load(file)
+    # 2️⃣ Ambil dari JSON
+    data_path = settings.BASE_DIR / 'database' / 'gears.json'
+    with open(data_path, 'r', encoding='utf-8') as file:
+        json_gears = json.load(file)
 
     combined_gears = []
 
@@ -143,18 +163,36 @@ def card_details(request, gear_id):
                     "is_from_db": True
                 }
             }
+
+            # ✅ catat view (gear dari DB)
+            key = f"gear:{gear.id}"
+            url = reverse("gearguide:card_details", kwargs={"gear_id": str(gear.id)})
+            bump_view(
+                key,
+                title=gear.name,
+                url=url,
+                category="Gear Guide",
+                image=(gear.image or ""),
+                request=request,
+            )
+
             return render(request, "gearguide/card_details.html", context)
     except ValueError:
         pass
 
     base_dir = Path(__file__).resolve().parent.parent.parent
     data_path = base_dir / 'database' / 'gears.json'
+    # 2) Cek JSON
+    data_path = settings.BASE_DIR / 'database' / 'gears.json'     
     with open(data_path, 'r', encoding='utf-8') as file:
         gears = json.load(file)
+
     gear = next((g for g in gears if str(g['id']) == str(gear_id)), None)
     if not gear:
         return render(request, "404.html", status=404)
     
+
+    # ⭐ Ambil nama sport dari database berdasarkan sport_id
     sport_name = "Unknown"
     sport_id = gear.get("sport_id")
     if sport_id:
@@ -165,9 +203,21 @@ def card_details(request, gear_id):
             sport_name = gear.get("sport", "Unknown")
     else:
         sport_name = gear.get("sport", "Unknown")
-    
+
     gear['is_from_db'] = False
     gear['sport'] = sport_name
+
+    # ✅ catat view (gear dari JSON)
+    key = f"gearjson:{gear['id']}"
+    url = reverse("gearguide:card_details", kwargs={"gear_id": str(gear['id'])})
+    bump_view(
+        key,
+        title=gear["name"],
+        url=url,
+        category="Gear Guide",
+        image=gear.get("image", ""),
+        request=request,
+    )
 
     context = {"title": gear["name"], "gear": gear}
     return render(request, "gearguide/card_details.html", context)
