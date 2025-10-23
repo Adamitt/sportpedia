@@ -7,7 +7,7 @@
 <style>
   html { scroll-behavior: smooth; }
 
-  /* Chip filter */
+  /* Chip filter dengan animasi lebih smooth */
   .t-chip {
     border: 1.8px solid #17356B;
     color: #1C3264;
@@ -15,14 +15,38 @@
     border-radius: 9999px;
     font-weight: 500;
     font-size: 14px;
-    transition: all .3s ease;
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
   }
-  .t-chip:hover { background: #17356B; color: white; }
-  .t-chip.active { background: #17356B; color: white; }
+  .t-chip::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: #17356B;
+    transform: translate(-50%, -50%);
+    transition: width .4s ease, height .4s ease;
+    z-index: -1;
+  }
+  .t-chip:hover::before,
+  .t-chip.active::before {
+    width: 200%;
+    height: 200%;
+  }
+  .t-chip:hover,
+  .t-chip.active { 
+    color: white;
+    box-shadow: 0 4px 12px rgba(23, 53, 107, 0.3);
+    transform: translateY(-2px);
+  }
 
-  /* Carousel per 3 (tanpa fade/scale) */
+  /* Carousel per 3 dengan animasi lebih halus */
   #t-viewport { overflow: hidden; padding: 20px 0; }
-  #t-track { display: flex; gap: 32px; transition: transform .5s ease-in-out; }
+  #t-track { display: flex; gap: 32px; transition: transform .6s cubic-bezier(0.4, 0, 0.2, 1); }
   .testimonial-card { flex: 0 0 calc((100% - 64px) / 3); }
   .t-arrow-disabled { opacity: .4; pointer-events: none; }
 
@@ -34,40 +58,603 @@
     display: flex; flex-direction: column; gap: .75rem;
     pointer-events: none;
   }
+
+  /* Greeting dengan gradient text */
+  .greeting-text {
+    background: linear-gradient(135deg, #992626 0%, #C94A4A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInDown .8s ease;
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Hero section dengan overlay gradient lebih dinamis */
+  .hero-overlay {
+    background: linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(28,50,100,0.4) 100%);
+    animation: fadeIn 1s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .hero-title {
+    animation: slideInUp 1s ease;
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .hero-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all .3s ease;
+  }
+  .hero-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transform: translate(-50%, -50%);
+    transition: width .5s ease, height .5s ease;
+  }
+  .hero-btn:hover::before {
+    width: 300%;
+    height: 300%;
+  }
+  .hero-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(28,50,100,0.4);
+  }
+
+  /* What's Hot section dengan efek parallax ringan */
+  .whats-hot-section {
+    background: linear-gradient(180deg, #ffffff 0%, #fef5f5 100%);
+  }
+
+  .hot-card { 
+    position: relative; 
+    display: flex; 
+    flex-direction: column;
+    transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .hot-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(201, 74, 74, 0.15);
+  }
+  
+  .hot-card .hot-media { 
+    height: 14rem; 
+    border-radius: 18px; 
+    overflow: hidden; 
+    margin-bottom: .75rem;
+    position: relative;
+  }
+  .hot-card .hot-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 100%);
+    opacity: 0;
+    transition: opacity .3s ease;
+  }
+  .hot-card:hover .hot-media::after {
+    opacity: 1;
+  }
+  
+  .hot-card .hot-img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    transition: transform .5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .hot-card:hover .hot-img { 
+    transform: scale(1.08);
+  }
+
+  /* text-mode (Library) look dengan gradient */
+  .hot-media--text {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 50%, #ffd5d5 100%);
+    border: 1px solid #f3caca;
+    padding: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hot-media--text::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    animation: shimmer 3s infinite;
+  }
+  @keyframes shimmer {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-30%, -30%); }
+  }
+
+  .hot-badge {
+    font-size: 10px; 
+    font-weight: 700; 
+    letter-spacing: .08em; 
+    text-transform: uppercase;
+    color: #9B2C2C; 
+    background: linear-gradient(135deg, #fdecec 0%, #ffd5d5 100%);
+    border: 1px solid #f4caca;
+    padding: 4px 8px; 
+    border-radius: 9999px; 
+    display: inline-block; 
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(155, 44, 44, 0.1);
+  }
+
+  .hot-title { 
+    font-size: 15px; 
+    font-weight: 700; 
+    color: #1f2937; 
+    line-height: 1.25;
+    position: relative;
+    z-index: 1;
+  }
+  .hot-excerpt { 
+    font-size: 12px; 
+    color: #4b5563; 
+    margin-top: 6px; 
+    display: -webkit-box; 
+    -webkit-line-clamp: 3; 
+    -webkit-box-orient: vertical; 
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* read more button dengan efek lebih menarik */
+  .hot-cta { margin-top: auto; display: flex; justify-content: center; }
+  .hot-btn {
+    padding: 8px 18px; 
+    border-radius: 9999px; 
+    font-size: 12px; 
+    font-weight: 600;
+    background: linear-gradient(135deg, #C94A4A 0%, #992626 100%);
+    color: #fff; 
+    box-shadow: 0 6px 15px rgba(201,74,74,.3);
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .hot-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left .5s ease;
+  }
+  .hot-btn:hover::before {
+    left: 100%;
+  }
+  .hot-btn:hover { 
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(201,74,74,.4);
+  }
+
+  /* Quick Nav cards dengan efek hover lebih dinamis */
+  .quick-nav-card {
+    transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    border: 1px solid #e5e7eb;
+  }
+  .quick-nav-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(28, 50, 100, 0.15);
+    background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+  }
+  .quick-nav-card img {
+    transition: transform .4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .quick-nav-card:hover img {
+    transform: scale(1.1) rotate(5deg);
+  }
+  .quick-nav-btn {
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .quick-nav-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .3s ease;
+    z-index: -1;
+  }
+  .quick-nav-btn:hover::before {
+    transform: scaleX(1);
+  }
+
+  /* Testimonial section header */
+  .testimonial-header {
+    background: linear-gradient(135deg, #1C3264 0%, #2d4a8f 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 2px 10px rgba(28, 50, 100, 0.1);
+  }
+
+  /* Testimonial frame dengan glassmorphism */
+  .testimonial-frame {
+    background: linear-gradient(135deg, rgba(28, 50, 100, 0.08) 0%, rgba(28, 50, 100, 0.12) 100%);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(28, 50, 100, 0.2);
+    box-shadow: 0 8px 32px rgba(28, 50, 100, 0.1);
+  }
+
+  /* Testimonial Card Design */
+  .testimonial-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(28, 50, 100, 0.08);
+    border: 1px solid rgba(28, 50, 100, 0.1);
+    transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .testimonial-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #1C3264 0%, #3b5998 50%, #1C3264 100%);
+    transform: scaleX(0);
+    transition: transform .4s ease;
+  }
+  .testimonial-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(28, 50, 100, 0.15);
+  }
+  .testimonial-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .testimonial-card .t-category-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #1565c0;
+    border: 1px solid #90caf9;
+  }
+
+  .testimonial-card .t-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #374151;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .testimonial-card .t-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 16px;
+    margin-bottom: 16px;
+    transition: transform .4s ease;
+  }
+  .testimonial-card:hover .t-image {
+    transform: scale(1.05);
+  }
+
+  .testimonial-card .t-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .testimonial-card .t-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .testimonial-card .t-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1C3264 0%, #3b5998 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  .testimonial-card .t-author-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .testimonial-card .t-author-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1f2937;
+  }
+
+  .testimonial-card .t-date {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .testimonial-card .t-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .testimonial-card .t-action-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all .3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .testimonial-card .t-edit-btn {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+  }
+  .testimonial-card .t-edit-btn:hover {
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .testimonial-card .t-delete-btn {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+  }
+  .testimonial-card .t-delete-btn:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Arrow buttons dengan efek lebih smooth */
+  .t-arrow {
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  .t-arrow:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #1C3264 0%, #2d4a8f 100%);
+    color: white;
+  }
+
+  /* Share button dengan hover effect */
+  .share-btn {
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+  }
+  .share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(23, 53, 107, 0.3);
+  }
+
+  /* Modal Styling - Enhanced */
+  .testimonial-modal {
+    animation: modalFadeIn .3s ease;
+  }
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .testimonial-modal-content {
+    animation: modalSlideUp .4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+  @keyframes modalSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 20px;
+  }
+
+  .modal-title {
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #1C3264 0%, #3b5998 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: all .3s ease;
+    border: none;
+    cursor: pointer;
+  }
+  .modal-close:hover {
+    background: #ef4444;
+    color: white;
+    transform: rotate(90deg);
+  }
+
+  .modal-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .modal-select,
+  .modal-textarea,
+  .modal-file-input {
+    transition: all .3s ease;
+    border: 2px solid #e5e7eb;
+  }
+  .modal-select:focus,
+  .modal-textarea:focus {
+    border-color: #1C3264;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(28, 50, 100, 0.1);
+  }
+
+  .modal-submit-btn {
+    background: linear-gradient(135deg, #1C3264 0%, #2d4a8f 100%);
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .modal-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width .5s ease, height .5s ease;
+  }
+  .modal-submit-btn:hover::before {
+    width: 300%;
+    height: 300%;
+  }
+  .modal-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(28, 50, 100, 0.4);
+  }
+
+  /* Footer dengan subtle gradient */
+  .footer {
+    background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 
 <!-- GREETING -->
-<section class="w-full flex justify-center pt-10 px-4 sm:px-6 lg:px-8">
+<section class="w-full flex justify-center pt-10 px-4 sm:px-6 lg:px-8 mb-8 md:mb-12">
   <div class="w-full max-w-7xl">
-    <h2 class="text-3xl font-semibold text-[#992626] opacity-80">
-      Hello, {{ request.user.first_name|default:'Are you new here?' }}!
-    </h2>
+    {% if request.user.is_authenticated %}
+      <h2 class="text-3xl font-semibold greeting-text opacity-90">
+        Hello, {{ request.user.first_name|default:request.user.username }}!
+      </h2>
+    {% else %}
+      <h2 class="text-3xl font-semibold greeting-text opacity-90">
+        Hello, Are you new here?
+        <a href="/accounts/login/" class="ml-2 text-blue-700 underline hover:text-blue-900">
+          Sign up here
+        </a>
+      </h2>
+    {% endif %}
   </div>
 </section>
 
+
 <!-- HERO -->
 <section class="w-full flex justify-center pb-10 px-4 sm:px-6 lg:px-8">
-  <div class="relative overflow-hidden w-full max-w-[1300px] h-[600px] rounded-[68px]"
+  <div class="relative overflow-hidden w-full max-w-[1200px] h-[500px] rounded-[68px]"
        style="background:url('{% static "images/heroSection.jpg" %}') center/cover no-repeat; box-shadow:-6px 7px 4px rgba(0,0,0,.3);">
-    <div class="absolute inset-0 bg-black/40 rounded-[68px]"></div>
+    <div class="absolute inset-0 hero-overlay rounded-[68px]"></div>
     <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6">
-      <h1 class="font-semibold text-[60px] leading-[80px] mb-6 drop-shadow-lg">
+      <h1 class="font-semibold text-[60px] leading-[80px] mb-6 drop-shadow-lg hero-title">
         Satu Langkah ke Arena,<br>Seribu Peluang Beraksi
       </h1>
-      <a href="#quick-nav" class="px-8 py-3 rounded-full bg-[#1C3264]/80 text-white hover:bg-[#1C3264] transition">
+      <a href="#quick-nav" class="hero-btn px-8 py-3 rounded-full bg-[#1C3264]/80 text-white transition">
         GET STARTED
       </a>
     </div>
   </div>
 </section>
 
-<!-- WHAT’S HOT -->
-<section class="relative w-full overflow-hidden py-24">
+<!-- WHAT'S HOT -->
+<section class="whats-hot-section relative w-full overflow-hidden py-24">
   <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 items-center gap-4 px-6">
-    <div class="md:col-span-5 relative">
+    
+    <!-- Gambar besar kiri -->
+    <div class="md:col-span-5 relative flex justify-center">
       <img
         src="{% static 'images/whatshot1.png' %}"
         alt="What's Hot"
@@ -76,24 +663,89 @@
         draggable="false"
       />
     </div>
-    <div class="md:col-span-7 grid sm:grid-cols-2 lg:grid-cols-3 gap-4 ml-[-40px] z-10">
-      {% for _ in "123" %}
-      <article class="rounded-[28px] border border-[#9A6A6A8A] bg-[#FFF3F380] shadow p-4 hover:shadow-lg transition">
-        <div class="rounded-[18px] mb-3 w-full h-36 bg-gray-100"></div>
-        <p class="text-xs text-gray-500 text-center uppercase">Trending • Library</p>
-        <p class="text-[13px] text-gray-700 text-center mt-2">New insights in sports rules and tactics.</p>
-        <div class="mx-auto mt-3 h-4 w-24 rounded-full bg-[#CA9292]/80"></div>
-      </article>
-      {% endfor %}
+
+    <!-- Frame kartu What's Hot -->
+    <div class="md:col-span-7 grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:ml-[-10px] z-10">
+  {% for item in hot_items %}
+  <article class="hot-card rounded-[28px] border border-[#e6caca] bg-[#fff8f8c9] shadow-sm p-4">
+    <a href="{{ item.url }}" class="block">
+
+      {% if item.category == "Library" %}
+        <!-- TEXT MODE (Library) -->
+        <div class="hot-media hot-media--text">
+          <div>
+            <span class="hot-badge">Trending • Library</span>
+            <div class="hot-title">{{ item.title|default:"Untitled" }}</div>
+            <div class="hot-excerpt">
+              {{ item.excerpt|default:"Explore rules, history, and starter tips for this sport." }}
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <!-- IMAGE MODE (Gear Guide) -->
+        <div class="hot-media bg-gray-100">
+          {% if item.image %}
+            <img src="{{ item.image }}" alt="{{ item.title }}" class="hot-img">
+          {% endif %}
+        </div>
+        <p class="text-[11px] text-gray-500 text-center uppercase tracking-wide">
+          Trending • {{ item.category|default:"—" }}
+        </p>
+        <p class="text-[14px] text-gray-800 text-center mt-2 font-medium line-clamp-2">
+          {{ item.title|default:"Untitled" }}
+        </p>
+      {% endif %}
+
+      <!-- CTA -->
+      <div class="hot-cta mt-4">
+        <button class="hot-btn">Read more</button>
+      </div>
+    </a>
+  </article>
+  {% empty %}
+    {% for _ in "123" %}
+    <article class="rounded-[28px] border border-[#e6caca] bg-[#fff8f8c9] shadow p-4 opacity-60">
+      <div class="hot-media bg-gray-100 animate-pulse"></div>
+      <p class="text-xs text-gray-400 text-center uppercase">Trending • —</p>
+      <p class="text-[13px] text-gray-400 text-center mt-2">Belum ada data What's Hot.</p>
+      <div class="hot-cta mt-4"><span class="hot-btn" style="opacity:.5; pointer-events:none;">Read more</span></div>
+    </article>
+    {% endfor %}
+  {% endfor %}
+</div>
+
+  </div>
+</section>
+
+<!-- QUICK NAV -->
+<section id="quick-nav" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t scroll-mt-24">
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 text-center">
+    <div class="quick-nav-card p-6">
+      <img src="{% static 'images/sportlibrary.png' %}" alt="Sports Library" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" />
+      <p class="text-sm text-gray-600 mb-4">Explore sports fundamentals — history, rules, and beginner guides.</p>
+      <a href="/library/" class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white relative z-0">Sports Library</a>
+    </div>
+    <div class="quick-nav-card p-6">
+      <img src="{% static 'images/community.png' %}" alt="Community" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" />
+      <p class="text-sm text-gray-600 mb-4">A space to share tips, stories, and motivation with fellow sports lovers.</p>
+      <a href="/forum/" class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white relative z-0">Community</a>
+    </div>
+    <div class="quick-nav-card p-6">
+      <img src="{% static 'images/gearguide.png' %}" alt="Gear Guide" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" />
+      <p class="text-sm text-gray-600 mb-4">Find the right equipment for your game, choose, and play smarter.</p>
+      <a href="/gear/" class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white relative z-0">Gear Guide</a>
+    </div>
+    <div class="quick-nav-card p-6">
+      <img src="{% static 'images/video.png' %}" alt="Video Gallery" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" />
+      <p class="text-sm text-gray-600 mb-4">Learn visually with step-by-step sports tutorials for every level.</p>
+      <a href="/videos/" class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white relative z-0">Video Gallery</a>
     </div>
   </div>
 </section>
 
-<!-- ============== QUICK NAV ============== --> <section id="quick-nav" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t scroll-mt-24"> <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 text-center"> <div class="p-4"> <img src="{% static 'images/sportlibrary.png' %}" alt="Sports Library" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" /> <p class="text-sm text-gray-600">Explore sports fundamentals — history, rules, and beginner guides.</p> <a href="/library/" class="mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:bg-blue-800 hover:text-white">Sports Library</a> </div> <div class="p-4"> <img src="{% static 'images/community.png' %}" alt="Community" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" /> <p class="text-sm text-gray-600">A space to share tips, stories, and motivation with fellow sports lovers.</p> <a href="/forum/" class="mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:bg-blue-800 hover:text-white">Community</a> </div> <div class="p-4"> <img src="{% static 'images/gearguide.png' %}" alt="Gear Guide" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" /> <p class="text-sm text-gray-600">Find the right equipment for your game, choose, and play smarter.</p> <a href="/gear/" class="mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:bg-blue-800 hover:text-white">Gear Guide</a> </div> <div class="p-4"> <img src="{% static 'images/video.png' %}" alt="Video Gallery" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" /> <p class="text-sm text-gray-600">Learn visually with step-by-step sports tutorials for every level.</p> <a href="/videos/" class="mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:bg-blue-800 hover:text-white">Video Gallery</a> </div> </div> </section>
-
 <!-- TESTIMONIALS -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
-  <h2 class="text-4xl md:text-5xl font-extrabold text-[#1C3264] text-center">TESTIMONI</h2>
+  <h2 class="testimonial-header text-4xl md:text-5xl font-extrabold text-center">TESTIMONI</h2>
   <p class="text-center text-gray-600 -mt-1">Andalan banyak orang, bisa jadi andalanmu</p>
 
   <!-- Filters -->
@@ -106,16 +758,16 @@
   </div>
 
   <!-- Frame besar -->
-  <div class="relative mt-6 rounded-[76px] border border-[#1C3264] bg-[#1C32641A] p-6 md:p-10 shadow-sm">
-    <button id="t-prev" class="absolute left-0 md:left-6 top-1/2 -translate-y-1/2 h-12 w-12 flex items-center justify-center rounded-full bg-white shadow z-10" aria-label="Prev">&#10094;</button>
+  <div class="testimonial-frame relative mt-6 rounded-[76px] p-6 md:p-10">
+    <button id="t-prev" class="t-arrow absolute left-0 md:left-6 top-1/2 -translate-y-1/2 h-12 w-12 flex items-center justify-center rounded-full shadow z-10" aria-label="Prev">&#10094;</button>
     <div id="t-viewport"><div id="t-track"></div></div>
-    <button id="t-next" class="absolute right-0 md:right-6 top-1/2 -translate-y-1/2 h-12 w-12 flex items-center justify-center rounded-full bg-white shadow z-10" aria-label="Next">&#10095;</button>
+    <button id="t-next" class="t-arrow absolute right-0 md:right-6 top-1/2 -translate-y-1/2 h-12 w-12 flex items-center justify-center rounded-full shadow z-10" aria-label="Next">&#10095;</button>
   </div>
 
   <!-- CTA -->
   <div class="flex items-center justify-between mt-6">
     {% if request.user.is_authenticated %}
-      <button id="t-share-btn" class="hidden md:inline-flex items-center gap-2 rounded-2xl border-2 border-[#17356B] px-5 py-2 font-medium text-[#1C3264] hover:bg-[#17356B] hover:text-white transition">
+      <button id="t-share-btn" class="share-btn hidden md:inline-flex items-center gap-2 rounded-2xl border-2 border-[#17356B] px-5 py-2 font-medium text-[#1C3264] hover:bg-[#17356B] hover:text-white transition">
         + share your testimonials!
       </button>
     {% else %}
@@ -126,54 +778,80 @@
 
 <!-- MODALS -->
 {% if request.user.is_authenticated %}
-<!-- Create (PASTIKAN ADA class 'flex' AGAR TENGAH) -->
-<div id="t-create" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
-  <form id="t-create-form" class="bg-white rounded-2xl w-full max-w-lg mx-4 p-5 relative" enctype="multipart/form-data">
-    <button type="button" id="t-create-close" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700">&times;</button>
-    <h3 class="text-xl font-bold mb-3">Share your testimonial</h3>
+<div id="t-create" class="testimonial-modal fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 backdrop-blur-sm">
+  <form id="t-create-form" class="testimonial-modal-content rounded-3xl w-full max-w-lg mx-4 p-8 relative" enctype="multipart/form-data">
+    <button type="button" id="t-create-close" class="modal-close absolute right-5 top-5">×</button>
+    
+    <div class="modal-header">
+      <h3 class="modal-title">Share Your Testimonial ✨</h3>
+      <p class="text-sm text-gray-500 mt-1">Tell us about your experience with SportPedia</p>
+    </div>
+
     {% csrf_token %}
+    
+    <div class="mb-4">
+      <label class="modal-label block">Category</label>
+      <select name="category" class="modal-select w-full border rounded-xl px-4 py-3 text-gray-700">
+        <option value="library">📚 Sports Library</option>
+        <option value="community">👥 Community</option>
+        <option value="gearguide">⚙️ Gear Guide</option>
+        <option value="video">🎥 Video</option>
+      </select>
+    </div>
 
-    <label class="block text-sm font-medium">Category</label>
-    <select name="category" class="w-full border rounded-lg px-3 py-2 mb-3">
-      <option value="library">Sports Library</option>
-      <option value="community">Community</option>
-      <option value="gearguide">Gear Guide</option>
-      <option value="video">Video</option>
-    </select>
+    <div class="mb-4">
+      <label class="modal-label block">Your Experience</label>
+      <textarea name="text" rows="5" class="modal-textarea w-full border rounded-xl px-4 py-3 text-gray-700 resize-none" required placeholder="Share your thoughts, experiences, or feedback here..."></textarea>
+    </div>
 
-    <label class="block text-sm font-medium">Description</label>
-    <textarea name="text" rows="5" class="w-full border rounded-lg px-3 py-2 mb-4" required placeholder="Tulis pengalamanmu di sini..."></textarea>
+    <div class="mb-6">
+      <label class="modal-label block">Add Image (Optional)</label>
+      <div class="relative">
+        <input type="file" name="image" accept="image/*" class="modal-file-input w-full border rounded-xl px-4 py-3 text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+      </div>
+    </div>
 
-    <label class="block text-sm font-medium">Image (optional)</label>
-    <input type="file" name="image" accept="image/*" class="mb-4">
-
-    <button class="w-full bg-[#17356B] text-white py-2 rounded-lg font-semibold">Submit</button>
+    <button type="submit" class="modal-submit-btn w-full text-white py-3 rounded-xl font-semibold text-base">
+      Submit Testimonial
+    </button>
   </form>
 </div>
 
-<!-- Edit (PASTIKAN ADA class 'flex' AGAR TENGAH) -->
-<div id="t-edit" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
-  <form id="t-edit-form" class="bg-white rounded-2xl w-full max-w-lg mx-4 p-5 relative" enctype="multipart/form-data">
-    <button type="button" id="t-edit-close" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700">&times;</button>
-    <h3 class="text-xl font-bold mb-3">Edit testimonial</h3>
+<div id="t-edit" class="testimonial-modal fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 backdrop-blur-sm">
+  <form id="t-edit-form" class="testimonial-modal-content rounded-3xl w-full max-w-lg mx-4 p-8 relative" enctype="multipart/form-data">
+    <button type="button" id="t-edit-close" class="modal-close absolute right-5 top-5">×</button>
+    
+    <div class="modal-header">
+      <h3 class="modal-title">Edit Your Testimonial ✏️</h3>
+      <p class="text-sm text-gray-500 mt-1">Update your experience and thoughts</p>
+    </div>
+
     {% csrf_token %}
     <input type="hidden" name="id" id="edit-id">
+    
+    <div class="mb-4">
+      <label class="modal-label block">Category</label>
+      <select name="category" id="edit-category" class="modal-select w-full border rounded-xl px-4 py-3 text-gray-700">
+        <option value="library">📚 Sports Library</option>
+        <option value="community">👥 Community</option>
+        <option value="gearguide">⚙️ Gear Guide</option>
+        <option value="video">🎥 Video</option>
+      </select>
+    </div>
 
-    <label class="block text-sm font-medium">Category</label>
-    <select name="category" id="edit-category" class="w-full border rounded-lg px-3 py-2 mb-3">
-      <option value="library">Sports Library</option>
-      <option value="community">Community</option>
-      <option value="gearguide">Gear Guide</option>
-      <option value="video">Video</option>
-    </select>
+    <div class="mb-4">
+      <label class="modal-label block">Your Experience</label>
+      <textarea name="text" id="edit-text" rows="5" class="modal-textarea w-full border rounded-xl px-4 py-3 text-gray-700 resize-none" required></textarea>
+    </div>
 
-    <label class="block text-sm font-medium">Description</label>
-    <textarea name="text" id="edit-text" rows="5" class="w-full border rounded-lg px-3 py-2 mb-4" required></textarea>
+    <div class="mb-6">
+      <label class="modal-label block">Replace Image (Optional)</label>
+      <input type="file" name="image" id="edit-image" accept="image/*" class="modal-file-input w-full border rounded-xl px-4 py-3 text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+    </div>
 
-    <label class="block text-sm font-medium">Replace Image (optional)</label>
-    <input type="file" name="image" id="edit-image" accept="image/*" class="mb-4">
-
-    <button class="w-full bg-[#17356B] text-white py-2 rounded-lg font-semibold">Save changes</button>
+    <button type="submit" class="modal-submit-btn w-full text-white py-3 rounded-xl font-semibold text-base">
+      Save Changes
+    </button>
   </form>
 </div>
 {% endif %}
@@ -181,7 +859,7 @@
 <!-- TOAST CONTAINER -->
 <div id="toast-stack"></div>
 
-<footer class="border-t py-10 text-center text-sm text-gray-600">
+<footer class="footer border-t py-10 text-center text-sm text-gray-600">
   <img src="{% static 'images/sportpedia.png' %}" alt="SportPedia" class="h-8 mx-auto mb-3">
   © 2025 SPORTPEDIA. All rights reserved.
 </footer>

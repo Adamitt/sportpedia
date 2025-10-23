@@ -3,11 +3,12 @@ import json
 from pathlib import Path
 from django.urls import reverse #
 from metrics.utils import bump_view #
+from django.conf import settings #
 
 
 def show_sports(request):
-    base_dir = Path(__file__).resolve().parent.parent
-    data_path = base_dir / 'database' / 'sports.json'
+    data_path = settings.BASE_DIR / 'database' / 'sports.json'
+
 
     with open(data_path, 'r', encoding='utf-8') as file:
         sports = json.load(file)

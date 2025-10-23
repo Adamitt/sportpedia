@@ -1,5 +1,6 @@
 from django.urls import reverse #
 from metrics.utils import bump_view #
+from django.conf import settings #
 import json
 from pathlib import Path
 from uuid import UUID
@@ -37,8 +38,7 @@ def show_all_gears(request):
     db_gears = list(Gear.objects.all().select_related('sport'))
 
     # 2️⃣ Ambil dari JSON
-    base_dir = Path(__file__).resolve().parent.parent.parent
-    data_path = base_dir / 'database' / 'gears.json'
+    data_path = settings.BASE_DIR / 'database' / 'gears.json' 
     with open(data_path, 'r', encoding='utf-8') as file:
         json_gears = json.load(file)
 
@@ -173,8 +173,7 @@ def card_details(request, gear_id):
         pass
 
     # 2) Cek JSON
-    base_dir = Path(__file__).resolve().parent.parent.parent
-    data_path = base_dir / 'database' / 'gears.json'
+    data_path = settings.BASE_DIR / 'database' / 'gears.json'     
     with open(data_path, 'r', encoding='utf-8') as file:
         gears = json.load(file)
 

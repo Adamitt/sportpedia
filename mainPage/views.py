@@ -4,26 +4,72 @@ from datetime import timedelta
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.views.decorators.http import require_GET, require_POST
 from .models import PageHit, Testimonial
-
+from django.shortcuts import render
+from metrics.models import ViewCounter
+import json
+from urllib.parse import urlparse
+from django.conf import settings
+from django.shortcuts import render
+from metrics.models import ViewCounter
 # =======================================================
 #               VIEWS UNTUK HALAMAN UTAMA
 # =======================================================
 
 def home(request):
-    # Logika untuk 'hot pages' tidak kita gunakan di template, tapi biarkan saja
-    seven_days_ago = now() - timedelta(days=7)
-    hot_pages = (PageHit.objects
-                 .filter(last_hit__gte=seven_days_ago)
-                 .order_by('-hits','-last_hit')[:3])
-    return render(request, "home.html", {"hot_pages": hot_pages})
+    hot_items = (ViewCounter.objects
+                 .filter(category__in=["Library", "Gear Guide"])
+                 .order_by("-views")[:3])
+    return render(request, "home.html", {"hot_items": hot_items})
 
-def search(request):
-    q = request.GET.get("q", "")
-    return render(request, "search_results.html", {"q": q, "results": []})
 
+def home(request):
+    # Ambil top 3 dari Library & Gear Guide
+    hot_qs = (ViewCounter.objects
+              .filter(category__in=["Library", "Gear Guide"])
+              .order_by("-views")[:3])
+
+    # Muat sports.json untuk ambil deskripsi singkat Library
+    sports_map = {}
+    try:
+        with open(settings.BASE_DIR / "database" / "sports.json", "r", encoding="utf-8") as f:
+            for s in json.load(f):
+                sports_map[str(s.get("id"))] = s
+    except Exception:
+        pass  # kalau gagal, nanti fallback
+
+    hot_items = []
+    for it in hot_qs:
+        item = {
+            "title": it.title,
+            "url": it.url,
+            "image": it.image,
+            "category": it.category,
+            "views": it.views,
+        }
+
+        # Kalau kategori Library → isi excerpt dari sports.json
+        if it.category == "Library":
+            try:
+                # url contoh: /sportlibrary/12/ → ambil "12"
+                path_segs = [seg for seg in urlparse(it.url).path.split("/") if seg]
+                sport_id = path_segs[-1] if path_segs else None
+                s = sports_map.get(str(sport_id))
+                desc = (s.get("description") or s.get("history") or "") if s else ""
+                item["excerpt"] = (desc[:140] + "…") if len(desc) > 140 else desc
+            except Exception:
+                item["excerpt"] = ""
+        hot_items.append(item)
+
+    return render(request, "home.html", {"hot_items": hot_items})
 # =======================================================
 #               ENDPOINT API UNTUK TESTIMONI
 # =======================================================
+
+def whats_hot(request):
+    hot = (ViewCounter.objects
+           .filter(category__in=["Library", "Gear Guide"])
+           .order_by("-views")[:3])
+    return render(request, "mainPage/whats_hot.html", {"hot_items": hot})
 
 def _serialize(t, request):
     """
