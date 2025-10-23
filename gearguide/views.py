@@ -11,6 +11,7 @@ from sportlibrary.models import Sport
 from django.contrib.auth.decorators import login_required
 
 
+# ======================= DETAIL VIEW =======================
 def show_gear_detail(request, gear_id):
     gear = get_object_or_404(Gear, id=gear_id)
     context = {
@@ -19,6 +20,8 @@ def show_gear_detail(request, gear_id):
     }
     return render(request, "gearguide/gear_detail.html", context)
 
+
+# ======================= SHOW ALL GEARS =======================
 def show_all_gears(request):
     db_gears = list(Gear.objects.select_related('sport').all())
 
@@ -86,17 +89,14 @@ def show_all_gears(request):
     # === FILTER LOGIC ===
     sport_filter = request.GET.get('sport')
     level_filter = request.GET.get('level')
-    view_filter = request.GET.get('view', 'all')  # new filter (all / your)
+    view_filter = request.GET.get('view', 'all')
 
-    # Sport filter
     if sport_filter:
         combined_gears = [g for g in combined_gears if sport_filter.lower() in str(g["sport"]).lower()]
 
-    # Level filter
     if level_filter:
         combined_gears = [g for g in combined_gears if g.get("level", "").lower() == level_filter.lower()]
 
-    # === View filter (new) ===
     if view_filter == "your":
         if request.user.is_authenticated:
             combined_gears = [
@@ -104,9 +104,9 @@ def show_all_gears(request):
                 if g["is_from_db"] and g.get("owner") == request.user.username
             ]
         else:
-            combined_gears = []  # ga login = kosong
+            combined_gears = []
     elif view_filter == "all":
-        combined_gears = combined_gears  # keep everything (JSON + DB)
+        combined_gears = combined_gears
 
     sports = sorted(set(str(g["sport"]) for g in combined_gears if g.get("sport")))
     all_sports = Sport.objects.all().order_by('name')
@@ -119,6 +119,8 @@ def show_all_gears(request):
         "view_filter": view_filter,
     })
 
+
+# ======================= CARD DETAILS =======================
 def card_details(request, gear_id):
     try:
         _ = UUID(str(gear_id))
@@ -154,7 +156,7 @@ def card_details(request, gear_id):
     gear = next((g for g in gears if str(g['id']) == str(gear_id)), None)
     if not gear:
         return render(request, "404.html", status=404)
-    
+
     sport_name = "Unknown"
     sport_id = gear.get("sport_id")
     if sport_id:
@@ -165,13 +167,15 @@ def card_details(request, gear_id):
             sport_name = gear.get("sport", "Unknown")
     else:
         sport_name = gear.get("sport", "Unknown")
-    
+
     gear['is_from_db'] = False
     gear['sport'] = sport_name
 
     context = {"title": gear["name"], "gear": gear}
     return render(request, "gearguide/card_details.html", context)
 
+
+# ======================= ADD GEAR =======================
 @login_required(login_url='login')
 def add_gear(request):
     if request.method == "POST":
@@ -180,27 +184,32 @@ def add_gear(request):
             gear = form.save(commit=False)
             gear.owner = request.user
             gear.save()
+            messages.success(request, "✅ Gear berhasil ditambahkan!")
             return redirect("gearguide:show_all_gears")
+        else:
+            messages.error(request, "⚠️ Gagal menambahkan gear. Periksa kembali input kamu.")
     else:
         form = GearForm()
     return render(request, "gearguide/add_gear.html", {"form": form})
 
+
+# ======================= DELETE GEAR =======================
 @login_required(login_url='login')
 @require_http_methods(["POST"])
 def delete_gear(request, gear_id):
     gear = get_object_or_404(Gear, id=gear_id)
     if hasattr(gear, "owner") and gear.owner != request.user:
+        messages.error(request, "🚫 Kamu tidak punya izin untuk menghapus gear ini.")
         return redirect("gearguide:show_all_gears")
 
     name = gear.name
     gear.delete()
-    messages.success(request, f"🗑 Gear '{name}' berhasil dihapus.")
+    messages.success(request, f"🗑️ Gear '{name}' berhasil dihapus.")
     return redirect("gearguide:show_all_gears")
 
-# ============ AJAX FUNCTIONS ============
 
+# ======================= AJAX HELPERS =======================
 def _gear_to_json(gear: Gear):
-    """Helper function untuk convert Gear model ke JSON"""
     return {
         "id": str(gear.id),
         "sport_id": str(gear.sport.id) if gear.sport else None,
@@ -208,7 +217,7 @@ def _gear_to_json(gear: Gear):
         "name": gear.name,
         "function": gear.function or "",
         "description": gear.description or "",
-        "level": gear.level,  # Return code, bukan display
+        "level": gear.level,
         "level_display": gear.get_level_display(),
         "price_range": gear.price_range or "",
         "recommended_brands": gear.recommended_brands or [],
@@ -219,18 +228,16 @@ def _gear_to_json(gear: Gear):
         "image": gear.image or "",
     }
 
+
+# ======================= AJAX GET =======================
 @require_http_methods(["GET"])
 def get_gear_json(request, gear_id):
-    """
-    AJAX GET: detail gear dari DB (bukan JSON file).
-    """
     try:
         gear = get_object_or_404(Gear, id=gear_id)
     except Exception:
         return JsonResponse({"ok": False, "error": "Gear tidak ditemukan di database."}, status=404)
 
     data = _gear_to_json(gear)
-    # Untuk prefill form text (comma separated)
     data.update({
         "recommended_brands_text": ", ".join(data["recommended_brands"]),
         "materials_text": ", ".join(data["materials"]),
@@ -238,6 +245,8 @@ def get_gear_json(request, gear_id):
     })
     return JsonResponse({"ok": True, "data": data}, status=200)
 
+
+# ======================= AJAX EDIT =======================
 @login_required(login_url='login')
 @require_http_methods(["POST"])
 def edit_gear_ajax(request, gear_id):
@@ -246,11 +255,13 @@ def edit_gear_ajax(request, gear_id):
         if hasattr(gear, "owner") and gear.owner != request.user:
             return JsonResponse({
                 "ok": False,
+                "message": "🚫 Kamu tidak punya izin untuk mengedit gear ini.",
                 "errors": {"general": ["Kamu tidak punya izin untuk mengedit gear ini."]}
             }, status=403)
     except Exception as e:
         return JsonResponse({
             "ok": False,
+            "message": "❌ Gear tidak ditemukan.",
             "errors": {"general": [f"Gear tidak ditemukan: {str(e)}"]}
         }, status=404)
 
@@ -259,12 +270,21 @@ def edit_gear_ajax(request, gear_id):
         try:
             gear = form.save()
             updated = _gear_to_json(gear)
-            return JsonResponse({"ok": True, "data": updated}, status=200)
+            return JsonResponse({
+                "ok": True, 
+                "message": f"✏️ Gear '{gear.name}' berhasil diperbarui!",
+                "data": updated
+            }, status=200)
         except Exception as e:
             return JsonResponse({
                 "ok": False,
+                "message": "❌ Gagal menyimpan gear.",
                 "errors": {"general": [f"Gagal menyimpan: {str(e)}"]}
             }, status=500)
 
     errors_dict = {field: [str(err) for err in errs] for field, errs in form.errors.items()}
-    return JsonResponse({"ok": False, "errors": errors_dict}, status=400)
+    return JsonResponse({
+        "ok": False, 
+        "message": "⚠️ Periksa kembali input kamu.",
+        "errors": errors_dict
+    }, status=400)

@@ -9,12 +9,13 @@ urlpatterns = [
     path("add/", views.add_gear, name="add_gear"),
     
     # API endpoints
-    path("api/gear/<str:gear_id>/", views.get_gear_json, name="get_gear_json"),
-    path("api/gear/<str:gear_id>/edit/", views.edit_gear_ajax, name="edit_gear_ajax"),
+    path('get-gear-json/<uuid:gear_id>/', views.get_gear_json, name='get_gear_json'),
+    path('edit-gear-ajax/<uuid:gear_id>/', views.edit_gear_ajax, name='edit_gear_ajax'),
     
     # Actions
     path("delete/<str:gear_id>/", views.delete_gear, name="delete_gear"),
     
     # Detail (catch-all)
     path("<str:gear_id>/", views.card_details, name="card_details"),
+    
 ]

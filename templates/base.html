@@ -1,38 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>{% block title %}SportPedia{% endblock %}</title>
+  <meta charset="UTF-8">
+  <title>{% block title %}SportPedia{% endblock %}</title>
+  {% load static %}
 
-    {% load static %}
+  <!-- Tailwind & Font -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- ✅ Tambahkan Tailwind CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+    }
+    /* Ensure the page takes at least full viewport height */
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    /* Flexbox to push footer to bottom */
+    #page-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    main {
+      flex: 1 0 auto;
+    }
+    footer {
+      flex-shrink: 0;
+    }
+  </style>
 
-    <!-- (Opsional) Font Poppins biar lebih halus -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
-        }
-    </style>
+  <!-- Django messages disiapin dalam bentuk JSON -->
+  {% if messages %}
+  <script id="django-messages" type="application/json">
+  [
+    {% for message in messages %}
+      {
+        "text": "{{ message|escapejs }}",
+        "type": "{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}"
+      }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]
+  </script>
+  {% else %}
+  <script id="django-messages" type="application/json">[]</script>
+  {% endif %}
 </head>
-<body class="bg-gray-50 text-gray-900">
 
-    <!-- ✅ Navbar -->
+<body class="bg-gray-50 text-gray-900">
+  <!-- Page container to enable flexbox -->
+  <div id="page-container">
+    <!-- Navbar global -->
     {% include 'navbar.html' %}
 
-        <!-- BENAR ✅ -->
+    <!-- Konten utama -->
     <main>
-    {% block content %}{% endblock %}
+      {% block content %}{% endblock %}
     </main>
 
-    <!-- ✅ Footer -->
-    <footer class="bg-gray-100 text-center text-gray-500 py-4 mt-10 text-sm">
-        &copy; 2025 SportPedia — Gerbang Olahragamu.
-    </footer>
+    <!-- Modern Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <!-- Logo/Brand -->
+          <div class="mb-4 md:mb-0">
+            <h2 class="text-2xl font-bold text-white">SportPedia</h2>
+            <p class="text-gray-400 text-sm">Gerbang Olahragamu</p>
+          </div>
 
+          <!-- Links -->
+          <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8">
+            <a href="#" class="text-gray-300 hover:text-white transition duration-300">About Us</a>
+            <a href="#" class="text-gray-300 hover:text-white transition duration-300">Contact</a>
+            <a href="#" class="text-gray-300 hover:text-white transition duration-300">Privacy Policy</a>
+            <a href="#" class="text-gray-300 hover:text-white transition duration-300">Terms of Service</a>
+          </div>
+
+          <!-- Social Media Icons -->
+          <div class="flex space-x-4 mt-4 md:mt-0">
+            <a href="#" class="text-gray-300 hover:text-white transition duration-300">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.04c-5.5 0-9.96 4.46-9.96 9.96 0 4.41 3.59 8.07 8.36 9.36v-6.62h-2.51v-2.74h2.51v-2.09c0-2.48 1.51-3.83 3.71-3.83 1.05 0 1.95.08 2.21.12v2.56h-1.51c-1.19 0-1.42.57-1.42 1.4v1.84h2.84l-.37 2.74h-2.47v6.62c4.77-1.29 8.36-4.95 8.36-9.36 0-5.5-4.46-9.96-9.96-9.96z"/></svg>
+            </a>
+            <a href="#" class="text-gray-300 hover:text-white transition duration-300">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.95 4.83c-.88.39-1.83.65-2.82.77 1.01-.61 1.79-1.57 2.15-2.72-.94.56-1.99.97-3.1 1.19-.89-.95-2.16-1.54-3.56-1.54-2.69 0-4.87 2.18-4.87 4.87 0 .38.04.75.12 1.11-4.05-.2-7.64-2.14-10.04-5.09-.42.72-.66 1.56-.66 2.46 0 1.69.86 3.18 2.17 4.05-.8-.03-1.55-.25-2.21-.62v.06c0 2.36 1.68 4.33 3.91 4.78-.41.11-.84.17-1.28.17-.31 0-.62-.03-.92-.09.62 1.94 2.42 3.35 4.56 3.39-1.67 1.31-3.78 2.09-6.07 2.09-.39 0-.78-.02-1.16-.07 2.15 1.38 4.71 2.18 7.46 2.18 8.95 0 13.85-7.41 13.85-13.85 0-.21 0-.42-.01-.63.95-.68 1.77-1.54 2.42-2.51z"/></svg>
+            </a>
+            <a href="#" class="text-gray-300 hover:text-white transition duration-300">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M7.55 2.04c-5.5 0-9.96 4.46-9.96 9.96 0 4.41 3.59 8.07 8.36 9.36v-6.62h-2.51v-2.74h2.51v-2.09c0-2.48 1.51-3.83 3.71-3.83 1.05 0 1.95.08 2.21.12v2.56h-1.51c-1.19 0-1.42.57-1.42 1.4v1.84h2.84l-.37 2.74h-2.47v6.62c4.77-1.29 8.36-4.95 8.36-9.36 0-5.5-4.46-9.96-9.96-9.96z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="mt-6 text-center text-gray-400 text-sm">
+          &copy; 2025 SportPedia — All Rights Reserved.
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Toast container + script bawaan -->
+  {% include 'toast.html' %}
+  <script src="{% static 'js/toast_messages.js' %}"></script>
+
+  <!-- Tambahan script tiap halaman (misal editscript) -->
+  {% block extra_scripts %}{% endblock %}
 </body>
 </html>
