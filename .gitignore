@@ -75,7 +75,6 @@ coverage.xml
 .ipynb_checkpoints
 # pyenv
 .python-version
-database
 # celery
 celerybeat-schedule.*
 # SageMath parsed files
