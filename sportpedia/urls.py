@@ -9,8 +9,6 @@ urlpatterns = [
     # Landing page / beranda utama
     path('', include(('landingpage.urls', 'landingpage'), namespace='landingpage')),
 
-    # App utama
-    path('main/', include(('main.urls', 'main'), namespace='main')),
 
     # App lain
     path('gearguide/', include(('gearguide.urls', 'gearguide'), namespace='gearguide')),

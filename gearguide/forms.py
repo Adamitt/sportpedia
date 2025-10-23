@@ -5,6 +5,12 @@ import json
 from pathlib import Path
 
 class GearForm(forms.ModelForm):
+    # ✅ Definisikan sport sebagai CharField (tidak akan di-save otomatis)
+    sport = forms.CharField(
+        label="Jenis Olahraga",
+        widget=forms.Select()
+    )
+    
     recommended_brands = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={'placeholder': 'Contoh: Yonex, Li-Ning, Victor (pisahkan dengan koma)'}),
@@ -39,7 +45,7 @@ class GearForm(forms.ModelForm):
     class Meta:
         model = Gear
         fields = [
-            'sport',
+            # ❌ JANGAN include 'sport' di sini!
             'name',
             'function',
             'description',
@@ -55,30 +61,37 @@ class GearForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.sport_from_json = False  # flag buat tahu sumbernya dari JSON atau DB
 
-        sports = Sport.objects.all()
+        # === Ambil sport dari DB ===
+        db_sports = [(str(s.id), f"{s.name} ({s.category})") for s in Sport.objects.all()]
 
-        if sports.exists():
-            # ✅ kalau ada di DB, pakai queryset ForeignKey biasa
-            self.fields['sport'].queryset = sports
-            self.fields['sport'].label_from_instance = lambda obj: f"{obj.name} ({obj.category})"
-        else:
-            # ⚙️ fallback ke JSON
-            base_dir = Path(__file__).resolve().parent.parent.parent
-            data_path = base_dir / 'database' / 'sports.json'
+        # === Ambil sport dari JSON ===
+        base_dir = Path(__file__).resolve().parent.parent.parent
+        data_path = base_dir / 'database' / 'sports.json'
+        json_sports = []
+        if data_path.exists():
             try:
                 with open(data_path, 'r', encoding='utf-8') as f:
                     sports_json = json.load(f)
-
-                choices = [(str(s['id']), f"{s['name']} ({s.get('category', '-')})") for s in sports_json]
-                self.fields['sport'] = forms.ChoiceField(choices=choices, label="Jenis Olahraga")
-                self.sport_from_json = True
-                self.sports_json_map = {str(s['id']): s['name'] for s in sports_json}
+                    json_sports = [
+                        (str(s['id']), f"{s['name']} ({s.get('category', '-')})")
+                        for s in sports_json
+                    ]
             except Exception as e:
-                print(f"⚠️ Gagal memuat sports.json: {e}")
-                self.fields['sport'] = forms.ChoiceField(choices=[], label="Jenis Olahraga (tidak tersedia)")
+                print(f"⚠️ Gagal baca sports.json: {e}")
 
+        # === Gabungkan & hilangkan duplikat ===
+        all_sports_dict = {}
+        for sport_id, sport_label in (db_sports + json_sports):
+            if sport_id not in all_sports_dict:
+                all_sports_dict[sport_id] = sport_label
+        
+        all_sports = list(all_sports_dict.items())
+        
+        # ✅ Set choices untuk dropdown
+        self.fields['sport'].widget.choices = [('', '---------')] + all_sports
+
+    # === Cleaners ===
     def clean_recommended_brands(self):
         data = self.cleaned_data.get('recommended_brands', '')
         return [b.strip() for b in data.split(',')] if data else []
@@ -90,26 +103,3 @@ class GearForm(forms.ModelForm):
     def clean_tags(self):
         data = self.cleaned_data.get('tags', '')
         return [t.strip() for t in data.split(',')] if data else []
-
-    def save(self, commit=True):
-        """Override save untuk handle kasus sport dari JSON."""
-        instance = super().save(commit=False)
-
-        if self.sport_from_json:
-            sport_id = self.cleaned_data['sport']
-            try:
-                # cari sport dari DB (kalau sempat diimport)
-                sport_obj = Sport.objects.filter(pk=sport_id).first()
-                if sport_obj:
-                    instance.sport = sport_obj
-                else:
-                    # kalau gak ada di DB, skip tapi log biar tahu
-                    print(f"⚠️ Sport ID {sport_id} dari JSON belum ada di DB.")
-                    instance.sport = None
-            except Exception as e:
-                print(f"⚠️ Error mapping sport JSON ke model: {e}")
-                instance.sport = None
-
-        if commit:
-            instance.save()
-        return instance

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 
 class Gear(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.AutoField(primary_key=True)
     sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name="gear_items")  # Ganti `related_name`
 
     name = models.CharField(max_length=100)
