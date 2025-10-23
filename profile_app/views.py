@@ -4,14 +4,17 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
 from .models import UserProfile, SportProgress
+from profile_app.models import ActivityLog
 
 @login_required(login_url='/accounts/login/')
 def profile_page(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
+    recent_activities = ActivityLog.objects.filter(user=request.user).order_by('-timestamp')[:10]
 
     context = {
         'user': request.user,
         'profile': profile,
+        'aktivitas': recent_activities,
     }
     return render(request, 'profile_app/profile.html', context)
 

@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from gearguide.models import Gear
 from sportlibrary.models import Sport
+from profile_app.models import ActivityLog
 
 # only admin/staff
 def admin_only(user):
@@ -59,6 +60,17 @@ def add_gear(request):
             care_tips=care_tips,
             tags=tags,
         )
+
+        try:
+            ActivityLog.objects.create(
+                user=request.user,
+                action_type='ADMIN_CREATE',
+                description=f"Admin menambahkan Gear: {new_gear.name}"
+            )
+            messages.success(request, '✅ Gear berhasil ditambahkan!')
+            return redirect('admin_sportpedia:manage_gear')
+        except Exception as e:
+             messages.error(request, f'❌ Gagal menambahkan gear: {e}')
 
         messages.success(request, '✅ Gear berhasil ditambahkan!')
         return redirect('manage_gear')

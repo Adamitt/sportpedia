@@ -1,6 +1,7 @@
 from django.shortcuts import render
 import json
 from pathlib import Path
+from profile_app.models import ActivityLog
 
 def show_sports(request):
     base_dir = Path(__file__).resolve().parent.parent
@@ -24,6 +25,13 @@ def sport_detail(request, sport_id):
 
     if not sport:
         return render(request, "404.html", status=404)
+
+    if request.user.is_authenticated:
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type='MODULE_ACCESS',
+            description=f"Mengakses Sport Library: {sport.get('name', 'Olahraga Tidak Dikenal')}"
+        )
 
     context = {"sport": sport}
     return render(request, 'sportlibrary/detail.html', context)

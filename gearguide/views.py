@@ -12,6 +12,7 @@ from .models import Gear
 from .forms import GearForm
 from sportlibrary.models import Sport
 from django.contrib.auth.decorators import login_required
+from profile_app.models import ActivityLog
 
 
 # ======================= DETAIL VIEW =======================
@@ -219,6 +220,13 @@ def card_details(request, gear_id):
         image=gear.get("image", ""),
         request=request,
     )
+
+    if request.user.is_authenticated:
+        ActivityLog.objects.create(
+        user=request.user,
+        action_type='MODULE_ACCESS',
+        description=f"Mengakses Gear: {gear.get('name', 'Olahraga Tidak Dikenal')}"
+        )
 
     context = {"title": gear["name"], "gear": gear}
     return render(request, "gearguide/card_details.html", context)
