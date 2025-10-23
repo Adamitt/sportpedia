@@ -3,7 +3,7 @@
   <div class="max-w-7xl mx-auto px-6 lg:px-12">
     
     <div class="flex items-center justify-between py-4 border-b border-gray-100">
-      <a href="{% url 'mainPage:home' %}" class="flex items-center gap-3">
+      <a href="{% url 'landingpage:home' %}" class="flex items-center gap-3">
         <img src="{% static 'images/sportpedia.png' %}" alt="SportPedia Logo" class="w-14 h-14 object-contain">
         <h1 class="text-2xl font-extrabold text-blue-900">
           SPORT<span class="text-red-700">PEDIA</span>
@@ -11,7 +11,7 @@
       </a>
 
       <div class="hidden md:flex flex-grow max-w-2xl mx-8">
-        <form action="{% url 'mainPage:home' %}" method="get" class="w-full relative">
+        <form action="{% url 'landingpage:home' %}" method="get" class="w-full relative">
           <input 
             type="text" 
             name="q"

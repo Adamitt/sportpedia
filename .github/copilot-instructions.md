@@ -6,7 +6,7 @@ Keep this file concise (20–50 lines). Reference concrete files and commands fo
 # Copilot instructions for SportPedia
 
 - Repo type: Django web app (Django 5.2.x). Key entry points: `manage.py` and `sportpedia/settings.py`.
-- Primary apps: `mainpage` (routes and templates for home/search), `sportlibrary` (models for Sport), `gearguide` (Gear model).
+- Primary apps: `landingpage` (routes and templates for home/search), `sportlibrary` (models for Sport), `gearguide` (Gear model).
 
 - Quick dev setup:
   - Activate the project's virtualenv: `source env/bin/activate` (venv is in `env/`).
@@ -14,15 +14,15 @@ Keep this file concise (20–50 lines). Reference concrete files and commands fo
   - Common commands: `python manage.py migrate`, `python manage.py runserver`, `python manage.py createsuperuser`.
 
 - Routing and templates:
-  - Root URLs are configured in `sportpedia/urls.py` which includes `mainPage.urls` (note: app folder is `mainpage`; `app_name` is `main`).
-  - Templates live in `templates/` (project-level) and app `templates/` folders. Base template: `templates/base.html`. Home page: `mainpage/templates/home.html`.
+  - Root URLs are configured in `sportpedia/urls.py` which includes `landingpage.urls` (note: app folder is `landingpage`; `app_name` is `main`).
+  - Templates live in `templates/` (project-level) and app `templates/` folders. Base template: `templates/base.html`. Home page: `landingpage/templates/home.html`.
   - Static assets referenced with `{% load static %}` in templates; static files served via Django staticfiles in dev.
 
 - Database and environments:
   - Development uses SQLite (`db.sqlite3`) by default. Production expects Postgres with env vars (`DB_NAME`, `DB_USER`, etc.) and `PRODUCTION=true` in environment; see `sportpedia/settings.py`.
 
 - Naming & conventions to preserve when editing:
-  - Apps: folder `mainpage` but `app_name = "main"` in `mainpage/urls.py`. Use that `app_name` when referencing URL names.
+  - Apps: folder `landingpage` but `app_name = "main"` in `landingpage/urls.py`. Use that `app_name` when referencing URL names.
   - Models: `gearguide.models.Gear` uses UUID primary keys. `sportlibrary.models.Sport` exists and is referenced by `gearguide`.
   - Keep templates and static path conventions (project-level `templates/` and `{% static '...' %}` usage).
 
@@ -31,12 +31,12 @@ Keep this file concise (20–50 lines). Reference concrete files and commands fo
 
 - Editing guidance for AI agents:
   - Make minimal, focused changes; run `python manage.py migrate` after model changes and `runserver` to smoke-test templates.
-  - When adding URLs, update `mainpage/urls.py` and ensure `sportpedia/urls.py` includes the app.
+  - When adding URLs, update `landingpage/urls.py` and ensure `sportpedia/urls.py` includes the app.
   - Respect existing internationalization/timezone settings in `sportpedia/settings.py`.
 
 - Files to inspect first for context on any UI or data change:
   - `README.md` (project overview and intended features)
-  - `templates/base.html`, `templates/search_results.html`, `mainpage/views.py`, `gearguide/models.py`, `sportlibrary/models.py`
+  - `templates/base.html`, `templates/search_results.html`, `landingpage/views.py`, `gearguide/models.py`, `sportlibrary/models.py`
 
 - If unclear, ask the maintainer for intended behavior before large refactors (especially changes touching database schema or auth).
 

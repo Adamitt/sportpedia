@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('last_hit', models.DateTimeField(auto_now=True)),
             ],
             options={
-                'indexes': [models.Index(fields=['-hits', '-last_hit'], name='mainPage_pa_hits_de2eb5_idx')],
+                'indexes': [models.Index(fields=['-hits', '-last_hit'], name='landingpage_pa_hits_de2eb5_idx')],
                 'unique_together': {('view_name', 'path')},
             },
         ),

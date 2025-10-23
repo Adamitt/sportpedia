@@ -8,7 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Beranda & halaman utama project (pakai app kamu)
-    path('', include(('mainPage.urls', 'mainPage'), namespace='mainPage')),
+    path('', include(('landingpage.urls', 'landingpage'), namespace='landingpage')),
 
     # App teman-teman
     path('sportlibrary/', include(('sportlibrary.urls', 'sportlibrary'), namespace='sportlibrary')),

@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('contenttypes', '0002_remove_content_type_name'),
-        ('mainPage', '0003_alter_testimonial_options_alter_testimonial_text_and_more'),
+        ('landingpage', '0003_alter_testimonial_options_alter_testimonial_text_and_more'),
     ]
 
     operations = [

@@ -1,4 +1,4 @@
-# mainPage/middleware.py
+# landingpage/middleware.py
 from django.utils.deprecation import MiddlewareMixin
 from django.urls import resolve
 from django.conf import settings
