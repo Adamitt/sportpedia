@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ video.title }} - SPORTPEDIA{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-8 py-12">
+    <!-- Back Button -->
+    <a href="{% url 'videos:gallery' %}" class="mb-6 font-semibold hover:opacity-80 flex items-center gap-2 transition-opacity text-lg inline-flex" style="color: #1E3A5F;">
+        ← Back to Gallery
+    </a>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Video Section -->
+        <div class="lg:col-span-2">
+            <!-- Video Player -->
+            <div class="rounded-3xl aspect-video flex items-center justify-center mb-8 relative overflow-hidden border-2" style="background: linear-gradient(135deg, #1E3A5F 0%, #2B5A8F 100%); border-color: #fce7f3;">
+                {% if video.video_url %}
+                    <iframe src="{{ video.video_url }}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+                {% else %}
+                    <i data-lucide="play" class="h-24 w-24 text-white opacity-80"></i>
+                {% endif %}
+            </div>
+
+            <!-- Video Info -->
+            <div class="bg-white rounded-3xl p-8 mb-8 border-2" style="border-color: #fce7f3;">
+                <div class="mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ video.title }}</h1>
+                    <div class="flex items-center gap-3 flex-wrap mb-6">
+                        <span class="px-4 py-2 rounded-full text-sm font-semibold text-white" style="background-color: #1E3A5F;">{{ video.sport.name }}</span>
+                        <span class="px-4 py-2 rounded-full text-sm font-semibold" style="background-color: #F4D160; color: #1E3A5F;">{{ video.get_difficulty_display }}</span>
+                        <div class="flex items-center gap-2 text-gray-600">
+                            <i data-lucide="eye" class="h-5 w-5"></i>
+                            <span class="text-sm font-medium">{{ video.views_count }} views</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="star" class="h-5 w-5 text-[#F4D160] fill-[#F4D160]"></i>
+                            <span class="text-sm font-bold text-gray-800">{{ video.average_rating }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-3 pb-6 border-b-2 border-gray-100">
+                    <form method="POST" action="{% url 'videos:like' video.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="flex items-center gap-2 px-6 py-3 text-white rounded-full hover:opacity-90 transition-opacity font-semibold" style="background-color: #A33B3B;">
+                            <i data-lucide="heart" class="h-5 w-5"></i>
+                            Like
+                        </button>
+                    </form>
+                    
+                    <form method="POST" action="{% url 'videos:bookmark' video.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="flex items-center gap-2 px-6 py-3 rounded-full hover:bg-gray-50 transition-colors font-semibold border-2" style="border-color: #1E3A5F; color: #1E3A5F;">
+                            <i data-lucide="bookmark" class="h-5 w-5"></i>
+                            Save
+                        </button>
+                    </form>
+                    
+                    <button class="flex items-center gap-2 px-6 py-3 rounded-full hover:bg-gray-50 transition-colors font-semibold border-2" style="border-color: #1E3A5F; color: #1E3A5F;">
+                        <i data-lucide="share-2" class="h-5 w-5"></i>
+                        Share
+                    </button>
+                </div>
+
+                <!-- Description -->
+                <div class="pt-6">
+                    <h3 class="font-bold text-lg mb-3" style="color: #1E3A5F;">Description</h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        {{ video.description }}
+                    </p>
+                    
+                    <div class="flex items-center gap-6 text-sm text-gray-500">
+                        <span>📅 Uploaded {{ video.created_at|timesince }} ago</span>
+                        <span>👤 By: {{ video.uploader.get_full_name }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="bg-white rounded-3xl p-8 border-2" style="border-color: #fce7f3;">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-bold text-2xl flex items-center gap-3" style="color: #1E3A5F;">
+                        <i data-lucide="message-square" class="h-6 w-6"></i>
+                        Comments & Ratings ({{ comments.count }})
+                    </h3>
+                    <form method="GET">
+                        <select name="sort_comments" onchange="this.form.submit()" class="px-4 py-2 border-2 rounded-full text-sm font-medium focus:outline-none" style="border-color: #1E3A5F; color: #1E3A5F;">
+                            <option value="latest" {% if request.GET.sort_comments == 'latest' %}selected{% endif %}>Latest</option>
+                            <option value="rating" {% if request.GET.sort_comments == 'rating' %}selected{% endif %}>Highest Rating</option>
+                            <option value="helpful" {% if request.GET.sort_comments == 'helpful' %}selected{% endif %}>Most Helpful</option>
+                        </select>
+                    </form>
+                </div>
+
+                <!-- Rating Summary -->
+                <div class="rounded-2xl p-6 mb-8" style="background-color: #f0f4f8;">
+                    <div class="flex items-center gap-8">
+                        <div class="text-center">
+                            <div class="text-5xl font-bold mb-2" style="color: #1E3A5F;">{{ video.average_rating }}</div>
+                            <div class="flex items-center justify-center gap-1 mb-2">
+                                {% for i in "12345" %}
+                                    <i data-lucide="star" class="h-5 w-5 text-[#F4D160] fill-[#F4D160]"></i>
+                                {% endfor %}
+                            </div>
+                            <div class="text-sm text-gray-600 font-medium">{{ video.ratings_count }} ratings</div>
+                        </div>
+                        <div class="flex-1">
+                            {% for rating in rating_distribution %}
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="text-sm font-medium w-10">{{ rating.stars }}⭐</span>
+                                <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                    <div class="h-3 rounded-full transition-all" style="width: {{ rating.percentage|floatformat:0 }}%; background-color: #F4D160"></div>
+                                </div>
+                                <span class="text-sm text-gray-600 font-medium w-14">{{ rating.count }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Comment Form -->
+                {% if user.is_authenticated %}
+                <div class="mb-8">
+                    <form method="POST" action="{% url 'videos:add_comment' video.id %}">
+                        {% csrf_token %}
+                        <textarea 
+                            name="comment"
+                            placeholder="Share your thoughts or give a rating..."
+                            class="w-full border-2 rounded-2xl p-4 focus:outline-none focus:ring-2 mb-3 resize-none"
+                            rows="4"
+                            style="border-color: #1E3A5F;"
+                            required
+                        ></textarea>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-600 font-medium mr-2">Your Rating:</span>
+                                <div class="flex gap-1" id="ratingStars">
+                                    {% for i in "12345" %}
+                                        <input type="radio" name="rating" value="{{ forloop.counter }}" id="star{{ forloop.counter }}" class="hidden" required>
+                                        <label for="star{{ forloop.counter }}" class="cursor-pointer">
+                                            <i data-lucide="star" class="h-6 w-6 text-gray-300 hover:text-[#F4D160] transition-colors star-icon"></i>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <button type="submit" class="px-8 py-3 text-white rounded-full hover:opacity-90 transition-opacity font-semibold" style="background-color: #1E3A5F;">
+                                Submit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% else %}
+                <div class="mb-8 p-6 bg-gray-50 rounded-2xl text-center">
+                    <p class="text-gray-600 mb-3">Please <a href="{% url 'login' %}" class="font-semibold" style="color: #1E3A5F;">sign in</a> to leave a comment or rating.</p>
+                </div>
+                {% endif %}
+
+                <!-- Comments List -->
+                <div class="space-y-6">
+                    {% for comment in comments %}
+                    <div class="border-b-2 border-gray-100 pb-6 last:border-0">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg" style="background-color: #1E3A5F;">
+                                {{ comment.user.get_full_name|first|upper }}
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="font-bold text-gray-800">{{ comment.user.get_full_name }}</span>
+                                    <span class="text-sm text-gray-500">{{ comment.created_at|timesince }} ago</span>
+                                </div>
+                                {% if comment.rating %}
+                                <div class="flex items-center gap-1 mb-3">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= comment.rating %}
+                                            <i data-lucide="star" class="h-4 w-4 text-[#F4D160] fill-[#F4D160]"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <p class="text-gray-700 leading-relaxed">{{ comment.text }}</p>
+                                <div class="flex items-center gap-4 mt-3 text-sm">
+                                    <form method="POST" action="{% url 'videos:helpful_comment' comment.id %}" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="hover:opacity-80 transition-opacity" style="color: #1E3A5F;">
+                                            👍 Helpful ({{ comment.helpful_count }})
+                                        </button>
+                                    </form>
+                                    <button class="hover:opacity-80 transition-opacity" style="color: #1E3A5F;">Reply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-center text-gray-500 py-8">No comments yet. Be the first to comment!</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar: Related Videos -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-3xl p-6 border-2" style="border-color: #fce7f3;">
+                <h3 class="font-bold text-xl mb-6" style="color: #1E3A5F;">Related Videos</h3>
+                <div class="space-y-5">
+                    {% for related_video in related_videos %}
+                    <a href="{% url 'videos:detail' related_video.id %}" class="flex gap-3 hover:bg-gray-50 p-3 rounded-2xl transition-colors">
+                        <div class="relative w-32 h-20 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-gray-100 to-gray-50">
+                            {% if related_video.thumbnail %}
+                                <img src="{{ related_video.thumbnail.url }}" alt="{{ related_video.title }}" class="w-full h-full object-cover rounded-xl">
+                            {% else %}
+                                <span class="text-2xl">🎾</span>
+                            {% endif %}
+                            <div class="absolute bottom-1 right-1 text-white text-xs px-2 py-1 rounded-full font-semibold" style="background-color: #1E3A5F;">
+                                {{ related_video.duration }}
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-sm text-gray-800 line-clamp-2 mb-2">{{ related_video.title }}</h4>
+                            <div class="flex items-center gap-2 text-xs text-gray-500">
+                                <span>{{ related_video.views_count }}</span>
+                                <span>•</span>
+                                <div class="flex items-center gap-1">
+                                    <i data-lucide="star" class="h-3 w-3 text-[#F4D160] fill-[#F4D160]"></i>
+                                    <span class="font-semibold">{{ related_video.average_rating }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Star rating interaction
+    const starInputs = document.querySelectorAll('#ratingStars input[type="radio"]');
+    const starIcons = document.querySelectorAll('#ratingStars .star-icon');
+    
+    starInputs.forEach((input, index) => {
+        input.addEventListener('change', () => {
+            starIcons.forEach((icon, i) => {
+                if (i <= index) {
+                    icon.style.color = '#F4D160';
+                    icon.classList.add('fill-[#F4D160]');
+                } else {
+                    icon.style.color = '#d1d5db';
+                    icon.classList.remove('fill-[#F4D160]');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -109,3 +109,115 @@ def delete_gear(request, gear_id):
 
     # optional: show a confirmation page; here we redirect back if not POST
     return redirect('manage_gear')
+
+@user_passes_test(admin_only, login_url='/accounts/login/')
+def manage_library(request):
+    """Lists all sports for admin management."""
+    sports = Sport.objects.all().order_by('name') # Order alphabetically
+    return render(request, 'library/manage_library.html', {'sports': sports})
+    return render(request, 'gear_app/manage_gear.html', {'gears': gears})
+
+@user_passes_test(admin_only, login_url='/accounts/login/')
+def add_sport(request):
+    """Handles adding a new sport."""
+    if request.method == 'POST':
+        # Basic fields
+        name = request.POST.get('name')
+        category = request.POST.get('category')
+        difficulty = request.POST.get('difficulty')
+        description = request.POST.get('description')
+        history = request.POST.get('history')
+
+        # Process JSONFields (assuming comma-separated input in textareas)
+        rules_str = request.POST.get('rules', '')
+        techniques_str = request.POST.get('techniques', '')
+        benefits_str = request.POST.get('benefits', '')
+        countries_str = request.POST.get('popular_countries', '')
+        tags_str = request.POST.get('tags', '')
+
+        def parse_json_list(text):
+            if not text: return []
+            return [item.strip() for item in text.split(',') if item.strip()]
+
+        try:
+            Sport.objects.create(
+                name=name,
+                category=category,
+                difficulty=difficulty,
+                description=description,
+                history=history,
+                rules=parse_json_list(rules_str),
+                techniques=parse_json_list(techniques_str),
+                benefits=parse_json_list(benefits_str),
+                popular_countries=parse_json_list(countries_str),
+                tags=parse_json_list(tags_str),
+            )
+            messages.success(request, f'✅ Olahraga "{name}" berhasil ditambahkan!')
+            return redirect('admin_sportpedia:manage_library')
+        except Exception as e:
+            messages.error(request, f'❌ Gagal menambahkan olahraga: {e}')
+            return render(request, 'library_app/sport_form.html', {'edit_mode': False})
+
+    return render(request, 'library_app/sport_form.html', {'edit_mode': False})
+
+@user_passes_test(admin_only, login_url='/accounts/login/')
+def edit_sport(request, sport_id):
+    """Handles editing an existing sport."""
+    sport = get_object_or_404(Sport, id=sport_id)
+
+    if request.method == 'POST':
+        sport.name = request.POST.get('name')
+        sport.category = request.POST.get('category')
+        sport.difficulty = request.POST.get('difficulty')
+        sport.description = request.POST.get('description')
+        sport.history = request.POST.get('history')
+
+        rules_str = request.POST.get('rules', '')
+        techniques_str = request.POST.get('techniques', '')
+        benefits_str = request.POST.get('benefits', '')
+        countries_str = request.POST.get('popular_countries', '')
+        tags_str = request.POST.get('tags', '')
+
+        def parse_json_list(text):
+             if not text: return []
+             return [item.strip() for item in text.split(',') if item.strip()]
+
+        sport.rules = parse_json_list(rules_str)
+        sport.techniques = parse_json_list(techniques_str)
+        sport.benefits = parse_json_list(benefits_str)
+        sport.popular_countries = parse_json_list(countries_str)
+        sport.tags = parse_json_list(tags_str)
+
+        try:
+            sport.save()
+            messages.success(request, f'✏️ Olahraga "{sport.name}" berhasil diperbarui!')
+            return redirect('admin_sportpedia:manage_library')
+        except Exception as e:
+             messages.error(request, f'❌ Gagal memperbarui olahraga: {e}')
+             return render(request, 'library_app/sport_form.html', {'sport': sport, 'edit_mode': True})
+
+    context = {
+        'sport': sport,
+        'edit_mode': True,
+        'rules_str': ', '.join(sport.rules),
+        'techniques_str': ', '.join(sport.techniques),
+        'benefits_str': ', '.join(sport.benefits),
+        'countries_str': ', '.join(sport.popular_countries),
+        'tags_str': ', '.join(sport.tags),
+    }
+    return render(request, 'library_app/sport_form.html', context)
+
+@user_passes_test(admin_only, login_url='/accounts/login/')
+def delete_sport(request, sport_id):
+    """Handles deleting a sport."""
+    sport = get_object_or_404(Sport, id=sport_id)
+    sport_name = sport.name
+    if request.method == 'POST':
+        try:
+            sport.delete()
+            messages.success(request, f'🗑️ Olahraga "{sport_name}" berhasil dihapus!')
+        except Exception as e:
+            messages.error(request, f'❌ Gagal menghapus olahraga: {e}')
+        return redirect('admin_sportpedia:manage_library')
+
+    return redirect('admin_sportpedia:manage_library')

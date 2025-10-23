@@ -56,6 +56,10 @@
            class="pb-1 border-b-4 transition-all duration-200 {% if '/videos/' in path %}border-blue-900 text-blue-900{% else %}border-transparent hover:border-blue-900 hover:text-blue-900{% endif %}">
           Video Gallery
         </a>
+        <a href="{% url 'admin_sportpedia:dashboard' %}" 
+           class="pb-1 border-b-4 transition-all duration-200 {% if '/videos/' in path %}border-blue-900 text-blue-900{% else %}border-transparent hover:border-blue-900 hover:text-blue-900{% endif %}">
+          Video Gallery
+        </a>
       {% endwith %}
     </div>
 

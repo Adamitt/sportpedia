@@ -42,8 +42,22 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('/')
+            
+            # --- START: Added Check ---
+            # Check if the user is staff or superuser
+            if user.is_staff or user.is_superuser:
+                # Redirect them to the admin dashboard
+                # Make sure 'admin_sportpedia:dashboard' is the correct URL name!
+                messages.success(request, f'Selamat datang kembali, Admin {user.username}!')
+                return redirect('admin_sportpedia:dashboard') 
+            else:
+                # Redirect regular users to the homepage
+                messages.success(request, f'Selamat datang kembali, {user.username}!')
+                return redirect('/') 
+            # --- END: Added Check ---
+
         else:
+            # Keep the error message generic for security
             messages.error(request, 'Username atau password salah.')
     else:
         form = LoginForm()

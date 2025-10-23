@@ -14,6 +14,7 @@ urlpatterns = [
     path('admin_sportpedia/', include('admin_sportpedia.urls')),
     path('sportlibrary/', include('sportlibrary.urls')),
     path('library/', include('sportlibrary.urls', namespace='library')),
+    path('videos/', include('videos.urls')),
 ]
 
 if settings.DEBUG:

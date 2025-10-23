@@ -50,7 +50,7 @@
 
         {% else %}
           <a href="{% url 'accounts:login' %}" class="text-blue-900 font-semibold hover:text-blue-700 transition-colors duration-200">Sign in</a>
-          <a href="{% url 'accounts:login' %}" class="bg-blue-900 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-800 transition-colors duration-200 shadow-md">Sign up</a>
+          <a href="{% url 'accounts:register' %}" class="bg-blue-900 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-800 transition-colors duration-200 shadow-md">Sign up</a>
         {% endif %}
       </div>
     </div>
@@ -60,6 +60,9 @@
       <a href="/forum/" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Community</a>
       <a href="{% url 'gearguide:show_all_gears' %}" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Gear Guide</a>
       <a href="/videos/" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Video Gallery</a>
+      {% if request.user.is_staff or request.user.is_superuser %}
+        <a href="{% url 'admin_sportpedia:dashboard' %}" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Admin Dashboard</a>
+      {% endif %}
     </div>
 
   </div>

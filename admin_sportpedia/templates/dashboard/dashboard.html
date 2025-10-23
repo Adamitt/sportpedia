@@ -1,46 +1,84 @@
-<!-- dashboard/templates/dashboard/dashboard.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard - Sportpedia</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #f9f9f9;
-            padding: 40px;
-        }
-        .menu {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            max-width: 400px;
-            margin: auto;
-        }
-        a {
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
-        }
-        a:hover {
-            background: #0056b3;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-    </style>
-</head>
-<body>
-    <h1>⚙️ Admin Dashboard</h1>
-    <div class="menu">
-        <a href="{% url 'manage_gear' %}">🏋️‍♂️ Kelola Gear</a>
-        <a href="#">📚 Kelola Sport Library</a>
-        <a href="#">🎥 Kelola Video Olahraga</a>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Sportpedia{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 py-12 md:py-16">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <div class="text-center mb-10 md:mb-12">
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-3" style="color: #1C3264;">
+        ⚙️ Admin Dashboard
+      </h1>
+      <p class="text-lg text-gray-600">
+        Manage Sportpedia content and settings.
+      </p>
     </div>
-</body>
-</html>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <a href="{% url 'admin_sportpedia:manage_gear' %}" 
+         class="quick-nav-card block p-6 text-center border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-all duration-300">
+        <div class="mb-4">
+          <span class="text-5xl">🏋️‍♂️</span> 
+          {% comment %} Or use an SVG/Image if you prefer {% endcomment %}
+          {% comment %} <img src="{% static 'images/gear_icon.png' %}" alt="Gear Icon" class="h-16 w-auto mx-auto mb-3 object-contain"> {% endcomment %}
+        </div>
+        <h2 class="text-xl font-semibold mb-2" style="color: #1C3264;">
+          Kelola Gear
+        </h2>
+        <p class="text-sm text-gray-500">
+          Add, edit, or delete sports equipment information.
+        </p>
+      </a>
+
+      <a href="{% url 'admin_sportpedia:manage_library' %}" 
+         class="quick-nav-card block p-6 text-center border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-all duration-300">
+        <div class="mb-4">
+          <span class="text-5xl">📚</span>
+        </div>
+        <h2 class="text-xl font-semibold mb-2" style="color: #1C3264;">
+          Kelola Sport Library
+        </h2>
+        <p class="text-sm text-gray-500">
+          Manage sports details, rules, and history.
+        </p>
+      </a>
+
+      <a href="#" 
+         class="quick-nav-card block p-6 text-center border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-all duration-300 opacity-70 cursor-not-allowed" 
+         aria-disabled="true" 
+         onclick="event.preventDefault(); alert('Fitur ini belum tersedia.');">
+        <div class="mb-4">
+          <span class="text-5xl">🎥</span>
+        </div>
+        <h2 class="text-xl font-semibold mb-2" style="color: #1C3264;">
+          Kelola Video Olahraga
+        </h2>
+        <p class="text-sm text-gray-500">
+          Add or update tutorial and highlight videos. (Coming Soon)
+        </p>
+      </a>
+
+      {% comment %} Add more admin links/cards here as needed {% endcomment %}
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block head %}
+{{ block.super }} {# Ensures styles from base.html are included #}
+<style>
+  /* You can reuse some styles from home.html if needed, or define specific admin ones */
+  .quick-nav-card {
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .quick-nav-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(28, 50, 100, 0.1); /* Slightly softer shadow */
+  }
+</style>
+{% endblock %}
