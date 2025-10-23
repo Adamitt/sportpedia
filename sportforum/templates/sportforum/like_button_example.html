@@ -1,0 +1,188 @@
+<!-- Contoh penggunaan Like Button dengan AJAX -->
+
+<!-- OPSI 1: Inline di template post_detail.html atau forum_list.html -->
+<div class="like-section">
+    <button 
+        class="like-btn" 
+        data-post-id="{{ post.id }}"
+        data-liked="{% if user in post.likes.all %}true{% else %}false{% endif %}">
+        
+        <span class="like-icon">
+            {% if user in post.likes.all %}
+                ❤️ <!-- Liked -->
+            {% else %}
+                🤍 <!-- Not liked -->
+            {% endif %}
+        </span>
+        
+        <span class="like-count">{{ post.total_likes }}</span>
+        <span class="like-text">{% if user in post.likes.all %}Unlike{% else %}Like{% endif %}</span>
+    </button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ambil semua tombol like
+    const likeButtons = document.querySelectorAll('.like-btn');
+    
+    likeButtons.forEach(button => {
+        button.addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            const postId = this.dataset.postId;
+            const likeIcon = this.querySelector('.like-icon');
+            const likeCount = this.querySelector('.like-count');
+            const likeText = this.querySelector('.like-text');
+            
+            try {
+                // Kirim request AJAX ke server
+                const response = await fetch(`/sportforum/like/${postId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const data = await response.json();
+                
+                // Update tampilan button
+                if (data.liked) {
+                    likeIcon.textContent = '❤️';
+                    likeText.textContent = 'Unlike';
+                    this.dataset.liked = 'true';
+                } else {
+                    likeIcon.textContent = '🤍';
+                    likeText.textContent = 'Like';
+                    this.dataset.liked = 'false';
+                }
+                
+                // Update jumlah likes
+                likeCount.textContent = data.total_likes;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Gagal memberikan like. Pastikan Anda sudah login.');
+            }
+        });
+    });
+});
+
+// Function untuk ambil CSRF token dari cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+<style>
+.like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.like-btn:hover {
+    background: #f0f0f0;
+    border-color: #ff6b6b;
+}
+
+.like-btn[data-liked="true"] {
+    border-color: #ff6b6b;
+    background: #fff5f5;
+}
+
+.like-icon {
+    font-size: 1.2em;
+}
+
+.like-count {
+    font-weight: bold;
+    color: #333;
+}
+
+.like-text {
+    color: #666;
+}
+</style>
+
+
+<!-- ========================================= -->
+<!-- OPSI 2: Versi Simple dengan emoji saja -->
+<!-- ========================================= -->
+<button 
+    onclick="toggleLike('{{ post.id }}', this)" 
+    class="simple-like-btn"
+    id="like-btn-{{ post.id }}">
+    <span id="like-icon-{{ post.id }}">
+        {% if user in post.likes.all %}❤️{% else %}🤍{% endif %}
+    </span>
+    <span id="like-count-{{ post.id }}">{{ post.total_likes }}</span>
+</button>
+
+<script>
+async function toggleLike(postId, button) {
+    try {
+        const response = await fetch(`/sportforum/like/${postId}/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+        });
+        
+        const data = await response.json();
+        
+        // Update icon dan count
+        document.getElementById(`like-icon-${postId}`).textContent = data.liked ? '❤️' : '🤍';
+        document.getElementById(`like-count-${postId}`).textContent = data.total_likes;
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Gagal memberikan like');
+    }
+}
+</script>
+
+
+<!-- ========================================= -->
+<!-- OPSI 3: Menggunakan form POST biasa tapi dengan HTMX (lebih mudah) -->
+<!-- ========================================= -->
+<!-- 
+1. Install htmx dengan menambahkan di base.html:
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+2. Lalu gunakan seperti ini:
+-->
+<button 
+    hx-post="{% url 'sportforum:toggle_like' post.id %}"
+    hx-trigger="click"
+    hx-swap="outerHTML"
+    class="htmx-like-btn">
+    {% if user in post.likes.all %}
+        ❤️ {{ post.total_likes }}
+    {% else %}
+        🤍 {{ post.total_likes }}
+    {% endif %}
+</button>

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'main',
     'gearguide',
     'sportlibrary',
+    'sportforum',
 ]
 
 MIDDLEWARE = [
@@ -63,7 +64,7 @@ ROOT_URLCONF = 'sportpedia.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -141,6 +142,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Folder tempat Django nyari file static kamu (contohnya images, css, js)
+STATICFILES_DIRS = [
+    BASE_DIR / "static",        # static global di root project
+    BASE_DIR / "main" / "static",  # static di app main
+]
+
+# Folder tempat Django ngumpulin semua file static pas deploy
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

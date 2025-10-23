@@ -1,0 +1,220 @@
+[
+  {
+    "id": 1,
+    "sport": "Bulu Tangkis",
+    "title": "Rekomendasi Raket untuk Pemula?",
+    "author": "Rafi",
+    "content": "Baru mau mulai latihan bulu tangkis, kira-kira raket yang ringan tapi awet apa ya?",
+    "likes": 34,
+    "views": 240,
+    "date_posted": "2025-02-18",
+    "replies": [
+      {"user": "Dina", "comment": "Coba Yonex Muscle Power 29 Light, cocok buat pemula!", "date": "2025-02-19"},
+      {"user": "Rian", "comment": "Kalau mau versi murah tapi bagus, Li-Ning XP series lumayan.", "date": "2025-02-20"}
+    ],
+    "tags": ["badminton", "gear", "pemula"]
+  },
+  {
+    "id": 2,
+    "sport": "Yoga",
+    "title": "Mat yoga gampang licin, solusi dong?",
+    "author": "Laras",
+    "content": "Aku baru beli yoga mat tapi pas latihan pose warrior malah sering selip, normal nggak sih?",
+    "likes": 18,
+    "views": 185,
+    "date_posted": "2025-03-01",
+    "replies": [
+      {"user": "Ayu", "comment": "Coba semprot air dikit biar ada grip-nya.", "date": "2025-03-02"},
+      {"user": "Devi", "comment": "Kalau masih licin, berarti bahannya PVC, ganti ke natural rubber.", "date": "2025-03-02"}
+    ],
+    "tags": ["yoga", "mat", "tips"]
+  },
+  {
+    "id": 3,
+    "sport": "Tenis",
+    "title": "Cara ningkatin serve biar nggak out mulu",
+    "author": "Edo",
+    "content": "Udah latihan serve seminggu tapi bola masih sering out. Ada trik biar konsisten nggak?",
+    "likes": 22,
+    "views": 210,
+    "date_posted": "2025-02-15",
+    "replies": [
+      {"user": "Coach Lita", "comment": "Perhatikan posisi toss bola. Banyak pemula salah di timing.", "date": "2025-02-16"}
+    ],
+    "tags": ["tennis", "serve", "technique"]
+  },
+  {
+    "id": 4,
+    "sport": "Renang",
+    "title": "Gaya dada bikin capek banget 😭",
+    "author": "Vina",
+    "content": "Baru belajar gaya dada, tapi tiap 2 putaran udah ngos-ngosan. Normal nggak sih?",
+    "likes": 41,
+    "views": 310,
+    "date_posted": "2025-03-03",
+    "replies": [
+      {"user": "Hana", "comment": "Wajar banget, fokus dulu ke napas, bukan ke kecepatan.", "date": "2025-03-03"},
+      {"user": "Adit", "comment": "Coba latihan pernapasan pakai snorkel dulu biar adaptasi.", "date": "2025-03-04"}
+    ],
+    "tags": ["swim", "breathing", "pemula"]
+  },
+  {
+    "id": 5,
+    "sport": "Panahan",
+    "title": "Target sering meleset padahal udah fokus 😭",
+    "author": "Andra",
+    "content": "Anak panahku selalu miring ke kanan, padahal posisi badan udah aku jaga.",
+    "likes": 27,
+    "views": 200,
+    "date_posted": "2025-02-25",
+    "replies": [
+      {"user": "Intan", "comment": "Kemungkinan tali busurmu terlalu kencang, coba longgarkan dikit.", "date": "2025-02-25"},
+      {"user": "Reno", "comment": "Cek juga arah mata dominanmu, itu sering ngaruh.", "date": "2025-02-26"}
+    ],
+    "tags": ["archery", "aim", "focus"]
+  },
+  {
+    "id": 6,
+    "sport": "Lari",
+    "title": "Lari 2 km aja udah ngos-ngosan 😭",
+    "author": "Aldo",
+    "content": "Ada cara biar bisa naikin stamina tanpa pingsan di tengah jalan?",
+    "likes": 53,
+    "views": 480,
+    "date_posted": "2025-03-05",
+    "replies": [
+      {"user": "Reva", "comment": "Coba interval training. Jalan 1 menit, lari 2 menit, ulang 5x.", "date": "2025-03-06"},
+      {"user": "Alya", "comment": "Kuncinya napas! Jangan lupa inhale-exhale di setiap 3 langkah.", "date": "2025-03-06"}
+    ],
+    "tags": ["running", "stamina", "training"]
+  },
+  {
+    "id": 7,
+    "sport": "Basket",
+    "title": "Tangan sering pegal pas shooting 😩",
+    "author": "Kevin",
+    "content": "Baru seminggu ikut UKM basket, tapi lengan kanan sakit tiap abis latihan. Salah teknik ya?",
+    "likes": 25,
+    "views": 230,
+    "date_posted": "2025-02-14",
+    "replies": [
+      {"user": "Randy", "comment": "Kemungkinan otot bahu belum adaptasi. Pemanasan penting banget.", "date": "2025-02-15"},
+      {"user": "Lia", "comment": "Latihan form dulu tanpa bola, biar nggak overuse.", "date": "2025-02-15"}
+    ],
+    "tags": ["basket", "shooting", "injury"]
+  },
+  {
+    "id": 8,
+    "sport": "Futsal",
+    "title": "Cara jaga stamina pas turnamen 2 hari berturut-turut?",
+    "author": "Rian",
+    "content": "Besok ada turnamen futsal, dua hari full. Gimana biar nggak drop di hari kedua?",
+    "likes": 29,
+    "views": 260,
+    "date_posted": "2025-03-08",
+    "replies": [
+      {"user": "Tama", "comment": "Tidur cukup dan jangan minum kopi sebelum main.", "date": "2025-03-08"},
+      {"user": "Bagas", "comment": "Bawa pisang dan air kelapa, elektrolit penting banget bro.", "date": "2025-03-09"}
+    ],
+    "tags": ["futsal", "nutrition", "recovery"]
+  },
+  {
+    "id": 9,
+    "sport": "Bersepeda",
+    "title": "Sepeda berat banget pas nanjak 😭",
+    "author": "Naya",
+    "content": "Udah pakai gear paling ringan tapi tetep aja susah nanjak. Apa aku salah posisi duduk?",
+    "likes": 33,
+    "views": 290,
+    "date_posted": "2025-03-02",
+    "replies": [
+      {"user": "Vito", "comment": "Badan harus condong ke depan, jangan duduk tegak waktu nanjak.", "date": "2025-03-02"},
+      {"user": "Reva", "comment": "Latih cadence rendah biar kaki nggak cepet capek.", "date": "2025-03-03"}
+    ],
+    "tags": ["cycling", "hill", "gear"]
+  },
+  {
+    "id": 10,
+    "sport": "Tenis Meja",
+    "title": "Gimana cara ngelawan pemain spin?",
+    "author": "Doni",
+    "content": "Setiap lawan yang spin terus, bola gue malah keluar. Ada teknik khusus buat counter-nya?",
+    "likes": 26,
+    "views": 210,
+    "date_posted": "2025-02-23",
+    "replies": [
+      {"user": "Mei", "comment": "Gunakan push atau chop rendah biar spin-nya nggak balik ke kamu.", "date": "2025-02-24"}
+    ],
+    "tags": ["pingpong", "spin", "counter"]
+  },
+  {
+    "id": 11,
+    "sport": "Voli",
+    "title": "Tangan perih banget abis passing 😬",
+    "author": "Bella",
+    "content": "Abis latihan voli 2 jam, pergelangan tangan merah semua. Normal kah?",
+    "likes": 17,
+    "views": 180,
+    "date_posted": "2025-03-07",
+    "replies": [
+      {"user": "Gina", "comment": "Iya, biasa di awal. Coba pakai wristband atau taping tipis.", "date": "2025-03-07"}
+    ],
+    "tags": ["volley", "passing", "injury"]
+  },
+  {
+    "id": 12,
+    "sport": "Muay Thai",
+    "title": "Ngantuk tiap abis latihan 😂",
+    "author": "Rafiq",
+    "content": "Abis sesi muay thai malah ngantuk banget, padahal baru jam 8 malam. Normal nggak sih?",
+    "likes": 19,
+    "views": 165,
+    "date_posted": "2025-03-10",
+    "replies": [
+      {"user": "Coach Suriya", "comment": "Normal banget, tubuh lagi recovery. Pastikan makan protein cukup.", "date": "2025-03-11"}
+    ],
+    "tags": ["muaythai", "recovery", "training"]
+  },
+  {
+    "id": 13,
+    "sport": "Selancar",
+    "title": "Board sering kebalik pas ombak besar 😭",
+    "author": "Dewa",
+    "content": "Aku udah bisa pop-up tapi tiap ombak gede selalu jatuh. Ada tips biar stabil?",
+    "likes": 24,
+    "views": 230,
+    "date_posted": "2025-03-04",
+    "replies": [
+      {"user": "Kai", "comment": "Jangan kakuin kaki, fleksibelin lutut dan baca arah ombak dulu.", "date": "2025-03-05"}
+    ],
+    "tags": ["surf", "balance", "wave"]
+  },
+  {
+    "id": 14,
+    "sport": "Pencak Silat",
+    "title": "Sulit jaga kuda-kuda lama 😅",
+    "author": "Andi",
+    "content": "Latihan 5 menit aja udah pegal semua. Emang perlu dilatih tiap hari ya?",
+    "likes": 20,
+    "views": 190,
+    "date_posted": "2025-02-27",
+    "replies": [
+      {"user": "Seno", "comment": "Latih 1 menit tiap pagi aja dulu, nanti lama-lama kuat sendiri.", "date": "2025-02-27"}
+    ],
+    "tags": ["silat", "stance", "training"]
+  },
+  {
+    "id": 15,
+    "sport": "Wall Climbing",
+    "title": "Telapak tangan gampang lecet 😭",
+    "author": "Tio",
+    "content": "Baru seminggu panjat indoor tapi tangan lecet terus. Harus pakai sarung tangan ya?",
+    "likes": 28,
+    "views": 250,
+    "date_posted": "2025-03-01",
+    "replies": [
+      {"user": "Zian", "comment": "Jangan pakai sarung tangan, nanti malah licin. Pakai chalk aja biar kering.", "date": "2025-03-02"}
+    ],
+    "tags": ["climb", "chalk", "injury"]
+  }
+]

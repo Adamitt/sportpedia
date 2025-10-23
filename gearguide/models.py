@@ -2,21 +2,56 @@ from django.db import models
 from sportlibrary.models import Sport
 import uuid
 
+
 class Gear(models.Model):
-    sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name="gears")
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name="gears")
+
     name = models.CharField(max_length=100)
+    function = models.TextField(blank=True, null=True)
     description = models.TextField()
-    required = models.BooleanField(default=True)  # apakah alat wajib atau opsional
-    image = models.URLField(blank=True, null=True)  # link gambar alat (opsional)
-    price_range = models.CharField(max_length=50, blank=True, null=True)  # contoh: "Rp300.000 – Rp800.000"
-    ecommerce_link = models.URLField(blank=True, null=True)  # link rekomendasi e-commerce
-    difficulty_level = models.CharField(max_length=50, choices=[
-        ('beginner', 'Pemula'),
-        ('intermediate', 'Menengah'),
-        ('advanced', 'Lanjutan')
-    ], default='beginner')
-    tips = models.TextField(blank=True, null=True)  # tips tambahan untuk pemakaian alat
+    required = models.BooleanField(default=True)
+
+    image = models.URLField(blank=True, null=True)
+    price_range = models.CharField(max_length=50, blank=True, null=True)
+    ecommerce_link = models.URLField(blank=True, null=True)
+
+    # Level pengguna / kesulitan
+    level = models.CharField(
+        max_length=50,
+        choices=[
+            ('beginner', 'Pemula'),
+            ('intermediate', 'Menengah'),
+            ('advanced', 'Lanjutan'),
+        ],
+        default='beginner'
+    )
+
+    # Data tambahan (gunakan JSONField biar bisa list)
+    recommended_brands = models.JSONField(blank=True, null=True, default=list)
+    materials = models.JSONField(blank=True, null=True, default=list)
+    care_tips = models.TextField(blank=True, null=True)
+    tags = models.JSONField(blank=True, null=True, default=list)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Gear'
+        verbose_name_plural = 'Gears'
 
     def __str__(self):
         return f"{self.name} - {self.sport.name}"
+
+    # Helper (buat AJAX atau JSON)
+    def to_dict(self):
+        return {
+            "id": str(self.id),
+            "sport": self.sport.name,
+            "name": self.name,
+            "description": self.description,
+            "price_range": self.price_range,
+            "level": self.get_level_display(),
+            "brands": self.recommended_brands or [],
+            "tags": self.tags or [],
+            "buy_link": self.ecommerce_link,
+            "image": self.image,
+        }

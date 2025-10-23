@@ -1,9 +1,15 @@
 from django import forms
+from .models import ForumPost, Reply
 
-class ForumPostForm(forms.Form):
-    title = forms.CharField(max_length=150)
-    content = forms.CharField(widget=forms.Textarea)
-    tags = forms.CharField(required=False, help_text="Pisahkan dengan koma, contoh: surf, wave, balance")
+class ForumPostForm(forms.ModelForm):
+    tags = forms.CharField(
+        required=False, 
+        help_text="Pisahkan dengan koma, contoh: surf, wave, balance"
+    )
+    
+    class Meta:
+        model = ForumPost
+        fields = ['sport', 'title', 'content', 'tags']
 
 
 class ReplyForm(forms.Form):
