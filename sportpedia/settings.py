@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'mainPage',
     'gearguide',
     'sportlibrary',
+    'metrics',
 
 ]
 
