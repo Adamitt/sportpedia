@@ -27,3 +27,13 @@ def sport_detail(request, sport_id):
 
     context = {"sport": sport}
     return render(request, 'sportlibrary/detail.html', context)
+
+def saved_sports(request):
+    base_dir = Path(__file__).resolve().parent.parent
+    data_path = base_dir / 'database' / 'sports.json'
+    
+    with open(data_path, 'r', encoding='utf-8') as file:
+        all_sports = json.load(file)
+    
+    context = {"all_sports_json": json.dumps(all_sports)}
+    return render(request, 'bookmarklist.html', context)

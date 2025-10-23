@@ -29,7 +29,7 @@ def register(request):
                 print(f"Gagal simpan ke users.json: {e}")
 
             messages.success(request, 'Akun berhasil dibuat! Silakan login.')
-            return redirect('login')
+            return redirect('accounts:login')
     else:
         form = RegisterForm()
     return render(request, 'accounts/register.html', {'form': form})
@@ -42,7 +42,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('/') 
+            return redirect('/')
         else:
             messages.error(request, 'Username atau password salah.')
     else:
@@ -52,4 +52,4 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('accounts:login')
