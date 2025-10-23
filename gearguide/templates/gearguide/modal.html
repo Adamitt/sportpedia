@@ -1,13 +1,15 @@
 <style>
 /* Modal Overlay Enhancement */
+/* Ganti ini */
 #editModal {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: none;
 }
 
+/* Pindahkan efek blur ke overlay-nya aja */
 #editModal .fixed.inset-0.bg-black\/50 {
-  background: rgba(0, 0, 0, 0.65) !important;
-  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.55) !important;
 }
 
 /* Modal Container Enhancement */
