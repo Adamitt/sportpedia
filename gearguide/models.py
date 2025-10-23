@@ -31,7 +31,13 @@ class Gear(models.Model):
     materials = models.JSONField(blank=True, null=True, default=list)
     care_tips = models.TextField(blank=True, null=True)
     tags = models.JSONField(blank=True, null=True, default=list)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="gears")
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='gears',
+        null=True,
+        blank=True
+    )
 
     class Meta:
         ordering = ['name']

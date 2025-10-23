@@ -52,6 +52,10 @@ INSTALLED_APPS = [
     'admin_sportpedia',
 ]
 
+LOGIN_URL = '/login/'  # biar decorator login_required tahu harus redirect ke sini
+LOGIN_REDIRECT_URL = '/'  # ke mana user dibawa setelah login\
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

@@ -8,6 +8,8 @@ from django.views.decorators.http import require_http_methods
 from .models import Gear
 from .forms import GearForm
 from sportlibrary.models import Sport
+from django.contrib.auth.decorators import login_required
+
 
 def show_gear_detail(request, gear_id):
     gear = get_object_or_404(Gear, id=gear_id)
@@ -18,16 +20,19 @@ def show_gear_detail(request, gear_id):
     return render(request, "gearguide/gear_detail.html", context)
 
 def show_all_gears(request):
-    db_gears = list(Gear.objects.all().select_related('sport'))
+    db_gears = list(Gear.objects.select_related('sport').all())
 
-    base_dir = Path(__file__).resolve().parent.parent.parent
-    data_path = base_dir / 'database' / 'gears.json'
-    with open(data_path, 'r', encoding='utf-8') as file:
-        json_gears = json.load(file)
+    BASE_DIR = Path(__file__).resolve().parent.parent.parent
+    data_path = BASE_DIR / 'database' / 'gears.json'
+
+    json_gears = []
+    if data_path.exists():
+        with open(data_path, 'r', encoding='utf-8') as file:
+            json_gears = json.load(file)
 
     combined_gears = []
 
-    # JSON items
+    # === JSON ITEMS ===
     for g in json_gears:
         sport_name = "Unknown"
         sport_id = g.get("sport_id")
@@ -52,9 +57,10 @@ def show_all_gears(request):
             "tags": g.get("tags", []),
             "image": g.get("image", ""),
             "is_from_db": False,
+            "owner": None,
         })
 
-    # DB items
+    # === DB ITEMS ===
     for g in db_gears:
         combined_gears.append({
             "id": g.id,
@@ -71,32 +77,36 @@ def show_all_gears(request):
             "tags": g.tags or [],
             "image": g.image or "",
             "is_from_db": True,
+            "owner": (
+                g.owner.username if hasattr(g, "owner") and g.owner
+                else "Anonymous"
+            ),
         })
 
-    # 🔹 Ambil filter dari query
+    # === FILTER LOGIC ===
     sport_filter = request.GET.get('sport')
     level_filter = request.GET.get('level')
-    source_filter = request.GET.get('source')  # 🆕 "db" / "json" / "all"
+    view_filter = request.GET.get('view', 'all')  # new filter (all / your)
 
-    # Filter jenis sport
+    # Sport filter
     if sport_filter:
-        combined_gears = [
-            g for g in combined_gears
-            if sport_filter.lower() in str(g["sport"]).lower()
-        ]
+        combined_gears = [g for g in combined_gears if sport_filter.lower() in str(g["sport"]).lower()]
 
-    # Filter level
+    # Level filter
     if level_filter:
-        combined_gears = [
-            g for g in combined_gears
-            if g.get("level", "").lower() == level_filter.lower()
-        ]
+        combined_gears = [g for g in combined_gears if g.get("level", "").lower() == level_filter.lower()]
 
-    # 🔹 Filter sumber data
-    if source_filter == "db":
-        combined_gears = [g for g in combined_gears if g["is_from_db"]]
-    elif source_filter == "json":
-        combined_gears = [g for g in combined_gears if not g["is_from_db"]]
+    # === View filter (new) ===
+    if view_filter == "your":
+        if request.user.is_authenticated:
+            combined_gears = [
+                g for g in combined_gears
+                if g["is_from_db"] and g.get("owner") == request.user.username
+            ]
+        else:
+            combined_gears = []  # ga login = kosong
+    elif view_filter == "all":
+        combined_gears = combined_gears  # keep everything (JSON + DB)
 
     sports = sorted(set(str(g["sport"]) for g in combined_gears if g.get("sport")))
     all_sports = Sport.objects.all().order_by('name')
@@ -106,17 +116,10 @@ def show_all_gears(request):
         "gears": combined_gears,
         "sports": sports,
         "all_sports": all_sports,
-        "source_filter": source_filter or "all",  # 🔹 kirim ke template
+        "view_filter": view_filter,
     })
 
-
 def card_details(request, gear_id):
-    """
-    Tampilkan detail gear.
-    1) Coba cari di DB (UUID)
-    2) Kalau tidak ada, cek di JSON
-    """
-    # 1) Coba treat sebagai UUID dan cari di DB
     try:
         _ = UUID(str(gear_id))
         gear = Gear.objects.select_related('sport').filter(id=gear_id).first()
@@ -142,10 +145,8 @@ def card_details(request, gear_id):
             }
             return render(request, "gearguide/card_details.html", context)
     except ValueError:
-        # bukan UUID, langsung ke JSON
         pass
 
-    # 2) Cek JSON
     base_dir = Path(__file__).resolve().parent.parent.parent
     data_path = base_dir / 'database' / 'gears.json'
     with open(data_path, 'r', encoding='utf-8') as file:
@@ -154,7 +155,6 @@ def card_details(request, gear_id):
     if not gear:
         return render(request, "404.html", status=404)
     
-    # ⭐ Ambil nama sport dari database berdasarkan sport_id
     sport_name = "Unknown"
     sport_id = gear.get("sport_id")
     if sport_id:
@@ -172,34 +172,31 @@ def card_details(request, gear_id):
     context = {"title": gear["name"], "gear": gear}
     return render(request, "gearguide/card_details.html", context)
 
+@login_required(login_url='login')
 def add_gear(request):
     if request.method == "POST":
         form = GearForm(request.POST)
         if form.is_valid():
             gear = form.save(commit=False)
-            if request.user.is_authenticated:
-                gear.owner = request.user  # 🆕 simpan user yang login
+            gear.owner = request.user
             gear.save()
             messages.success(request, "✅ Gear baru berhasil ditambahkan!")
             return redirect("gearguide:show_all_gears")
     else:
         form = GearForm()
-
     return render(request, "gearguide/add_gear.html", {"form": form})
 
+@login_required(login_url='login')
+@require_http_methods(["POST"])
 def delete_gear(request, gear_id):
-    """
-    Hanya hapus gear dari database.
-    Gear dari JSON tidak bisa dihapus.
-    """
-    try:
-        gear = get_object_or_404(Gear, id=gear_id)
-        name = gear.name
-        gear.delete()
-        messages.success(request, f"🗑 Gear '{name}' berhasil dihapus dari database.")
-    except Exception as e:
-        messages.error(request, f"❌ Gagal menghapus gear: {str(e)}")
+    gear = get_object_or_404(Gear, id=gear_id)
+    if hasattr(gear, "owner") and gear.owner != request.user:
+        messages.error(request, "❌ Kamu tidak punya izin untuk menghapus gear ini.")
+        return redirect("gearguide:show_all_gears")
 
+    name = gear.name
+    gear.delete()
+    messages.success(request, f"🗑 Gear '{name}' berhasil dihapus.")
     return redirect("gearguide:show_all_gears")
 
 # ============ AJAX FUNCTIONS ============
@@ -243,22 +240,23 @@ def get_gear_json(request, gear_id):
     })
     return JsonResponse({"ok": True, "data": data}, status=200)
 
+@login_required(login_url='login')
 @require_http_methods(["POST"])
 def edit_gear_ajax(request, gear_id):
-    """
-    AJAX POST: update gear via forms.py (ModelForm).
-    """
     try:
         gear = get_object_or_404(Gear, id=gear_id)
+        if hasattr(gear, "owner") and gear.owner != request.user:
+            return JsonResponse({
+                "ok": False,
+                "errors": {"general": ["Kamu tidak punya izin untuk mengedit gear ini."]}
+            }, status=403)
     except Exception as e:
         return JsonResponse({
             "ok": False,
             "errors": {"general": [f"Gear tidak ditemukan: {str(e)}"]}
         }, status=404)
 
-    # Gunakan GearForm supaya clean_* untuk list jalan
     form = GearForm(request.POST, instance=gear)
-    
     if form.is_valid():
         try:
             gear = form.save()
@@ -270,13 +268,5 @@ def edit_gear_ajax(request, gear_id):
                 "errors": {"general": [f"Gagal menyimpan: {str(e)}"]}
             }, status=500)
 
-    # Kirim error field-friendly
-    errors_dict = {}
-    for field, errs in form.errors.items():
-        errors_dict[field] = [str(err) for err in errs]
-    
-    return JsonResponse({
-        "ok": False,
-        "errors": errors_dict
-    }, status=400)
-
+    errors_dict = {field: [str(err) for err in errs] for field, errs in form.errors.items()}
+    return JsonResponse({"ok": False, "errors": errors_dict}, status=400)
