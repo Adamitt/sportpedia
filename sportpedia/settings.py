@@ -33,7 +33,7 @@ PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "chevinka-queen-sportpedia.pbp.cs.ui.ac.id"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ainur-fadhil-sportpedia.pbp.cs.ui.ac.id"]
 
 
 # Application definition
@@ -153,6 +153,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Folder tempat Django nyari file static kamu (contohnya images, css, js)
+STATICFILES_DIRS = [
+    BASE_DIR / "static",        # static global di root project
+    BASE_DIR / "main" / "static",  # static di app main
+]
+
+# Folder tempat Django ngumpulin semua file static pas deploy
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
