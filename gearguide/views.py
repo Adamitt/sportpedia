@@ -1,3 +1,6 @@
+from django.urls import reverse #
+from metrics.utils import bump_view #
+from django.conf import settings #
 import json
 from pathlib import Path
 from uuid import UUID
@@ -14,6 +17,19 @@ from django.contrib.auth.decorators import login_required
 # ======================= DETAIL VIEW =======================
 def show_gear_detail(request, gear_id):
     gear = get_object_or_404(Gear, id=gear_id)
+    
+    # ✅ catat view (gear dari DB)
+    key = f"gear:{gear.id}"
+    url = reverse("gearguide:card_details", kwargs={"gear_id": str(gear.id)})
+    bump_view(
+        key,
+        title=gear.name,
+        url=url,
+        category="Gear Guide",
+        image=(gear.image or ""),
+        request=request,
+    )
+
     context = {
         "title": gear.name,
         "gear": gear,
@@ -24,7 +40,6 @@ def show_gear_detail(request, gear_id):
 # ======================= SHOW ALL GEARS =======================
 def show_all_gears(request):
     db_gears = list(Gear.objects.select_related('sport').all())
-
     BASE_DIR = Path(__file__).resolve().parent.parent.parent
     data_path = BASE_DIR / 'database' / 'gears.json'
 
@@ -32,7 +47,6 @@ def show_all_gears(request):
     if data_path.exists():
         with open(data_path, 'r', encoding='utf-8') as file:
             json_gears = json.load(file)
-
     combined_gears = []
 
     # === JSON ITEMS ===
@@ -145,6 +159,19 @@ def card_details(request, gear_id):
                     "is_from_db": True
                 }
             }
+
+            # ✅ catat view (gear dari DB)
+            key = f"gear:{gear.id}"
+            url = reverse("gearguide:card_details", kwargs={"gear_id": str(gear.id)})
+            bump_view(
+                key,
+                title=gear.name,
+                url=url,
+                category="Gear Guide",
+                image=(gear.image or ""),
+                request=request,
+            )
+
             return render(request, "gearguide/card_details.html", context)
     except ValueError:
         pass
@@ -153,10 +180,10 @@ def card_details(request, gear_id):
     data_path = base_dir / 'database' / 'gears.json'
     with open(data_path, 'r', encoding='utf-8') as file:
         gears = json.load(file)
+
     gear = next((g for g in gears if str(g['id']) == str(gear_id)), None)
     if not gear:
         return render(request, "404.html", status=404)
-
     sport_name = "Unknown"
     sport_id = gear.get("sport_id")
     if sport_id:
@@ -170,6 +197,18 @@ def card_details(request, gear_id):
 
     gear['is_from_db'] = False
     gear['sport'] = sport_name
+
+    # ✅ catat view (gear dari JSON)
+    key = f"gearjson:{gear['id']}"
+    url = reverse("gearguide:card_details", kwargs={"gear_id": str(gear['id'])})
+    bump_view(
+        key,
+        title=gear["name"],
+        url=url,
+        category="Gear Guide",
+        image=gear.get("image", ""),
+        request=request,
+    )
 
     context = {"title": gear["name"], "gear": gear}
     return render(request, "gearguide/card_details.html", context)
