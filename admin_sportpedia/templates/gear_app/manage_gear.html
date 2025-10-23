@@ -1,0 +1,29 @@
+{% extends "base.html" %} {# opsional, kalau punya base #}
+{% block content %}
+<h2>📦 Daftar Gear</h2>
+<a href="{% url 'add_gear' %}">+ Tambah Gear</a>
+<table>
+  <thead>
+    <tr><th>Nama</th><th>Olahraga</th><th>Tingkat</th><th>Harga</th><th>Aksi</th></tr>
+  </thead>
+  <tbody>
+  {% for g in gears %}
+    <tr>
+      <td>{{ g.name }}</td>
+      <td>{{ g.sport.name }}</td>
+      <td>{{ g.get_level_display }}</td>
+      <td>{{ g.price_range|default:"-" }}</td>
+      <td>
+        <a href="{% url 'edit_gear' g.id %}">Edit</a> |
+        <form action="{% url 'delete_gear' g.id %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" onclick="return confirm('Hapus gear ini?')">Hapus</button>
+        </form>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5">Belum ada gear.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

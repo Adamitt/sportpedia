@@ -1,0 +1,384 @@
+<style>
+/* Modal Overlay Enhancement */
+#editModal {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+#editModal .fixed.inset-0.bg-black\/50 {
+  background: rgba(0, 0, 0, 0.65) !important;
+  transition: all 0.3s ease;
+}
+
+/* Modal Container Enhancement */
+#editModal .bg-white {
+  animation: modalSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Header Enhancement */
+#editModal .border-b {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-bottom: none !important;
+}
+
+#editModal .border-b h3 {
+  color: white !important;
+  font-size: 26px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#editModal .border-b button {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+#editModal .border-b button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: rotate(90deg);
+}
+
+#editModal .border-b button svg {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+/* Form Styling */
+#editGearForm {
+  max-height: calc(90vh - 180px);
+  overflow-y: auto;
+}
+
+#editGearForm::-webkit-scrollbar {
+  width: 8px;
+}
+
+#editGearForm::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+#editGearForm::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+}
+
+/* Label Enhancement */
+#editGearForm label {
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#editGearForm label::before {
+  content: '●';
+  color: #667eea;
+  font-size: 8px;
+}
+
+/* Input Enhancement */
+#editGearForm input[type="text"],
+#editGearForm input[type="url"],
+#editGearForm select,
+#editGearForm textarea {
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+#editGearForm input[type="text"]:focus,
+#editGearForm input[type="url"]:focus,
+#editGearForm select:focus,
+#editGearForm textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  transform: translateY(-1px);
+}
+
+#editGearForm input[type="text"]:hover,
+#editGearForm input[type="url"]:hover,
+#editGearForm select:hover,
+#editGearForm textarea:hover {
+  border-color: #cbd5e1;
+}
+
+#editGearForm textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* Hint Text */
+#editGearForm .text-xs {
+  color: #64748b;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#editGearForm .text-xs::before {
+  content: 'ℹ️';
+  font-size: 14px;
+}
+
+/* Error Message Enhancement */
+#edit-error {
+  border-radius: 12px;
+  animation: errorShake 0.4s ease;
+  border: 2px solid #fecaca;
+  background: linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%);
+}
+
+#edit-error.hidden {
+  display: none;
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+#edit-error p::before {
+  content: '⚠️ ';
+  margin-right: 8px;
+}
+
+/* Button Enhancement */
+#editGearForm button[type="button"] {
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 13px 24px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  background: white;
+  color: #475569;
+}
+
+#editGearForm button[type="button"]:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+#editGearForm button[type="submit"] {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 12px;
+  padding: 13px 28px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+#editGearForm button[type="submit"]:hover {
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+}
+
+#editGearForm button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+/* Grid spacing adjustment */
+#editGearForm .grid {
+  gap: 24px;
+}
+
+/* Select arrow styling */
+#editGearForm select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23667eea'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+  padding-right: 40px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  #editModal .bg-white {
+    margin: 0;
+    border-radius: 20px;
+    max-height: 95vh;
+  }
+  
+  #editModal .border-b h3 {
+    font-size: 22px;
+  }
+  
+  #editGearForm .mt-6 {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  #editGearForm button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+</style>
+
+<div id="editModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+  <div class="flex items-center justify-center min-h-screen px-4">
+    <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeEditModal()"></div>
+    
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-auto my-8 z-10">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200">
+        <h3 class="text-2xl font-bold text-gray-900">✏️ Edit Gear</h3>
+        <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form id="editGearForm" class="p-6">
+        {% csrf_token %}
+        <input type="hidden" name="gear_id" id="edit-gear-id">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Nama -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Gear *</label>
+            <input id="edit-name" name="name" required
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+
+          <!-- Sport/Kategori -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Olahraga *</label>
+            <select id="edit-sport" name="sport" required
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="">Pilih Kategori</option>
+              {% for s in all_sports %}
+              <option value="{{ s.id }}">{{ s.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Level -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Level *</label>
+            <select id="edit-level" name="level" required
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="beginner">🌱 Pemula</option>
+              <option value="intermediate">⚡ Menengah</option>
+              <option value="advanced">🏆 Lanjutan</option>
+            </select>
+          </div>
+
+          <!-- Harga -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Harga</label>
+            <input id="edit-price" name="price_range" placeholder="Rp 500.000 - Rp 1.000.000"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+
+          <!-- Deskripsi -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi</label>
+            <textarea id="edit-description" name="description" rows="3"
+                      class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+          </div>
+
+          <!-- Function -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Fungsi</label>
+            <input id="edit-function" name="function"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+
+          <!-- Brands -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Brand Rekomendasi</label>
+            <input id="edit-brands" name="recommended_brands" placeholder="Nike, Adidas, Puma"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <p class="text-xs text-gray-500 mt-1">Pisahkan dengan koma</p>
+          </div>
+
+          <!-- Materials -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Material</label>
+            <input id="edit-materials" name="materials" placeholder="Kulit, Mesh, Rubber"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <p class="text-xs text-gray-500 mt-1">Pisahkan dengan koma</p>
+          </div>
+
+          <!-- Link Beli -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Link Beli</label>
+            <input id="edit-buy" name="ecommerce_link" type="url" placeholder="https://tokopedia.com/..."
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+
+          <!-- Image URL -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">URL Gambar</label>
+            <input id="edit-image" name="image" type="url" placeholder="https://example.com/image.jpg"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+
+          <!-- Care Tips -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Tips Perawatan</label>
+            <textarea id="edit-care" name="care_tips" rows="2"
+                      class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+          </div>
+
+          <!-- Tags -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Tags</label>
+            <input id="edit-tags" name="tags" placeholder="premium, outdoor, waterproof"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <p class="text-xs text-gray-500 mt-1">Pisahkan dengan koma</p>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="edit-error" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p class="text-sm text-red-600 font-medium"></p>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-6 flex justify-end gap-3">
+          <button type="button" onclick="closeEditModal()"
+                  class="px-6 py-2.5 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+            Batal
+          </button>
+          <button type="submit"
+                  class="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md">
+            💾 Simpan Perubahan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
