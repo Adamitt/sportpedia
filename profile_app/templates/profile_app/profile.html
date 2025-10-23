@@ -23,18 +23,18 @@
     <div class="mt-10 bg-white rounded-2xl shadow-md p-6">
       <h3 class="text-lg font-semibold text-gray-900 mb-4">🧭 Informasi Dasar</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <p><span class="font-medium text-gray-700">Olahraga Favorit:</span> 
+        <p><span class="font-medium text-gray-700">Olahraga Favorit:</span>
            <span class="text-gray-600">{{ profile.olahraga_favorit|default:"Belum diatur" }}</span></p>
         <p><span class="font-medium text-gray-700">Preferensi:</span>
            <span class="text-gray-600">{{ profile.preferensi|default:"Belum ada preferensi" }}</span></p>
       </div>
 
       <div class="mt-6 flex flex-wrap gap-3">
-        <a href="{% url 'pengaturan_akun' %}" 
+        <a href="{% url 'pengaturan_akun' %}"
            class="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:opacity-90 transition">
            ⚙️ Pengaturan Akun
         </a>
-        <a href="{% url 'accounts:logout' %}" 
+        <a href="{% url 'accounts:logout' %}"
            class="px-5 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition">
            🚪 Logout
         </a>
