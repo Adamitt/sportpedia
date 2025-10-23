@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Video Gallery - SPORTPEDIA{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-8 py-12">
+    <!-- Hero Section -->
+    <div class="relative rounded-3xl overflow-hidden mb-12 h-80">
+        <div class="absolute inset-0 bg-gradient-to-r from-[#1E3A5F]/90 to-[#1E3A5F]/70"></div>
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200'); opacity: 0.3;"></div>
+        <div class="relative h-full flex flex-col items-center justify-center text-white text-center px-6">
+            <h1 class="text-5xl font-bold mb-4">Learn visually with step-by-step</h1>
+            <h2 class="text-4xl font-bold mb-6">sports tutorials for every level.</h2>
+            <a href="#videos" class="px-8 py-3 rounded-full font-semibold text-lg border-3 hover:bg-white hover:text-[#1E3A5F] transition-all" style="border-width: 3px; border-color: white; color: white;">
+                GET STARTED
+            </a>
+        </div>
+    </div>
+
+    <!-- Section Title -->
+    <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-3 mb-4">
+            <div class="p-3 rounded-lg" style="background-color: #f0f4f8;">
+                <i data-lucide="play" class="h-8 w-8" style="color: #1E3A5F;"></i>
+            </div>
+        </div>
+        <h3 class="text-3xl font-bold mb-2" style="color: #1E3A5F;">VIDEO GALLERY</h3>
+        <p class="text-gray-600">Explore our collection of beginner-friendly sports tutorials</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="bg-white rounded-2xl shadow-sm p-6 mb-8 border border-gray-100" id="videos">
+        <form method="GET" action="{% url 'videos:gallery' %}">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-3 flex-wrap">
+                    <!-- Filter Toggle -->
+                    <button type="button" id="filterToggle" class="flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all border-2 hover:bg-gray-50" style="border-color: #1E3A5F; color: #1E3A5F;">
+                        <i data-lucide="filter" class="h-4 w-4"></i>
+                        Filter
+                        <i data-lucide="chevron-down" class="h-4 w-4"></i>
+                    </button>
+                    
+                    <!-- Sport Filter -->
+                    <select name="sport" class="px-5 py-2.5 rounded-full font-medium border-2 focus:outline-none transition-colors" style="border-color: #1E3A5F; color: #1E3A5F;">
+                        <option value="">All Sports</option>
+                        {% for sport in sports %}
+                            <option value="{{ sport.id }}" {% if request.GET.sport == sport.id|stringformat:"s" %}selected{% endif %}>{{ sport.name }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <!-- Difficulty Filter -->
+                    <select name="difficulty" class="px-5 py-2.5 rounded-full font-medium border-2 focus:outline-none transition-colors" style="border-color: #1E3A5F; color: #1E3A5F;">
+                        <option value="">Difficulty Level</option>
+                        <option value="beginner" {% if request.GET.difficulty == 'beginner' %}selected{% endif %}>Beginner</option>
+                        <option value="intermediate" {% if request.GET.difficulty == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                        <option value="advanced" {% if request.GET.difficulty == 'advanced' %}selected{% endif %}>Advanced</option>
+                    </select>
+                    
+                    <button type="submit" class="px-5 py-2.5 rounded-full font-medium border-2 transition-colors text-white" style="background-color: #1E3A5F; border-color: #1E3A5F;">
+                        Apply Filters
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <span class="text-sm text-gray-600 font-medium">{{ videos.count }} videos</span>
+                    <div class="flex gap-2">
+                        <button type="button" id="gridView" class="p-2.5 rounded-lg transition-colors text-white" style="background-color: #1E3A5F;">
+                            <i data-lucide="grid" class="h-5 w-5"></i>
+                        </button>
+                        <button type="button" id="listView" class="p-2.5 rounded-lg transition-colors bg-gray-100 text-gray-600">
+                            <i data-lucide="list" class="h-5 w-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Filter Panel (Hidden by default) -->
+            <div id="filterPanel" class="hidden mt-6 pt-6 border-t border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div>
+                        <h4 class="font-semibold mb-4" style="color: #1E3A5F;">Video Duration</h4>
+                        <label class="flex items-center gap-3 mb-3 cursor-pointer">
+                            <input type="checkbox" name="duration" value="short" class="w-4 h-4 rounded accent-[#1E3A5F]">
+                            <span class="text-sm text-gray-700">Less than 5 minutes</span>
+                        </label>
+                        <label class="flex items-center gap-3 mb-3 cursor-pointer">
+                            <input type="checkbox" name="duration" value="medium" class="w-4 h-4 rounded accent-[#1E3A5F]">
+                            <span class="text-sm text-gray-700">5-10 minutes</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" name="duration" value="long" class="w-4 h-4 rounded accent-[#1E3A5F]">
+                            <span class="text-sm text-gray-700">More than 10 minutes</span>
+                        </label>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold mb-4" style="color: #1E3A5F;">Rating</h4>
+                        <label class="flex items-center gap-3 mb-3 cursor-pointer">
+                            <input type="checkbox" name="rating" value="4.5" class="w-4 h-4 rounded accent-[#1E3A5F]">
+                            <span class="text-sm text-gray-700 flex items-center gap-2">
+                                <i data-lucide="star" class="h-4 w-4 text-[#F4D160] fill-[#F4D160]"></i> 4.5+
+                            </span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" name="rating" value="4.0" class="w-4 h-4 rounded accent-[#1E3A5F]">
+                            <span class="text-sm text-gray-700 flex items-center gap-2">
+                                <i data-lucide="star" class="h-4 w-4 text-[#F4D160] fill-[#F4D160]"></i> 4.0+
+                            </span>
+                        </label>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold mb-4" style="color: #1E3A5F;">Sort By</h4>
+                        <select name="sort" class="w-full px-5 py-2.5 rounded-full border-2 font-medium focus:outline-none" style="border-color: #1E3A5F; color: #1E3A5F;">
+                            <option value="popular">Most Popular</option>
+                            <option value="rating">Highest Rating</option>
+                            <option value="newest">Newest</option>
+                            <option value="shortest">Shortest Duration</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Video Grid -->
+    <div id="videoGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for video in videos %}
+        <a href="{% url 'videos:detail' video.id %}" class="bg-white rounded-3xl overflow-hidden hover:shadow-xl transition-all cursor-pointer border-2" style="border-color: #fce7f3;">
+            <div class="relative h-52 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-50">
+                {% if video.thumbnail %}
+                    <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="w-full h-full object-cover">
+                {% else %}
+                    <span class="text-7xl">🎾</span>
+                {% endif %}
+                <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-all flex items-center justify-center">
+                    <div class="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        <i data-lucide="play" class="h-8 w-8" style="color: #1E3A5F;"></i>
+                    </div>
+                </div>
+                <div class="absolute bottom-3 right-3 text-white text-xs px-3 py-1.5 rounded-full font-semibold flex items-center gap-1" style="background-color: #1E3A5F;">
+                    <i data-lucide="clock" class="h-3 w-3"></i>
+                    {{ video.duration }}
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <h3 class="font-bold text-lg text-gray-800 mb-3 line-clamp-2">{{ video.title }}</h3>
+                
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="px-3 py-1.5 rounded-full text-xs font-semibold text-white" style="background-color: #1E3A5F;">{{ video.sport.name }}</span>
+                    <span class="px-3 py-1.5 rounded-full text-xs font-semibold" style="background-color: #F4D160; color: #1E3A5F;">{{ video.get_difficulty_display }}</span>
+                </div>
+                
+                <div class="flex items-center justify-between text-sm text-gray-600">
+                    <div class="flex items-center gap-1.5">
+                        <i data-lucide="eye" class="h-4 w-4"></i>
+                        <span class="font-medium">{{ video.views_count }}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <i data-lucide="star" class="h-4 w-4 text-[#F4D160] fill-[#F4D160]"></i>
+                        <span class="font-bold text-gray-800">{{ video.average_rating }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div class="col-span-3 text-center py-12">
+            <p class="text-gray-500 text-lg">No videos found. Try adjusting your filters.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- List View (Hidden by default) -->
+    <div id="videoList" class="hidden space-y-6">
+        {% for video in videos %}
+        <a href="{% url 'videos:detail' video.id %}" class="bg-white rounded-3xl p-6 flex gap-6 hover:shadow-xl transition-all cursor-pointer border-2" style="border-color: #fce7f3;">
+            <div class="relative w-56 h-36 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-gray-100 to-gray-50">
+                {% if video.thumbnail %}
+                    <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="w-full h-full object-cover rounded-2xl">
+                {% else %}
+                    <span class="text-5xl">🎾</span>
+                {% endif %}
+                <div class="absolute bottom-2 right-2 text-white text-xs px-3 py-1.5 rounded-full font-semibold" style="background-color: #1E3A5F;">
+                    {{ video.duration }}
+                </div>
+            </div>
+            
+            <div class="flex-1">
+                <h3 class="font-bold text-xl text-gray-800 mb-3">{{ video.title }}</h3>
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="px-3 py-1.5 rounded-full text-xs font-semibold text-white" style="background-color: #1E3A5F;">{{ video.sport.name }}</span>
+                    <span class="px-3 py-1.5 rounded-full text-xs font-semibold" style="background-color: #F4D160; color: #1E3A5F;">{{ video.get_difficulty_display }}</span>
+                </div>
+                <div class="flex items-center gap-6 text-sm text-gray-600">
+                    <div class="flex items-center gap-1.5">
+                        <i data-lucide="eye" class="h-4 w-4"></i>
+                        <span class="font-medium">{{ video.views_count }} views</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <i data-lucide="star" class="h-4 w-4 text-[#F4D160] fill-[#F4D160]"></i>
+                        <span class="font-bold text-gray-800">{{ video.average_rating }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Filter toggle
+    const filterToggle = document.getElementById('filterToggle');
+    const filterPanel = document.getElementById('filterPanel');
+    
+    filterToggle.addEventListener('click', () => {
+        filterPanel.classList.toggle('hidden');
+    });
+
+    // View toggle
+    const gridView = document.getElementById('gridView');
+    const listView = document.getElementById('listView');
+    const videoGrid = document.getElementById('videoGrid');
+    const videoList = document.getElementById('videoList');
+    
+    gridView.addEventListener('click', () => {
+        videoGrid.classList.remove('hidden');
+        videoList.classList.add('hidden');
+        gridView.style.backgroundColor = '#1E3A5F';
+        gridView.style.color = 'white';
+        listView.style.backgroundColor = '#f3f4f6';
+        listView.style.color = '#6b7280';
+    });
+    
+    listView.addEventListener('click', () => {
+        videoGrid.classList.add('hidden');
+        videoList.classList.remove('hidden');
+        listView.style.backgroundColor = '#1E3A5F';
+        listView.style.color = 'white';
+        gridView.style.backgroundColor = '#f3f4f6';
+        gridView.style.color = '#6b7280';
+    });
+</script>
+{% endblock %}
