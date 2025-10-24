@@ -2,6 +2,7 @@
 
 import uuid
 from django.db import migrations, models
+import uuid
 
 
 class Migration(migrations.Migration):
@@ -27,7 +28,7 @@ class Migration(migrations.Migration):
                 ('benefits', models.JSONField(default=list)),
                 ('popular_countries', models.JSONField(default=list)),
                 ('tags', models.JSONField(default=list)),
-                ('gears', models.ManyToManyField(blank=True, related_name='sports', to='gearguide.gear')),
+                ('gears', models.ManyToManyField(related_name='gear_relations', to='gearguide.gear')),
             ],
         ),
     ]

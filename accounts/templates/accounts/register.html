@@ -127,7 +127,7 @@
                 <div class="mt-8 text-center">
                     <p class="text-sm text-gray-600">
                         Sudah punya akun?
-                        <a href="{% url 'login' %}" class="font-semibold text-blue-900 hover:text-blue-700 transition login-link">
+                        <a href="{% url 'accounts:login' %}" class="font-semibold text-blue-900 hover:text-blue-700 transition login-link">
                             Masuk sekarang →
                         </a>
                     </p>
@@ -141,7 +141,7 @@
             e.preventDefault();
             document.querySelectorAll('.slide-section').forEach(section => section.classList.add('slide-to-login'));
             setTimeout(() => {
-                window.location.href = "{% url 'login' %}";
+                window.location.href = "{% url 'accounts:login' %}";
             }, 500); // Match the transition duration
         });
     </script>

@@ -12,12 +12,13 @@ from .models import Gear
 from .forms import GearForm
 from sportlibrary.models import Sport
 from django.contrib.auth.decorators import login_required
+from profile_app.models import ActivityLog
 
 
 # ======================= DETAIL VIEW =======================
 def show_gear_detail(request, gear_id):
     gear = get_object_or_404(Gear, id=gear_id)
-    
+
     # ✅ catat view (gear dari DB)
     key = f"gear:{gear.id}"
     url = reverse("gearguide:card_details", kwargs={"gear_id": str(gear.id)})
@@ -39,27 +40,20 @@ def show_gear_detail(request, gear_id):
 
 # ======================= SHOW ALL GEARS =======================
 def show_all_gears(request):
-    from pathlib import Path
-    import json
+    db_gears = list(Gear.objects.select_related('sport').all())
 
     BASE_DIR = Path(__file__).resolve().parent.parent.parent
-    gears_path = BASE_DIR / 'database' / 'gears.json'
-    sports_path = BASE_DIR / 'database' / 'sports.json'
+    data_path = BASE_DIR / 'database' / 'gears.json'
 
-    # === Load JSONs ===
-    json_gears, json_sports = [], []
-    if gears_path.exists():
-        with open(gears_path, 'r', encoding='utf-8') as f:
-            json_gears = json.load(f)
-    if sports_path.exists():
-        with open(sports_path, 'r', encoding='utf-8') as f:
-            json_sports = json.load(f)
+    json_gears = []
+    if data_path.exists():
+        with open(data_path, 'r', encoding='utf-8') as file:
+            json_gears = json.load(file)
+    # 2️⃣ Ambil dari JSON
+    data_path = settings.BASE_DIR / 'database' / 'gears.json'
+    with open(data_path, 'r', encoding='utf-8') as file:
+        json_gears = json.load(file)
 
-    # === Map sport_id ke nama sport ===
-    sport_map = {str(s['id']): s['name'] for s in json_sports}
-
-    # === Load Gear dari DB ===
-    db_gears = list(Gear.objects.select_related('sport').all())
     combined_gears = []
 
     # === JSON ITEMS ===
@@ -168,35 +162,93 @@ def show_all_gears(request):
 # ======================= CARD DETAILS =======================
 # ======================= CARD DETAILS =======================
 def card_details(request, gear_id):
-    # 🧠 Coba ambil dari DB dulu
     try:
-        # kalau ID kamu UUID:
-        try:
-            gear = get_object_or_404(Gear, id=UUID(gear_id))
-        except ValueError:
-            gear = get_object_or_404(Gear, id=gear_id)
-        
-        return render(request, "gearguide/card_details.html", {
-            "gear": gear,
-            "source": "database"
-        })
+        _ = UUID(str(gear_id))
+        gear = Gear.objects.select_related('sport').filter(id=gear_id).first()
+        if gear:
+            context = {
+                "title": gear.name,
+                "gear": {
+                    "id": str(gear.id),
+                    "sport": gear.sport.name if gear.sport else "Unknown",
+                    "name": gear.name,
+                    "function": gear.function,
+                    "description": gear.description,
+                    "level": gear.get_level_display(),
+                    "price_range": gear.price_range,
+                    "recommended_brands": gear.recommended_brands or [],
+                    "materials": gear.materials or [],
+                    "care_tips": gear.care_tips,
+                    "buy_link": gear.ecommerce_link,
+                    "tags": gear.tags or [],
+                    "image": gear.image or "",
+                    "is_from_db": True
+                }
+            }
 
-    except Exception:
-        # fallback: cari dari JSON kalau memang nggak ketemu di DB
-        base_dir = Path(__file__).resolve().parent.parent.parent
-        data_path = base_dir / 'database' / 'gears.json'
-        if data_path.exists():
-            with open(data_path, 'r', encoding='utf-8') as f:
-                gears = json.load(f)
-                gear = next((g for g in gears if str(g["id"]) == str(gear_id)), None)
-                if gear:
-                    return render(request, "gearguide/card_details.html", {
-                        "gear": gear,
-                        "source": "json"
-                    })
+            # ✅ catat view (gear dari DB)
+            key = f"gear:{gear.id}"
+            url = reverse("gearguide:card_details", kwargs={"gear_id": str(gear.id)})
+            bump_view(
+                key,
+                title=gear.name,
+                url=url,
+                category="Gear Guide",
+                image=(gear.image or ""),
+                request=request,
+            )
+
+            return render(request, "gearguide/card_details.html", context)
+    except ValueError:
+        pass
+
+    base_dir = Path(__file__).resolve().parent.parent.parent
+    data_path = base_dir / 'database' / 'gears.json'
+    # 2) Cek JSON
+    data_path = settings.BASE_DIR / 'database' / 'gears.json'     
+    with open(data_path, 'r', encoding='utf-8') as file:
+        gears = json.load(file)
+
+    gear = next((g for g in gears if str(g['id']) == str(gear_id)), None)
+    if not gear:
         return render(request, "404.html", status=404)
 
+    # ⭐ Ambil nama sport dari database berdasarkan sport_id
+    sport_name = "Unknown"
+    sport_id = gear.get("sport_id")
+    if sport_id:
+        try:
+            sport_obj = Sport.objects.get(id=sport_id)
+            sport_name = sport_obj.name
+        except Sport.DoesNotExist:
+            sport_name = gear.get("sport", "Unknown")
+    else:
+        sport_name = gear.get("sport", "Unknown")
 
+    gear['is_from_db'] = False
+    gear['sport'] = sport_name
+
+    # ✅ catat view (gear dari JSON)
+    key = f"gearjson:{gear['id']}"
+    url = reverse("gearguide:card_details", kwargs={"gear_id": str(gear['id'])})
+    bump_view(
+        key,
+        title=gear["name"],
+        url=url,
+        category="Gear Guide",
+        image=gear.get("image", ""),
+        request=request,
+    )
+
+    if request.user.is_authenticated:
+        ActivityLog.objects.create(
+        user=request.user,
+        action_type='MODULE_ACCESS',
+        description=f"Mengakses Gear: {gear.get('name', 'Olahraga Tidak Dikenal')}"
+        )
+
+    context = {"title": gear["name"], "gear": gear}
+    return render(request, "gearguide/card_details.html", context)
 
 
 # ======================= ADD GEAR =======================
