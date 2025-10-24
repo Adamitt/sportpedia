@@ -1,0 +1,182 @@
+[
+  {
+    "id": 1,
+    "username": "angelique",
+    "email": "angelique@sportpedia.id",
+    "joined_date": "2025-01-15",
+    "favorite_sport": "Yoga",
+    "badges": ["Starter Explorer", "Mindful Learner"],
+    "videos_watched": [4, 5, 8, 9],
+    "articles_read": [2, 4],
+    "progress": {
+      "sports_learned": 2,
+      "videos_completed": 4,
+      "forum_posts": 3
+    },
+    "achievements": ["Selesai kursus Yoga dasar", "Top 5 pengguna aktif bulan Februari"],
+    "bio": "Mahasiswi yang suka mencoba olahraga baru tiap bulan. Fokus ke fleksibilitas & kesehatan mental.",
+    "profile_image": "https://cdn.sportpedia.id/profiles/angelique.jpg"
+  },
+  {
+    "id": 2,
+    "username": "raihan",
+    "email": "raihan@sportpedia.id",
+    "joined_date": "2025-02-01",
+    "favorite_sport": "Bulu Tangkis",
+    "badges": ["Quick Learner", "Forum Helper"],
+    "videos_watched": [1, 2, 3],
+    "articles_read": [1, 5],
+    "progress": {
+      "sports_learned": 3,
+      "videos_completed": 6,
+      "forum_posts": 5
+    },
+    "achievements": ["Kontributor aktif forum Bulutangkis"],
+    "bio": "Suka main bulutangkis tiap weekend, lagi latihan buat turnamen kampus.",
+    "profile_image": "https://cdn.sportpedia.id/profiles/raihan.jpg"
+  },
+  {
+    "id": 3,
+    "username": "laras",
+    "email": "laras@sportpedia.id",
+    "joined_date": "2025-03-01",
+    "favorite_sport": "Renang",
+    "badges": ["Aqua Starter"],
+    "videos_watched": [8, 9],
+    "articles_read": [4],
+    "progress": {
+      "sports_learned": 1,
+      "videos_completed": 2,
+      "forum_posts": 1
+    },
+    "achievements": ["Menyelesaikan kursus gaya bebas dasar"],
+    "bio": "Baru belajar renang, takut air tapi semangat terus tiap minggu!",
+    "profile_image": "https://cdn.sportpedia.id/profiles/laras.jpg"
+  },
+  {
+    "id": 4,
+    "username": "kevin",
+    "email": "kevin@sportpedia.id",
+    "joined_date": "2025-02-22",
+    "favorite_sport": "Basket",
+    "badges": ["Team Player", "Shooter Rookie"],
+    "videos_watched": [14, 15],
+    "articles_read": [7],
+    "progress": {
+      "sports_learned": 2,
+      "videos_completed": 3,
+      "forum_posts": 2
+    },
+    "achievements": ["Selesai modul shooting & dribble"],
+    "bio": "Anak UKM basket yang pengen upgrade teknik shooting.",
+    "profile_image": "https://cdn.sportpedia.id/profiles/kevin.jpg"
+  },
+  {
+    "id": 5,
+    "username": "vito",
+    "email": "vito@sportpedia.id",
+    "joined_date": "2025-02-05",
+    "favorite_sport": "Bersepeda",
+    "badges": ["Road Rider", "Community Supporter"],
+    "videos_watched": [18, 19],
+    "articles_read": [9],
+    "progress": {
+      "sports_learned": 1,
+      "videos_completed": 2,
+      "forum_posts": 4
+    },
+    "achievements": ["100KM Ride Challenge Completed"],
+    "bio": "Penggemar sepeda gunung & touring, suka bahas gear di forum.",
+    "profile_image": "https://cdn.sportpedia.id/profiles/vito.jpg"
+  },
+  {
+    "id": 6,
+    "username": "naya",
+    "email": "naya@sportpedia.id",
+    "joined_date": "2025-03-03",
+    "favorite_sport": "Panahan",
+    "badges": ["Focus Achiever"],
+    "videos_watched": [10, 11],
+    "articles_read": [5],
+    "progress": {
+      "sports_learned": 1,
+      "videos_completed": 2,
+      "forum_posts": 1
+    },
+    "achievements": ["Menyelesaikan sesi panahan pertama di klub kampus"],
+    "bio": "Suka olahraga yang butuh fokus & ketenangan. Baru mulai panahan bulan ini.",
+    "profile_image": "https://cdn.sportpedia.id/profiles/naya.jpg"
+  },
+  {
+    "id": 7,
+    "username": "aldi",
+    "email": "aldi@sportpedia.id",
+    "joined_date": "2025-01-28",
+    "favorite_sport": "Lari",
+    "badges": ["Consistency Badge", "Endurance Hero"],
+    "videos_watched": [12, 13],
+    "articles_read": [6],
+    "progress": {
+      "sports_learned": 2,
+      "videos_completed": 3,
+      "forum_posts": 3
+    },
+    "achievements": ["Menamatkan 5K run tanpa berhenti"],
+    "bio": "Mulai lari karena stres kuliah, tapi sekarang malah nagih.",
+    "profile_image": "https://cdn.sportpedia.id/profiles/aldi.jpg"
+  },
+  {
+    "id": 8,
+    "username": "bella",
+    "email": "bella@sportpedia.id",
+    "joined_date": "2025-02-10",
+    "favorite_sport": "Voli",
+    "badges": ["Power Serve", "Active Member"],
+    "videos_watched": [22, 23],
+    "articles_read": [11],
+    "progress": {
+      "sports_learned": 1,
+      "videos_completed": 2,
+      "forum_posts": 2
+    },
+    "achievements": ["Partisipasi di turnamen voli antar fakultas"],
+    "bio": "Pemain voli UKM, masih belajar spike yang konsisten.",
+    "profile_image": "https://cdn.sportpedia.id/profiles/bella.jpg"
+  },
+  {
+    "id": 9,
+    "username": "tio",
+    "email": "tio@sportpedia.id",
+    "joined_date": "2025-03-06",
+    "favorite_sport": "Wall Climbing",
+    "badges": ["Grip Master", "Challenge Seeker"],
+    "videos_watched": [40, 41],
+    "articles_read": [20],
+    "progress": {
+      "sports_learned": 2,
+      "videos_completed": 3,
+      "forum_posts": 1
+    },
+    "achievements": ["Top 10 fastest climb di SportPedia Week"],
+    "bio": "Suka panjat karena seru dan bikin otot tangan makin kuat.",
+    "profile_image": "https://cdn.sportpedia.id/profiles/tio.jpg"
+  },
+  {
+    "id": 10,
+    "username": "andi",
+    "email": "andi@sportpedia.id",
+    "joined_date": "2025-02-25",
+    "favorite_sport": "Pencak Silat",
+    "badges": ["Spirit of Fighter", "Forum Active"],
+    "videos_watched": [32, 33],
+    "articles_read": [16],
+    "progress": {
+      "sports_learned": 2,
+      "videos_completed": 4,
+      "forum_posts": 3
+    },
+    "achievements": ["Selesai modul bela diri tradisional"],
+    "bio": "Latihan silat tiap weekend, pengen ikut kejuaraan antar kampus.",
+    "profile_image": "https://cdn.sportpedia.id/profiles/andi.jpg"
+  }
+]

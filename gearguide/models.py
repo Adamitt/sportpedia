@@ -1,10 +1,11 @@
 from django.db import models
 from sportlibrary.models import Sport
 import uuid
+from django.contrib.auth.models import User
 
 
 class Gear(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.AutoField(primary_key=True)
     sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name="gear_items")  # Ganti `related_name`
 
     name = models.CharField(max_length=100)
@@ -30,6 +31,13 @@ class Gear(models.Model):
     materials = models.JSONField(blank=True, null=True, default=list)
     care_tips = models.TextField(blank=True, null=True)
     tags = models.JSONField(blank=True, null=True, default=list)
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='gears',
+        null=True,
+        blank=True
+    )
 
     class Meta:
         ordering = ['name']

@@ -21,7 +21,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -48,9 +49,16 @@ INSTALLED_APPS = [
     'landingpage',
     'gearguide',
     'sportlibrary',
+    'profile_app',
+    'accounts',
+    'admin_sportpedia',
     'metrics',
-
+    'videos',
 ]
+
+LOGIN_URL = '/login/'  # biar decorator login_required tahu harus redirect ke sini
+LOGIN_REDIRECT_URL = '/'  # ke mana user dibawa setelah login\
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

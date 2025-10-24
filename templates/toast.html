@@ -1,0 +1,72 @@
+<div id="toast-container"
+     class="fixed bottom-5 right-5 z-[999999] flex flex-col gap-3 pointer-events-none">
+
+<style>
+  @keyframes slideIn {
+    0% {transform:translateX(150%);opacity:0;}
+    60% {transform:translateX(-5%);opacity:1;}
+    100% {transform:translateX(0);opacity:1;}
+  }
+  @keyframes fadeOut {
+    0% {opacity:1;transform:translateX(0);}
+    100% {opacity:0;transform:translateX(150%);}
+  }
+  .toast {
+    display:flex;align-items:center;gap:12px;
+    padding:14px 18px;min-width:280px;
+    border-radius:14px;box-shadow:0 4px 15px rgba(0,0,0,0.1);
+    animation:slideIn .5s ease forwards;
+    font-weight:500;pointer-events:auto;
+  }
+  .toast.hide {animation:fadeOut .5s ease forwards;}
+  .toast-success{background:linear-gradient(to right,#22c55e,#16a34a);color:white;}
+  .toast-info{background:linear-gradient(to right,#3b82f6,#2563eb);color:white;}
+  .toast-warning{background:linear-gradient(to right,#facc15,#eab308);color:#1e1e1e;}
+  .toast-error{background:linear-gradient(to right,#ef4444,#b91c1c);color:white;}
+  .toast svg{width:22px;height:22px;}
+  .toast-close{margin-left:auto;background:rgba(255,255,255,0.2);border:none;
+    border-radius:9999px;color:white;cursor:pointer;padding:4px;}
+  .toast-close:hover{background:rgba(255,255,255,0.4);}
+</style>
+
+<script>
+window.showToast = function(message, type="info") {
+  const container = document.getElementById("toast-container");
+  if (!container) {
+    console.error("❌ Toast container not found!");
+    return;
+  }
+
+  const toast = document.createElement("div");
+  toast.className = `toast toast-${type}`;
+
+  const icons = {
+    success:`<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+    </svg>`,
+    info:`<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 20h0a8 8 0 100-16 8 8 0 000 16z"/>
+    </svg>`,
+    warning:`<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M4.93 4.93l14.14 14.14"/>
+    </svg>`,
+    error:`<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+    </svg>`
+  };
+
+  toast.innerHTML = `
+    ${icons[type] || icons.info}
+    <span>${message}</span>
+    <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+  `;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("hide");
+    setTimeout(() => toast.remove(), 500);
+  }, 3000);
+};
+</script>
+

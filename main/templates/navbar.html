@@ -32,8 +32,8 @@
 
       <!-- Auth Buttons -->
       <div class="flex items-center gap-4">
-        <a href="/login/" class="text-blue-900 font-semibold hover:text-blue-700 transition-colors duration-200">Sign in</a>
-        <a href="/register/" class="bg-blue-900 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-800 transition-colors duration-200 shadow-md">Sign up</a>
+        <a href="{% url 'accounts:login' %}" class="text-blue-900 font-semibold hover:text-blue-700 transition-colors duration-200"> Sign in </a>
+        <a href="{% url 'accounts:register' %}" class="bg-blue-900 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-800 transition-colors duration-200 shadow-md">Sign up</a>
       </div>
     </div>
 
@@ -53,6 +53,10 @@
           Gear Guide
         </a>
         <a href="/videos/" 
+           class="pb-1 border-b-4 transition-all duration-200 {% if '/videos/' in path %}border-blue-900 text-blue-900{% else %}border-transparent hover:border-blue-900 hover:text-blue-900{% endif %}">
+          Video Gallery
+        </a>
+        <a href="{% url 'admin_sportpedia:dashboard' %}" 
            class="pb-1 border-b-4 transition-all duration-200 {% if '/videos/' in path %}border-blue-900 text-blue-900{% else %}border-transparent hover:border-blue-900 hover:text-blue-900{% endif %}">
           Video Gallery
         </a>

@@ -6,5 +6,6 @@ app_name = 'sportlibrary'
 urlpatterns = [
     path('', views.show_sports, name='show_sports'),
     path('saved/', views.saved_sports, name='saved_sports'),
-    path('<str:sport_id>/', views.sport_detail, name='sport_detail'),  # ⬅️ ini penting
+    # Pakai <str:> supaya bisa angka biasa (e.g. "5") dan UUID-like (e.g. "0000...00a")
+    path('<str:sport_id>/', views.sport_detail, name='sport_detail'),
 ]
