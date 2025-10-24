@@ -9,30 +9,9 @@ from profile_app.models import ActivityLog
 from .models import Sport, SavedSport
 
 def show_sports(request):
-    base_dir = Path(__file__).resolve().parent.parent
-    data_path = base_dir / 'database' / 'sports.json'
-    
-    with open(data_path, 'r', encoding='utf-8') as file:
-        sports = json.load(file)
-    
-    # Sync missing sports to database
-    for sport_data in sports:
-        Sport.objects.get_or_create(
-            id=sport_data['id'],
-            defaults={
-                'name': sport_data['name'],
-                'category': sport_data['category'],
-                'difficulty': sport_data['difficulty'],
-                'description': sport_data['description'],
-                'history': sport_data['history'],
-                'rules': sport_data.get('rules', []),
-                'techniques': sport_data.get('techniques', []),
-                'benefits': sport_data.get('benefits', []),
-                'popular_countries': sport_data.get('popular_countries', []),
-                'tags': sport_data.get('tags', [])
-            }
-        )
-    
+    # Ambil semua sport dari database
+    sports = Sport.objects.all()
+
     # Get saved sports for current user
     saved_count = 0
     saved_sport_ids = []
@@ -40,7 +19,7 @@ def show_sports(request):
         saved_sports = SavedSport.objects.filter(user=request.user).values_list('sport_id', flat=True)
         saved_sport_ids = list(saved_sports)
         saved_count = len(saved_sport_ids)
-    
+
     context = {
         "sports": sports,
         "saved_count": saved_count,
@@ -49,48 +28,20 @@ def show_sports(request):
     return render(request, 'sportlibrary/sportlibrary.html', context)
 
 def sport_detail(request, sport_id):
-    base_dir = Path(__file__).resolve().parent.parent
-    data_path = base_dir / 'database' / 'sports.json'
-    
-    with open(data_path, 'r', encoding='utf-8') as file:
-        sports = json.load(file)
-    
-    sport = next((s for s in sports if s['id'] == sport_id), None)
-    
-    if not sport:
-        return render(request, "404.html", status=404)
-    
-    # Ensure sport exists in database
-    Sport.objects.get_or_create(
-        id=sport_id,
-        defaults={
-            'name': sport['name'],
-            'category': sport['category'],
-            'difficulty': sport['difficulty'],
-            'description': sport['description'],
-            'history': sport['history'],
-            'rules': sport.get('rules', []),
-            'techniques': sport.get('techniques', []),
-            'benefits': sport.get('benefits', []),
-            'popular_countries': sport.get('popular_countries', []),
-            'tags': sport.get('tags', [])
-        }
-    )
-    
-    # Check if sport is saved
+    sport = get_object_or_404(Sport, id=sport_id)
+
     is_saved = False
     if request.user.is_authenticated:
         is_saved = SavedSport.objects.filter(
-            user=request.user, 
-            sport_id=sport_id
+            user=request.user,
+            sport=sport
         ).exists()
-        
         ActivityLog.objects.create(
             user=request.user,
             action_type='MODULE_ACCESS',
-            description=f"Mengakses Sport Library: {sport.get('name', 'Olahraga Tidak Dikenal')}"
+            description=f"Mengakses Sport Library: {sport.name}"
         )
-    
+
     context = {
         "sport": sport,
         "is_saved": is_saved
