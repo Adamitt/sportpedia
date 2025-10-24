@@ -1,0 +1,37 @@
+<div class="card-hover bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100" 
+     data-category="{{ sport.category }}" 
+     data-difficulty="{{ sport.difficulty }}" 
+     data-name="{{ sport.name|lower }}">
+    <div class="p-6">
+        <div class="flex justify-between items-start mb-4">
+            <div class="flex flex-wrap gap-2">
+                <span class="badge category-{{ sport.category|lower }}">{{ sport.category }}</span>
+                <span class="badge difficulty-{{ sport.difficulty|lower }}">{{ sport.difficulty }}</span>
+            </div>
+            <button class="save-heart" 
+                    data-id="{{ sport.id }}" 
+                    data-name="{{ sport.name|escapejs }}">
+                <svg class="w-6 h-6 text-gray-400 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ sport.name }}</h3>
+        <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">{{ sport.description }}</p>
+
+        <div class="flex flex-wrap gap-2 mb-4">
+            {% for tag in sport.tags|slice:":3" %}
+                <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">#{{ tag }}</span>
+            {% endfor %}
+        </div>
+
+        <a href="#detail-{{ sport.id }}" 
+           class="block w-full text-center bg-gradient-to-r from-[#992626] to-[#1C3264] 
+                  hover:from-[#992626] hover:to-[#1C3264] text-white py-3 rounded-xl font-semibold 
+                  transition-all shadow-md hover:shadow-lg">
+            Lihat Detail
+        </a>
+    </div>
+</div>

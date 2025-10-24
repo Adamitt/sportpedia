@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ sport.name }} - SportPedia{% endblock %}
+
+{% block head %}
+  {{ block.super }} {# Include base head content #}
+  <style>
+    /* ... (Keep your existing detail page CSS styles here) ... */
+    .gradient-header { background: linear-gradient(135deg, #1C3264 0%, #992626 50%, #1C3264 100%); }
+    .section-card { background: white; border-radius: 1rem; padding: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .section-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); }
+    .section-title { color: #1C3264; font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .badge { display: inline-flex; align-items: center; padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; }
+    .difficulty-pemula { background-color: #d1fae5; color: #065f46; }
+    .difficulty-menengah { background-color: #fed7aa; color: #92400e; }
+    .difficulty-lanjutan { background-color: #fecaca; color: #991b1b; }
+    .category-indoor { background-color: #dbeafe; color: #1C3264; }
+    .category-outdoor { background-color: #fef3c7; color: #92400e; }
+    .list-item { padding: 0.75rem; margin: 0.5rem 0; background: #f9fafb; border-left: 4px solid #FFDD78; border-radius: 0.5rem; transition: all 0.2s ease; }
+    .list-item:hover { background: #f3f4f6; border-left-color: #992626; transform: translateX(4px); }
+    .country-badge { display: inline-block; background: linear-gradient(135deg, #1C3264 0%, #992626 100%); color: white; padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; margin: 0.25rem; font-weight: 500; }
+    .tag-badge { display: inline-block; background: #FFDD78; color: #1C3264; padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; margin: 0.25rem; font-weight: 600; }
+    .back-btn { background: linear-gradient(135deg, #1C3264 0%, #992626 100%); color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease; text-decoration: none; }
+    .back-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); }
+    /* REMOVE save-btn styles if not needed, or replace with bookmark logic */
+    .icon-box { width: 2.5rem; height: 2.5rem; background: linear-gradient(135deg, #FFDD78 0%, #ffc107 100%); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .fade-in { animation: fadeIn 0.6s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .stagger-1 { animation-delay: 0.1s; } .stagger-2 { animation-delay: 0.2s; } .stagger-3 { animation-delay: 0.3s; } .stagger-4 { animation-delay: 0.4s; } .stagger-5 { animation-delay: 0.5s; } .stagger-6 { animation-delay: 0.6s; }
+  </style>
+  
+  {# --- Add JS Variables (ONLY if user is logged in) --- #}
+  {% if request.user.is_authenticated %}
+  <script>
+      // Make sure sport.id from JSON is treated as a number if needed
+      window.SPORT_ID = parseInt("{{ sport.id }}", 10); 
+      window.UPDATE_PROGRESS_URL = "{% url 'sportlibrary:update_progress' sport.id %}";
+      // Function to get CSRF token (needed if NOT using @csrf_exempt on view)
+      function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
+      }
+      window.CSRF_TOKEN = getCookie('csrftoken'); 
+  </script>
+  {% endif %}
+{% endblock %}
+
+
+{% block content %}
+<body class="bg-gray-50"> {# Body tag is not needed here as it's in base.html #}
+
+  {# Navbar is already included in base.html #}
+  {# {% include 'navbar.html' %} #}
+
+  <div class="gradient-header text-white py-12 px-4">
+      <div class="max-w-5xl mx-auto">
+          <div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+              <a href="{% url 'sportlibrary:show_sports' %}" class="back-btn">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                  Kembali
+              </a>
+              {# --- REMOVED Save Button related to localStorage --- #}
+              {# If you need a bookmark button, implement it using the API approach #}
+          </div>
+
+          <h1 class="text-5xl font-bold mb-4 fade-in">{{ sport.name }}</h1>
+          <p class="text-xl text-white/90 mb-6 fade-in">{{ sport.description }}</p>
+          
+          <div class="flex flex-wrap gap-3 fade-in">
+              <span class="badge category-{{ sport.category|lower }}">{{ sport.category }}</span>
+              <span class="badge difficulty-{{ sport.difficulty|lower }}">{{ sport.difficulty }}</span>
+          </div>
+      </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 py-12">
+      
+      <div class="section-card fade-in stagger-1">
+          <h2 class="section-title"><div class="icon-box"><svg class="w-6 h-6" style="color: #1C3264;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg></div>Sejarah</h2>
+          <p class="text-gray-700 leading-relaxed text-lg">{{ sport.history }}</p>
+      </div>
+
+      <div class="section-card fade-in stagger-2">
+          <h2 class="section-title"><div class="icon-box"><svg class="w-6 h-6" style="color: #1C3264;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>Aturan Dasar</h2>
+          <div class="space-y-2">
+              {% for rule in sport.rules %}
+              <div class="list-item"><span class="text-gray-700 ml-2">{{ rule }}</span></div>
+              {% empty %} <p class="text-gray-500 italic">Data aturan belum tersedia.</p> {% endfor %}
+          </div>
+      </div>
+
+      <div class="section-card fade-in stagger-3">
+          <h2 class="section-title"><div class="icon-box"><svg class="w-6 h-6" style="color: #1C3264;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>Teknik Fundamental</h2>
+          <div class="space-y-2">
+              {% for technique in sport.techniques %}
+              <div class="list-item"><span class="text-gray-700 ml-2">{{ technique }}</span></div>
+              {% empty %} <p class="text-gray-500 italic">Data teknik belum tersedia.</p> {% endfor %}
+          </div>
+      </div>
+
+      <div class="section-card fade-in stagger-4">
+          <h2 class="section-title"><div class="icon-box"><svg class="w-6 h-6" style="color: #1C3264;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg></div>Manfaat untuk Kesehatan</h2>
+          <div class="grid md:grid-cols-2 gap-3">
+              {% for benefit in sport.benefits %}
+              <div class="list-item"><span class="font-semibold" style="color: #992626;">✓</span><span class="text-gray-700 ml-2">{{ benefit }}</span></div>
+              {% empty %} <p class="text-gray-500 italic md:col-span-2">Data manfaat belum tersedia.</p> {% endfor %}
+          </div>
+      </div>
+
+      <div class="section-card fade-in stagger-5">
+          <h2 class="section-title"><div class="icon-box"><svg class="w-6 h-6" style="color: #1C3264;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>Negara Populer</h2>
+          <div class="flex flex-wrap gap-2">
+              {% for country in sport.popular_countries %}
+              <span class="country-badge">🌍 {{ country }}</span>
+              {% empty %} <p class="text-gray-500 italic">Data negara belum tersedia.</p> {% endfor %}
+          </div>
+      </div>
+
+      <div class="section-card fade-in stagger-6">
+          <h2 class="section-title"><div class="icon-box"><svg class="w-6 h-6" style="color: #1C3264;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg></div>Kata Kunci</h2>
+          <div class="flex flex-wrap gap-2">
+              {% for tag in sport.tags %}
+              <span class="tag-badge">#{{ tag }}</span>
+              {% empty %} <p class="text-gray-500 italic">Data tag belum tersedia.</p> {% endfor %}
+          </div>
+      </div>
+
+  </div>
+
+  {# Toast is already in base.html #}
+  {# <div id="toast" ...>...</div> #}
+
+{# Body tag is not needed here #}
+</body>
+</html>
+{% endblock %}
+
+
+{% block scripts %}
+  {{ block.super }} {# Include base scripts #}
+
+  {# --- Progress Tracking Script (ONLY if user is logged in) --- #}
+  {% if request.user.is_authenticated %}
+  <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          // Check if the URL variable exists (defined in head)
+          if (typeof window.UPDATE_PROGRESS_URL === 'undefined') {
+              console.error("UPDATE_PROGRESS_URL is not defined. Progress tracking disabled.");
+              return; 
+          }
+
+          const startTime = Date.now();
+          let dataSent = false; // Flag to prevent sending multiple times
+
+          const sendProgressUpdate = () => {
+              if (!dataSent) { 
+                  const endTime = Date.now();
+                  // Calculate time in seconds
+                  const timeSpentSeconds = Math.max(0, Math.round((endTime - startTime) / 1000)); 
+
+                  // Only send if time > 5 seconds
+                  if (timeSpentSeconds > 5) {
+                      const data = JSON.stringify({ time_spent: timeSpentSeconds });
+                      
+                      try {
+                          // Use sendBeacon for reliability
+                          // Note: Ensure @csrf_exempt is used OR handle CSRF token appropriately if needed for sendBeacon alternatives
+                          if (navigator.sendBeacon) {
+                              const sent = navigator.sendBeacon(window.UPDATE_PROGRESS_URL, data);
+                              if (sent) {
+                                  dataSent = true; 
+                                  console.log(`Progress update sent via sendBeacon: ${timeSpentSeconds} seconds for sport ID ${window.SPORT_ID}`);
+                              } else {
+                                  console.error("sendBeacon failed to queue the data.");
+                                  // Fallback or error handling can go here
+                              }
+                          } else {
+                              // Fallback for browsers not supporting sendBeacon (less reliable on unload)
+                              console.warn("sendBeacon not supported, using fetch as fallback (less reliable on unload).");
+                              fetch(window.UPDATE_PROGRESS_URL, {
+                                  method: 'POST',
+                                  headers: { 
+                                      'Content-Type': 'application/json',
+                                      // Include CSRF token if not using @csrf_exempt
+                                      // 'X-CSRFToken': window.CSRF_TOKEN 
+                                  },
+                                  body: data,
+                                  keepalive: true // Important for fetch during unload/hide
+                              }).then(response => {
+                                  if (response.ok) {
+                                       dataSent = true;
+                                       console.log(`Progress update sent via fetch: ${timeSpentSeconds} seconds`);
+                                  } else {
+                                       console.error(`Fetch progress update failed: ${response.status}`);
+                                  }
+                              }).catch(error => console.error("Error sending progress via fetch:", error));
+                          }
+                      } catch (e) {
+                           console.error("Error during sendProgressUpdate:", e);
+                      }
+                  } else {
+                      console.log(`Time spent (${timeSpentSeconds}s) too short, not sending progress.`);
+                  }
+              }
+          };
+
+          // Primary trigger: when the page becomes hidden
+          document.addEventListener('visibilitychange', () => {
+              if (document.visibilityState === 'hidden') {
+                  console.log("Visibility changed to hidden, attempting to send progress.");
+                  sendProgressUpdate();
+              }
+          });
+
+          // Secondary trigger: pagehide (covers bfcache and unload scenarios better)
+          window.addEventListener('pagehide', (event) => {
+              // event.persisted is true if page goes into bfcache
+              console.log("Pagehide event triggered, attempting to send progress.");
+              sendProgressUpdate();
+          });
+
+          // Note: 'beforeunload' is generally less reliable for async operations like fetch,
+          // but sendBeacon is designed to work with it or pagehide.
+          // window.addEventListener('beforeunload', sendProgressUpdate);
+
+      });
+  </script>
+  {% endif %}
+{% endblock %}
