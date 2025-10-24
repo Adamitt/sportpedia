@@ -17,9 +17,6 @@ from sportlibrary.models import Sport
 from profile_app.models import ActivityLog
 from .models import Gear
 
-# ============================================================
-# Helper & Permission
-# ============================================================
 
 def admin_only(user):
     """Hanya admin/staff yang lolos"""
@@ -55,10 +52,6 @@ def _gear_to_json(gear):
         "tags": gear.tags or [],
         "image": gear.image or "",
     }
-
-# ============================================================
-# DETAIL VIEW
-# ============================================================
 
 def show_gear_detail(request, gear_id):
     base_dir = Path(__file__).resolve().parent.parent.parent
@@ -99,7 +92,7 @@ def show_all_gears(request):
     sport_map = {str(s["id"]): s["name"] for s in json_sports}
     combined_gears = []
 
-    # ========== From JSON ==========
+    # ===== Dari JSON =====
     for g in json_gears:
         sport_id = str(g.get("sport_id", ""))
         combined_gears.append({
@@ -120,7 +113,7 @@ def show_all_gears(request):
             "owner": None,
         })
 
-    # ========== From DB ==========
+    # ===== Dari DB =====
     for g in Gear.objects.select_related("sport").all():
         combined_gears.append({
             "id": str(g.id),
@@ -137,22 +130,29 @@ def show_all_gears(request):
             "tags": g.tags or [],
             "image": g.image or "",
             "is_from_db": True,
-            "owner": g.owner.username if g.owner else None,  # 🔥 FIX DISINI
+            "owner": g.owner.username if g.owner else None,
         })
 
+    # ========== FILTER berdasarkan parameter GET ==========
+    selected_sport = request.GET.get("sport", "").strip().lower()
+    selected_level = request.GET.get("level", "").strip()
 
-    # 🔥 DEBUG current user
-    print(f"🔥 Current user: {request.user.username if request.user.is_authenticated else 'Anonymous'}")
-    print(f"🔥 Is staff?: {request.user.is_staff if request.user.is_authenticated else False}")
-    print(f"🔥 Is superuser?: {request.user.is_superuser if request.user.is_authenticated else False}")
+    if selected_sport:
+        combined_gears = [
+            g for g in combined_gears if g["sport"].lower() == selected_sport
+        ]
+
+    if selected_level:
+        combined_gears = [
+            g for g in combined_gears if g["level"].lower() == selected_level.lower()
+        ]
 
     # ========== Filter view (your/all) ==========
     view_filter = request.GET.get("view", "all")
     if view_filter == "your" and request.user.is_authenticated:
         combined_gears = [g for g in combined_gears if g.get("owner") == request.user.username]
 
-    # Ambil semua olahraga dari JSON biar dropdown gak kosong
-    all_sports_list = json_sports  
+    all_sports_list = json_sports
 
     return render(request, "gearguide/gearguide.html", {
         "gears": combined_gears,
@@ -162,9 +162,6 @@ def show_all_gears(request):
     })
 
 
-# ============================================================
-# ADD GEAR (SEMUA USER BISA!)
-# ============================================================
 
 @login_required(login_url="/accounts/login/")
 def add_gear(request):
@@ -229,10 +226,6 @@ def add_gear(request):
 
 
 
-# ============================================================
-# EDIT GEAR (Admin-only)
-# ============================================================
-
 from django.http import JsonResponse, HttpResponseForbidden
 
 @login_required
@@ -269,10 +262,6 @@ def edit_gear(request, gear_id):
     return JsonResponse({"ok": False, "message": "❌ Metode tidak valid."}, status=405)
 
 
-# ============================================================
-# DELETE GEAR (Admin-only)
-# ============================================================
-
 
 @login_required
 @csrf_exempt  # biar request fetch tanpa form masih diterima
@@ -300,10 +289,6 @@ def delete_gear(request, gear_id):
         "message": "❌ Metode tidak valid."
     }, status=405)
 
-
-# ============================================================
-# AJAX: Get gear JSON
-# ============================================================
 
 @require_http_methods(["GET"])
 def get_gear_json(request, gear_id):
