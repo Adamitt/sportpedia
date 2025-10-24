@@ -128,14 +128,12 @@ Modul ini menjadi ruang diskusi dan interaksi antar pengguna SportPedia. Penggun
 
 ### 👤 **6. Modul Profil & Perjalanan Olahraga**
 **Deskripsi:**  
-Modul ini berfungsi untuk menampilkan data pengguna, aktivitas yang telah dilakukan, serta perkembangan belajar olahraga. Didesain agar pengguna dapat melacak kemajuan mereka secara visual dan termotivasi untuk terus berlatih.  
+Modul ini berfungsi untuk menampilkan data pengguna, aktivitas yang telah dilakukan, serta perkembangan belajar olahraga. Didesain agar pengguna dapat melacak kemajuan mereka secara visual dan termotivasi untuk terus berlatih.
 
 **Fitur-Fitur:**
-- Profil Pengguna: berisi identitas dasar, olahraga favorit, dan preferensi pengguna.  
-- Progress Tracker: menampilkan olahraga yang telah dipelajari, video yang ditonton, dan artikel yang dibaca.  
-- Badge & Sertifikat: penghargaan virtual untuk pengguna yang menyelesaikan panduan tertentu.  
-- Riwayat Aktivitas: daftar aktivitas pengguna di forum, pustaka, dan video.  
-- Pengaturan Akun: ubah profil, password, atau preferensi tampilan.  
+- Profil Pengguna: berisi identitas dasar, olahraga favorit, dan preferensi pengguna.
+- Riwayat Aktivitas: daftar aktivitas pengguna di forum, pustaka, dan video.
+- Pengaturan Akun: ubah profil, password, atau preferensi tampilan.
 
 ---
 
@@ -144,7 +142,7 @@ Modul ini berfungsi untuk menampilkan data pengguna, aktivitas yang telah dilaku
 - 👩‍💼 **Individu Dewasa & Profesional Muda:**  
   Mereka yang ingin mencari hobi baru untuk menyeimbangkan hidup dan mengurangi stres, namun memiliki waktu terbatas untuk riset mendalam.  
 
-- 🎓 **Mahasiswa dan Pelajar:**  
+- 🎓 **Mahasiswa dan Pelajar:**
   Mereka yang ingin mencoba kegiatan baru di luar akademis atau bergabung dengan unit kegiatan mahasiswa (UKM) olahraga.  
 
 - 👨‍👩‍👧 **Orang Tua:**  
