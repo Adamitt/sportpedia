@@ -36,7 +36,7 @@ def pengaturan_akun(request):
         if email and email != user.email:
             if User.objects.filter(email=email).exclude(pk=user.pk).exists():
                 messages.error(request, '❌ Email sudah digunakan.')
-                return redirect('pengaturan_akun')
+                return redirect('profile_app:pengaturan_akun')
             user.email = email
 
         if new_password:
@@ -52,8 +52,7 @@ def pengaturan_akun(request):
             profile.foto_profil = foto
         profile.save()
 
-        messages.success(request, '✅ Pengaturan akun berhasil diperbarui!')
-        return redirect('profile_page')
+        return redirect('profile_app:profile_page')
 
     context = {
         'user': user,

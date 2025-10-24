@@ -5,7 +5,7 @@ import uuid
 from django.conf import settings
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name='profile')
     olahraga_favorit = models.CharField(max_length=100, blank=True, null=True)
     preferensi = models.TextField(blank=True, null=True)
     foto_profil = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
@@ -14,18 +14,30 @@ class UserProfile(models.Model):
         return self.user.username
 
 class SportProgress(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    TARGET_SECONDS = 240 # Target time in seconds for 100%
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     sport = models.ForeignKey(Sport, on_delete=models.CASCADE)
+    # Ensure time_spent can store enough seconds (e.g., IntegerField)
+    time_spent = models.PositiveIntegerField(default=0) # Store total seconds spent
     completed = models.BooleanField(default=False)
-    time_spent = models.FloatField(default=0.0)  # dalam detik
     last_accessed = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        unique_together = ('user', 'sport')
+    @property
+    def percent(self):
+        """Calculates the completion percentage."""
+        if self.completed:
+            return 100
+        # Calculate percentage, ensuring it doesn't exceed 100
+        percentage = min(int((self.time_spent / self.TARGET_SECONDS) * 100), 100)
+        return percentage
 
     def __str__(self):
-        return f"{self.user.username} - {self.sport.name} ({'Done' if self.completed else 'In Progress'})"
+        return f"{self.user.username} - {self.sport.name} ({self.percent}%)"
+
+    class Meta:
+        unique_together = ('user', 'sport') # Prevent duplicate entries
+        ordering = ['-last_accessed']
 
 class ActivityLog(models.Model):
     # Define choices for the type of action
