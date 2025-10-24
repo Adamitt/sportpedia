@@ -683,13 +683,14 @@
     "instructor": "Coach Derry",
     "description": "Panduan langkah demi langkah untuk mempelajari trik ollie pertama kamu.",
     "rating": 4.9,
-    "views": 12800,
+    "views": 12801,
     "upload_date": "2025-02-14",
     "tags": [
       "skate",
       "trick",
       "beginner"
-    ]
+    ],
+    "sport_name": "Skateboarding"
   },
   {
     "id": 37,
