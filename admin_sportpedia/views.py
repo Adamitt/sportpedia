@@ -4,11 +4,12 @@ from django.contrib import messages
 from gearguide.models import Gear
 from sportlibrary.models import Sport
 from profile_app.models import ActivityLog
-from django.contrib.auth.models import User # Import User model
-from django.db.models import Q            # For OR queries
-from .forms import AdminUserCreationForm, AdminUserChangeForm # Import the new forms
-from django.views.decorators.http import require_POST # For delete safety
+from django.contrib.auth.models import User
+from django.db.models import Q
+from .forms import AdminUserCreationForm, AdminUserChangeForm
+from django.views.decorators.http import require_POST
 from django.http import JsonResponse
+from django.db import models
 
 # only admin/staff
 def admin_only(user):
@@ -138,46 +139,65 @@ def manage_library(request):
 def add_sport(request):
     """Handles adding a new sport."""
     if request.method == 'POST':
-        # Basic fields
         name = request.POST.get('name')
         category = request.POST.get('category')
         difficulty = request.POST.get('difficulty')
         description = request.POST.get('description')
         history = request.POST.get('history')
 
-        # Process JSONFields (assuming comma-separated input in textareas)
-        rules_str = request.POST.get('rules', '')
-        techniques_str = request.POST.get('techniques', '')
-        benefits_str = request.POST.get('benefits', '')
-        countries_str = request.POST.get('popular_countries', '')
-        tags_str = request.POST.get('tags', '')
-
+        # ✅ versi parse_json_list yang aman dan fleksibel
+        import json
         def parse_json_list(text):
-            if not text: return []
-            return [item.strip() for item in text.split(',') if item.strip()]
+            if not text:
+                return []
+            try:
+                # Kalau user kirim string JSON (misal: '["rule1","rule2"]')
+                data = json.loads(text)
+                if isinstance(data, list):
+                    return [str(item).strip() for item in data if str(item).strip()]
+            except json.JSONDecodeError:
+                # Kalau bukan JSON valid, pisahkan pakai koma
+                return [item.strip() for item in text.split(',') if item.strip()]
+            return []
 
         try:
-            Sport.objects.create(
+            # 🔥 FIX: Get max ID from database and set next ID manually
+            sports_objects = Sport.objects.all()
+            id_sports=[int(sport.id) for sport in sports_objects]
+            id_sports.sort()
+            max_id = id_sports[-1] if id_sports else 0
+            next_id = int(max_id or 0) + 1
+            
+            print(f"🔍 Debug: Max ID = {max_id}, Next ID = {next_id}")  # Debug
+            
+            # Create sport with manual ID
+            new_sport = Sport(
+                id=next_id,
                 name=name,
                 category=category,
                 difficulty=difficulty,
                 description=description,
                 history=history,
-                rules=parse_json_list(rules_str),
-                techniques=parse_json_list(techniques_str),
-                benefits=parse_json_list(benefits_str),
-                popular_countries=parse_json_list(countries_str),
-                tags=parse_json_list(tags_str),
+                rules=parse_json_list(request.POST.get('rules', '')),
+                techniques=parse_json_list(request.POST.get('techniques', '')),
+                benefits=parse_json_list(request.POST.get('benefits', '')),
+                popular_countries=parse_json_list(request.POST.get('popular_countries', '')),
+                tags=parse_json_list(request.POST.get('tags', '')),
             )
+
+            new_sport.save()
+            
             messages.success(request, f'✅ Olahraga "{name}" berhasil ditambahkan!')
             return redirect('admin_sportpedia:manage_library')
+            
         except Exception as e:
+            import traceback
+            print("❌ Error:")
+            print(traceback.format_exc())
             messages.error(request, f'❌ Gagal menambahkan olahraga: {e}')
-            return render(request, 'library_app/sport_form.html', {'edit_mode': False})
 
-    return render(request, 'library_app/sport_form.html', {'edit_mode': False})
+    return render(request, 'library/sport_form.html', {'edit_mode': False})
 
-@user_passes_test(admin_only, login_url='/accounts/login/')
 def edit_sport(request, sport_id):
     """Handles editing an existing sport."""
     sport = get_object_or_404(Sport, id=sport_id)
@@ -211,7 +231,7 @@ def edit_sport(request, sport_id):
             return redirect('admin_sportpedia:manage_library')
         except Exception as e:
              messages.error(request, f'❌ Gagal memperbarui olahraga: {e}')
-             return render(request, 'library_app/sport_form.html', {'sport': sport, 'edit_mode': True})
+             return render(request, 'library/sport_form.html', {'sport': sport, 'edit_mode': True})
 
     context = {
         'sport': sport,
@@ -222,7 +242,7 @@ def edit_sport(request, sport_id):
         'countries_str': ', '.join(sport.popular_countries),
         'tags_str': ', '.join(sport.tags),
     }
-    return render(request, 'library_app/sport_form.html', context)
+    return render(request, 'library/sport_form.html', context)
 
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def delete_sport(request, sport_id):

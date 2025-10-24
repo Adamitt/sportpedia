@@ -15,7 +15,8 @@ urlpatterns = [
     path('sportlibrary/', include('sportlibrary.urls')),
     path('library/', include('sportlibrary.urls', namespace='library')),
     path('videos/', include('videos.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
+    # path('accounts/', include('django.contrib.auth.urls')),
+
 ]
 
 if settings.DEBUG:
