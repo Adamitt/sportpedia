@@ -15,29 +15,6 @@
       <p class="text-gray-600 text-lg">Selamat datang, <span class="font-semibold">{{ user.username }}</span>! Kelola konten Sportpedia Anda di sini.</p>
     </div>
 
-<<<<<<< HEAD
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-        <a href="{% url 'admin_sportpedia:manage_admin' %}" 
-         class="quick-nav-card block p-6 text-center border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-all duration-300">
-        <div class="mb-4">
-          <span class="text-5xl">🤷‍♀️</span> 
-          {% comment %} Or use an SVG/Image if you prefer {% endcomment %}
-          {% comment %} <img src="{% static 'images/gear_icon.png' %}" alt="Gear Icon" class="h-16 w-auto mx-auto mb-3 object-contain"> {% endcomment %}
-        </div>
-        <h2 class="text-xl font-semibold mb-2" style="color: #1C3264;">
-          Kelola Admin
-        </h2>
-        <p class="text-sm text-gray-500">
-          Add, edit, or delete admin accounts.
-        </p>
-      </a>
-
-      <a href="{% url 'admin_sportpedia:manage_gear' %}" 
-         class="quick-nav-card block p-6 text-center border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-all duration-300">
-        <div class="mb-4">
-          <span class="text-5xl">🏋️‍♂️</span> 
-=======
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <!-- Total Sports Card -->
@@ -52,7 +29,6 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
->>>>>>> origin/freya
         </div>
         <div class="mt-4">
           <a href="{% url 'admin_sportpedia:manage_library' %}" class="text-sm text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1">
@@ -62,15 +38,6 @@
             </svg>
           </a>
         </div>
-<<<<<<< HEAD
-        <h2 class="text-xl font-semibold mb-2" style="color: #1C3264;">
-          Kelola Sport Library
-        </h2>
-        <p class="text-sm text-gray-500">
-          Manage sports details, rules, and history.
-        </p>
-      </a>
-=======
       </div>
 
       <!-- Total Gears Card -->
@@ -113,7 +80,6 @@
           <span class="text-sm text-gray-500 font-medium">Pengguna terdaftar</span>
         </div>
       </div>
->>>>>>> origin/freya
     </div>
 
     <!-- Quick Actions -->
@@ -163,6 +129,23 @@
           </div>
           <span class="font-semibold text-gray-700 group-hover:text-orange-600">Kelola Gear</span>
         </a>
+
+        
+        <a href="{% url 'admin_sportpedia:manage_admin' %}" 
+          class="quick-nav-card block p-6 text-center border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-all duration-300">
+          <div class="mb-4">
+            <span class="text-5xl">🤷‍♀️</span> 
+            {% comment %} Or use an SVG/Image if you prefer {% endcomment %}
+            {% comment %} <img src="{% static 'images/gear_icon.png' %}" alt="Gear Icon" class="h-16 w-auto mx-auto mb-3 object-contain"> {% endcomment %}
+          </div>
+          <h2 class="text-xl font-semibold mb-2" style="color: #1C3264;">
+            Kelola Admin
+          </h2>
+          <p class="text-sm text-gray-500">
+            Add, edit, or delete admin accounts.
+          </p>
+        </a>
+
       </div>
     </div>
 
@@ -220,7 +203,6 @@
 
   </div>
 </section>
-<<<<<<< HEAD
 
 {% endblock %}
 
@@ -236,6 +218,4 @@
     box-shadow: 0 10px 25px rgba(28, 50, 100, 0.1); /* Slightly softer shadow */
   }
 </style>
-=======
->>>>>>> origin/freya
 {% endblock %}

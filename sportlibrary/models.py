@@ -5,6 +5,7 @@ import uuid
 class Sport(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='sports/', blank=True, null=True) #
     category = models.CharField(max_length=20)
     difficulty = models.CharField(max_length=20)
     description = models.TextField()

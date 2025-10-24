@@ -95,7 +95,7 @@ def show_gear_detail(request, gear_id):
         key,
         title=gear.name,
         url=url,
-        category="Gear Guide",
+        category="Gear",
         image=(gear.image or ""),
         request=request,
     )
@@ -256,17 +256,25 @@ def card_details(request, gear_id):
             "gear": gear,
         })
 
-    # Fallback ke JSON
+ # Fallback ke JSON
     data_path = settings.BASE_DIR / 'database' / 'gears.json'
     if not data_path.exists():
         return render(request, "404.html", status=404)
 
     with open(data_path, 'r', encoding='utf-8') as file:
         gears = json.load(file)
-        gear = next((g for g in gears if str(g['id']) == str(gear_id)), None)
+        # ⭐ perketat-melonggarkan matching ID
+        raw_id = str(gear_id)
+        alt_id = raw_id.lstrip("0") or "0"
+        gear = next(
+            (g for g in gears
+            if str(g.get('id')) == raw_id or str(g.get('id')) == alt_id),
+            None
+        )
 
     if not gear:
         return render(request, "404.html", status=404)
+
 
     sport_name = gear.get("sport", "Unknown")
     sport_id = gear.get("sport_id")

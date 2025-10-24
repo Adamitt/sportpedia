@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Search — "{{ query }}"{% endblock %}
+
+{% block head %}
+<style>
+  /* --- styles persis seperti punyamu, tanpa perubahan fungsional --- */
+  @keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+  .search-header{background:linear-gradient(135deg,#1C3264 0%,#17356B 50%,#0f1f3d 100%);background-size:200% 200%;animation:gradientShift 15s ease infinite;padding:80px 24px 100px;margin:-40px -24px 0;position:relative;overflow:hidden}
+  .search-header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");opacity:.4}
+  .search-header::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(2px 2px at 20% 30%, white, transparent),radial-gradient(2px 2px at 60% 70%, white, transparent),radial-gradient(1px 1px at 50% 50%, white, transparent),radial-gradient(1px 1px at 80% 10%, white, transparent),radial-gradient(2px 2px at 90% 60%, white, transparent);background-size:200% 200%;animation:float 20s linear infinite;opacity:.6}
+  @keyframes float{0%,100%{transform:translate(0,0)}25%{transform:translate(10px,-10px)}50%{transform:translate(-5px,5px)}75%{transform:translate(5px,10px)}}
+  .search-title{position:relative;z-index:1;color:#fff;text-align:center;font-size:2.5rem;font-weight:900;margin-bottom:16px;text-shadow:0 4px 20px rgba(0,0,0,.3);animation:titlePulse 3s ease-in-out infinite}
+  @keyframes titlePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+  .search-query{background:rgba(255,255,255,.25);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:6px 20px;border-radius:16px;display:inline-block;color:#fff;font-weight:700;border:2px solid rgba(255,255,255,.3);box-shadow:0 8px 32px rgba(0,0,0,.2);animation:queryGlow 2s ease-in-out infinite}
+  @keyframes queryGlow{0%,100%{box-shadow:0 8px 32px rgba(255,255,255,.2)}50%{box-shadow:0 8px 32px rgba(255,255,255,.4)}}
+  .search-subtitle{position:relative;z-index:1;color:rgba(255,255,255,.9);text-align:center;font-size:1rem;margin-top:12px;font-weight:500}
+  .result-section{background:linear-gradient(135deg,#fff 0%,#f9fafb 100%);border-radius:32px;padding:40px;margin-top:-60px;position:relative;z-index:2;box-shadow:0 20px 60px rgba(0,0,0,.12),0 0 0 1px rgba(0,0,0,.05);border:3px solid rgba(255,255,255,.8);animation:sectionSlideUp .6s cubic-bezier(.4,0,.2,1)}
+  @keyframes sectionSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;padding-bottom:20px;border-bottom:3px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(90deg,#C94A4A 0%,#1C3264 100%) border-box;border-radius:0;border-bottom:3px solid;border-image:linear-gradient(90deg,#C94A4A 0%,#1C3264 100%) 1}
+  .section-title{font-size:1.75rem;font-weight:800;background:linear-gradient(135deg,#1C3264 0%,#C94A4A 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:flex;align-items:center;gap:16px}
+  .section-icon{width:52px;height:52px;background:linear-gradient(135deg,#C94A4A 0%,#992626 100%);border-radius:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;box-shadow:0 8px 24px rgba(201,74,74,.4),inset 0 -2px 8px rgba(0,0,0,.2);animation:iconFloat 3s ease-in-out infinite;position:relative}
+  .section-icon::before{content:'';position:absolute;inset:-4px;border-radius:18px;background:linear-gradient(135deg,#C94A4A,#992626);z-index:-1;opacity:.3;filter:blur(8px)}
+  @keyframes iconFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-5px) rotate(5deg)}}
+  .count-badge{background:linear-gradient(135deg,#1C3264 0%,#17356B 100%);color:#fff;padding:8px 20px;border-radius:24px;font-size:.875rem;font-weight:700;box-shadow:0 6px 16px rgba(28,50,100,.4),inset 0 1px 2px rgba(255,255,255,.3);position:relative;overflow:hidden}
+  .count-badge::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent,rgba(255,255,255,.2),transparent);animation:badgeShine 3s infinite}
+  @keyframes badgeShine{0%,100%{transform:translateX(-100%) translateY(-100%) rotate(45deg)}50%{transform:translateX(100%) translateY(100%) rotate(45deg)}}
+  .result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:32px}
+  .card{border:2px solid #e5e7eb;border-radius:24px;background:linear-gradient(135deg,#fff 0%,#fafafa 100%);padding:0;display:flex;flex-direction:column;transition:all .4s cubic-bezier(.4,0,.2,1);overflow:hidden;position:relative;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,#C94A4A 0%,#992626 100%);transform:scaleX(0);transition:transform .4s ease}
+  .card::after{content:'';position:absolute;inset:-2px;background:linear-gradient(135deg,#C94A4A,#992626);border-radius:24px;z-index:-1;opacity:0;transition:opacity .4s ease;filter:blur(20px)}
+  .card:hover{border-color:#C94A4A;box-shadow:0 20px 60px rgba(201,74,74,.25),0 0 0 1px rgba(201,74,74,.1);transform:translateY(-12px) scale(1.02)}
+  .card:hover::after{opacity:.4}
+  .card:hover::before{transform:scaleX(1)}
+  .thumb{height:220px;background:linear-gradient(135deg,#1C3264 0%,#17356B 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .thumb::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,74,74,.3),rgba(28,50,100,.3));opacity:0;transition:opacity .4s ease}
+  .card:hover .thumb::before{opacity:1}
+  .thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.6) 100%);opacity:0;transition:opacity .4s ease}
+  .card:hover .thumb::after{opacity:1}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.4,0,.2,1)}
+  .card:hover .thumb img{transform:scale(1.15) rotate(2deg)}
+  .sport-card{border:2px solid #e5e7eb;border-radius:24px;background:linear-gradient(135deg,#f9f5ff 0%,#ffe5e5 50%,#ffd5d5 100%);padding:32px 24px;display:flex;flex-direction:column;transition:all .4s cubic-bezier(.4,0,.2,1);overflow:hidden;position:relative;box-shadow:0 4px 16px rgba(201,74,74,.1);min-height:280px}
+  .sport-card::before{content:'';position:absolute;top:-50%;right:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,255,255,.4) 0%,transparent 70%);animation:sportShimmer 4s infinite;pointer-events:none}
+  @keyframes sportShimmer{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(-30%,-30%) rotate(180deg)}}
+  .sport-card::after{content:'';position:absolute;inset:-2px;background:linear-gradient(135deg,#C94A4A,#fff);border-radius:24px;z-index:-1;opacity:0;transition:opacity .4s ease;filter:blur(20px)}
+  .sport-card:hover{border-color:#C94A4A;box-shadow:0 20px 60px rgba(201,74,74,.3),0 0 0 1px rgba(201,74,74,.2);transform:translateY(-12px) scale(1.02);background:linear-gradient(135deg,#ffe5e5 0%,#ffd5d5 50%,#ffc5c5 100%)}
+  .sport-card:hover::after{opacity:.3}
+  .sport-icon-big{font-size:4rem;margin-bottom:16px;text-align:center;animation:sportIconBounce 2s ease-in-out infinite;position:relative;z-index:1}
+  @keyframes sportIconBounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.1)}}
+  .card-content{padding:24px;flex:1;display:flex;flex-direction:column;position:relative;z-index:1}
+  .badge{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1C3264;background:rgba(28,50,100,.12);padding:8px 14px;border-radius:10px;width:fit-content;border:1px solid rgba(28,50,100,.2);box-shadow:0 2px 8px rgba(28,50,100,.1)}
+  .sport-badge{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9B2C2C;background:linear-gradient(135deg,#fdecec 0%,#ffd5d5 100%);border:1px solid #f4caca;padding:8px 14px;border-radius:10px;width:fit-content;box-shadow:0 2px 8px rgba(155,44,44,.15);position:relative;z-index:1}
+  .title{margin-top:12px;font-weight:800;font-size:1.25rem;color:#111827;line-height:1.4;position:relative;z-index:1}
+  .sport-title{margin-top:12px;font-weight:800;font-size:1.5rem;color:#992626;line-height:1.3;text-align:center;position:relative;z-index:1;text-shadow:0 2px 4px rgba(153,38,38,.1)}
+  .meta{font-size:13px;color:#6b7280;margin-top:8px;font-weight:600;position:relative;z-index:1}
+  .excerpt{font-size:14px;color:#4b5563;margin-top:12px;line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;position:relative;z-index:1}
+  .sport-excerpt{font-size:15px;color:#7c2d2d;margin-top:12px;line-height:1.7;text-align:center;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;position:relative;z-index:1}
+  .cta{margin-top:auto;padding-top:20px;display:flex;justify-content:center;position:relative;z-index:1}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 28px;border-radius:16px;background:linear-gradient(135deg,#C94A4A 0%,#992626 100%);color:#fff;font-weight:700;font-size:14px;transition:all .4s cubic-bezier(.4,0,.2,1);box-shadow:0 6px 20px rgba(201,74,74,.4),inset 0 1px 2px rgba(255,255,255,.3);position:relative;overflow:hidden}
+  .btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);transition:left .6s ease}
+  .btn:hover::before{left:100%}
+  .btn:hover{transform:translateY(-4px) scale(1.05);box-shadow:0 12px 32px rgba(201,74,74,.5),inset 0 1px 2px rgba(255,255,255,.4)}
+  .btn svg{transition:transform .4s ease}
+  .btn:hover svg{transform:translateX(4px)}
+  .empty{padding:80px 24px;border:3px dashed #d1d5db;border-radius:28px;color:#9ca3af;text-align:center;background:linear-gradient(135deg,#fafafa 0%,#f3f4f6 100%);position:relative;overflow:hidden}
+  .empty::before{content:'';position:absolute;top:0;left:-100%;width:200%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:emptyShine 3s infinite}
+  @keyframes emptyShine{0%{left:-100%}100%{left:100%}}
+  .empty-icon{font-size:4rem;margin-bottom:16px;opacity:.4;animation:emptyFloat 3s ease-in-out infinite}
+  @keyframes emptyFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .empty-text{font-size:1.25rem;font-weight:700;color:#6b7280;position:relative;z-index:1}
+  mark{background:linear-gradient(120deg,#fef3c7 0%,#fde68a 100%);color:#92400e;padding:4px 10px;border-radius:8px;font-weight:700;box-shadow:0 2px 8px rgba(252,211,77,.3)}
+  .divider{height:60px}
+  @media (max-width:768px){.search-header{padding:60px 16px 80px}.search-title{font-size:1.75rem}.result-section{padding:28px 20px;margin-top:-40px}.section-header{flex-direction:column;gap:16px;align-items:flex-start}.result-grid{grid-template-columns:1fr;gap:24px}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-header">
+  <div class="max-w-7xl mx-auto">
+    <h1 class="search-title">
+      Hasil pencarian untuk: <span class="search-query">{{ query }}</span>
+    </h1>
+    <p class="search-subtitle">Menemukan konten terbaik untukmu</p>
+  </div>
+</div>
+
+<section class="max-w-7xl mx-auto px-6">
+  <!-- GEARS -->
+  <div class="result-section">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+        </div>
+        <span>Gear</span>
+      </div>
+      <span class="count-badge">{{ gear_results|length }} items</span>
+    </div>
+
+    {% if gear_results %}
+      <div class="result-grid">
+        {% for g in gear_results %}
+          {# PENTING: gunakan named kwarg "gear_id" agar tidak salah urut #}
+          <a href="{% url 'gearguide:card_details' gear_id=g.id %}" class="card">
+            <div class="thumb">
+              {% if g.image %}
+                {# Aman untuk ImageField (punya .url) atau string path #}
+                <img src="{{ g.image.url|default:g.image }}" alt="{{ g.name }}">
+              {% else %}
+                <span class="text-white text-6xl">📦</span>
+              {% endif %}
+            </div>
+            <div class="card-content">
+              <span class="badge">⚡ {{ g.sport.name|default:"Unknown" }}</span>
+              <div class="title">{{ g.name }}</div>
+              <div class="meta">{{ g.price_range|default:"Hubungi untuk harga" }}</div>
+              <p class="excerpt">{{ g.function|default:g.description|truncatechars:140 }}</p>
+              <div class="cta">
+                <span class="btn">
+                  Lihat Detail
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-text">Tidak ada gear yang cocok dengan pencarian Anda</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SPORTS -->
+  <div class="result-section">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a5.2 5.2 0 0 0-3.5 9.3L4.2 15.5a1 1 0 0 0 1.3 1.3l3.8-3.8A5.2 5.2 0 0 0 12 22a5.2 5.2 0 0 0 3.5-9.3l3.8 3.8a1 1 0 0 0 1.3-1.3l-3.8-3.8A5.2 5.2 0 0 0 12 2Z"></path></svg>
+        </div>
+        <span>Sports</span>
+      </div>
+      <span class="count-badge">{{ sport_results|length }} items</span>
+    </div>
+
+    {% if sport_results %}
+      <div class="result-grid">
+        {% for s in sport_results %}
+          <a href="{% url 'sportlibrary:sport_detail' sport_id=s.id %}" class="sport-card">
+            <span class="sport-badge">📚 Library</span>
+            <div class="sport-title">{{ s.name }}</div>
+            <p class="sport-excerpt">{{ s.description|truncatechars:150 }}</p>
+            <div class="cta">
+              <span class="btn">
+                Pelajari Lebih Lanjut
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-text">Tidak ada olahraga yang cocok dengan pencarian Anda</div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<div style="height:80px;"></div>
+{% endblock %}

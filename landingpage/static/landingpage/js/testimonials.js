@@ -2,21 +2,15 @@
 function showToast(message, variant='info', ms=3500){
   const stack = document.getElementById('toast-stack');
   if(!stack) return;
-  const colors = {
-    info:'bg-blue-600', success:'bg-emerald-600', error:'bg-rose-600', warning:'bg-amber-500'
-  };
+  const colors = { info:'bg-blue-600', success:'bg-emerald-600', error:'bg-rose-600', warning:'bg-amber-500' };
   const el = document.createElement('div');
   el.className = `pointer-events-auto ${colors[variant]||colors.info} text-white rounded-xl shadow-lg px-4 py-3 flex items-center gap-3 w-[min(360px,90vw)] opacity-0 -translate-y-2 transition-all duration-300`;
   el.innerHTML = `<span>${message}</span>`;
   stack.appendChild(el);
   requestAnimationFrame(()=>{ el.classList.remove('opacity-0','-translate-y-2'); el.classList.add('opacity-100','translate-y-0'); });
-  setTimeout(()=>{ el.classList.add('opacity-0','-translate-y-2'); setTimeout(()=>el.remove(),300); },ms);
+  setTimeout(()=>{ el.classList.add('opacity-0','-translate-y-2'); setTimeout(()=>el.remove(),300); }, ms);
 }
-
-// helper escape
-function esc(s){
-  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ======== MAIN =========
 document.addEventListener('DOMContentLoaded', function(){
@@ -37,37 +31,38 @@ document.addEventListener('DOMContentLoaded', function(){
   const editId     = document.getElementById('edit-id');
   const editText   = document.getElementById('edit-text');
   const editCat    = document.getElementById('edit-category');
-  const editImg    = document.getElementById('edit-image');
+  const editImgUrl = document.getElementById('edit-image-url');
 
   const csrftoken = document.cookie.match('(^|;)\\s*csrftoken\\s*=\\s*([^;]+)')?.pop() || '';
 
   const VISIBLE = 3;
   let groupIndex = 0, itemCount = 0, stepWidth = 0;
 
-  function cardHTML(item){
-    const img = item.image_url || "/static/images/placeholder.jpg";
-    // tampilkan DESKRIPSI (text) sebagai konten utama
-    const textHTML = esc(item.text || '').replace(/\n/g,'<br>');
-    const owner = item.is_owner ? `
-      <div class='mt-3 flex justify-center gap-2'>
-        <button
-          class='edit-btn bg-amber-500 text-white px-3 py-1 rounded'
-          data-id='${item.id}'
-          data-text='${(item.text||"").replace(/'/g,"&#39;")}'
-          data-category='${item.category}'
-        >Edit</button>
-        <button class='delete-btn bg-rose-600 text-white px-3 py-1 rounded' data-id='${item.id}'>Delete</button>
-      </div>` : '';
-    return `<article class='testimonial-card'>
-      <img src='${img}' class='w-full h-40 object-cover rounded-xl mb-3' alt='testimonial'>
-      <div class='text-center p-2'>
-        <p class='text-xs text-gray-500 uppercase tracking-wide'>${item.category}</p>
-        <p class='mt-2 text-[15px] leading-relaxed text-gray-800 whitespace-pre-line'>${textHTML}</p>
-        <p class='text-xs text-gray-500 mt-2'>— <strong>${esc(item.user)}</strong></p>
-        ${owner}
-      </div>
-    </article>`;
-  }
+function cardHTML(item){
+  const img = item.image_url || (window.SPORTPEDIA_PLACEHOLDER || "https://placehold.co/600x400?text=No+Image");
+  const textHTML = esc(item.text || '').replace(/\n/g,'<br>');
+  const owner = item.is_owner ? `
+    <div class='mt-3 flex justify-center gap-2'>
+      <button
+        class='edit-btn bg-amber-500 text-white px-3 py-1 rounded'
+        data-id='${item.id}'
+        data-text='${(item.text||"").replace(/'/g,"&#39;")}'
+        data-category='${item.category}'
+        data-image-url='${esc(item.image_url || "")}'
+      >Edit</button>
+      <button class='delete-btn bg-rose-600 text-white px-3 py-1 rounded' data-id='${item.id}'>Delete</button>
+    </div>` : '';
+  return `<article class='testimonial-card'>
+    <img src='${img}' class='w-full h-40 object-cover rounded-xl mb-3' alt='testimonial'>
+    <div class='text-center p-2'>
+      <p class='text-xs text-gray-500 uppercase tracking-wide'>${item.category}</p>
+      <p class='mt-2 text-[15px] leading-relaxed text-gray-800 whitespace-pre-line'>${textHTML}</p>
+      <p class='text-xs text-gray-500 mt-2'>— <strong>${esc(item.user)}</strong></p>
+      ${owner}
+    </div>
+  </article>`;
+}
+
 
   function computeStepWidth(){
     const first = track.querySelector('.testimonial-card');
@@ -75,10 +70,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const gap = parseFloat(getComputedStyle(track).gap) || 32;
     stepWidth = first.offsetWidth * VISIBLE + gap * (VISIBLE - 1);
   }
-
-  function applyTransform(){
-    track.style.transform = `translateX(${-groupIndex * stepWidth}px)`;
-  }
+  function applyTransform(){ track.style.transform = `translateX(${-groupIndex * stepWidth}px)`; }
 
   async function loadTestimonials(cat='all'){
     try{
@@ -126,10 +118,7 @@ document.addEventListener('DOMContentLoaded', function(){
       nextBtn.classList.toggle('t-arrow-disabled', groupIndex >= maxGroup);
     }
   });
-  window.addEventListener('resize', ()=>{
-    computeStepWidth();
-    applyTransform();
-  });
+  window.addEventListener('resize', ()=>{ computeStepWidth(); applyTransform(); });
 
   // Filter
   filters.addEventListener('click', (e)=>{
@@ -142,17 +131,17 @@ document.addEventListener('DOMContentLoaded', function(){
   // load awal
   loadTestimonials('all');
 
-  // ===== Create modal (tengah) =====
+  // ===== Create modal =====
   createBtn?.addEventListener('click', ()=> createWrap.classList.remove('hidden'));
   createClose?.addEventListener('click', ()=> createWrap.classList.add('hidden'));
   createForm?.addEventListener('submit', async (e)=>{
     e.preventDefault();
     try{
       const fd = new FormData(createForm);
-      // backend masih butuh title -> auto-generate dari awal deskripsi
       const text = (fd.get('text') || '').toString().trim();
       const autoTitle = text ? text.slice(0, 60) : 'Testimonial';
-      fd.set('title', autoTitle);
+      fd.set('title', autoTitle); // backend expects title
+      // image_url sudah ada dari input name="image_url"
 
       const res = await fetch(EP.create, {
         method:'POST',
@@ -189,27 +178,31 @@ document.addEventListener('DOMContentLoaded', function(){
       return;
     }
 
-    // EDIT (open modal + prefill)
-    const edit = e.target.closest('.edit-btn');
-    if(edit){
-      document.getElementById('edit-id').value     = edit.dataset.id;
-      document.getElementById('edit-text').value   = edit.dataset.text || '';
-      document.getElementById('edit-category').value = edit.dataset.category || 'library';
-      const f = document.getElementById('edit-image'); if(f) f.value = '';
-      editWrap.classList.remove('hidden');
-    }
+    // EDIT
+// EDIT (open modal + prefill)
+const edit = e.target.closest('.edit-btn');
+if (edit) {
+  document.getElementById('edit-id').value = edit.dataset.id;
+  document.getElementById('edit-text').value = edit.dataset.text || '';
+  document.getElementById('edit-category').value = edit.dataset.category || 'library';
+  // prefill image_url kalau ada di data-* nanti (kita isi saat render)
+  const urlInput = document.getElementById('edit-image-url');
+  if (urlInput) urlInput.value = edit.dataset.imageUrl || '';
+  editWrap.classList.remove('hidden');
+}
+
   });
 
-  // ===== Edit modal submit =====
+  // ===== Edit submit =====
   editClose?.addEventListener('click', ()=> editWrap.classList.add('hidden'));
   editForm?.addEventListener('submit', async (e)=>{
     e.preventDefault();
     const id = editId.value;
     const fd = new FormData(editForm);
-    // backend butuh title -> auto dari text
     const text = (fd.get('text') || '').toString().trim();
     const autoTitle = text ? text.slice(0, 60) : 'Testimonial';
     fd.set('title', autoTitle);
+    // image_url sudah ada dari input name="image_url"
 
     try{
       const res = await fetch(`${EP.updateBase}${id}/update/`, {

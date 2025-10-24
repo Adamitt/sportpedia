@@ -9,6 +9,50 @@ from profile_app.models import ActivityLog
 from django.http import JsonResponse
 from .models import Sport, SavedSport
 
+# -------------------------------------------------
+# Helpers
+# -------------------------------------------------
+def _load_sports_json():
+    """Baca data olahraga dari database/sports.json"""
+    data_path = settings.BASE_DIR / 'database' / 'sports.json'
+    with open(data_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
+def _normalize_id(raw_id: str):
+    """
+    Terima:
+      - "10"  -> 10
+      - "00000000-0000-0000-0000-00000000000a" -> 10 (ambil segmen hex terakhir)
+      - "00000000-0000-0000-0000-000000000003" -> 3
+    Kalau gagal parse, balikin None.
+    """
+    s = str(raw_id).strip().lower()
+
+    if s.isdigit():
+        try:
+            return int(s)
+        except Exception:
+            return None
+
+    # UUID-like: ambil segmen terakhir setelah '-'
+    if '-' in s:
+        tail = s.split('-')[-1]
+        try:
+            return int(tail, 16)
+        except Exception:
+            return None
+
+    # terakhir: coba hex langsung
+    try:
+        return int(s, 16)
+    except Exception:
+        return None
+
+
+# -------------------------------------------------
+# Views
+# -------------------------------------------------
 def show_sports(request):
     # Ambil semua sport dari database
     sports = Sport.objects.all()
@@ -48,6 +92,7 @@ def sport_detail(request, sport_id):
         "is_saved": is_saved
     }
     return render(request, 'sportlibrary/detail.html', context)
+
 
 def saved_sports(request):
     if not request.user.is_authenticated:
