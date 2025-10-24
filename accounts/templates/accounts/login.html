@@ -78,7 +78,7 @@
                 <div class="mt-8 text-center">
                     <p class="text-sm text-gray-600">
                         Belum punya akun?
-                        <a href="{% url 'register' %}" class="font-semibold text-blue-900 hover:text-blue-700 transition register-link">
+                        <a href="{% url 'accounts:register' %}" class="font-semibold text-blue-900 hover:text-blue-700 transition register-link">
                             Daftar gratis sekarang →
                         </a>
                     </p>
@@ -151,7 +151,7 @@
             e.preventDefault();
             document.querySelectorAll('.slide-section').forEach(section => section.classList.add('slide-to-register'));
             setTimeout(() => {
-                window.location.href = "{% url 'register' %}";
+                window.location.href = "{% url 'accounts:register' %}";
             }, 500); // Match the transition duration
         });
     </script>

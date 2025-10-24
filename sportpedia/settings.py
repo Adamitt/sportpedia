@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'accounts',
     'admin_sportpedia',
     'metrics',
+    'videos',
 ]
 
 LOGIN_URL = '/login/'  # biar decorator login_required tahu harus redirect ke sini

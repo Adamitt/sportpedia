@@ -5,17 +5,17 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('landingpage.urls')),
+    path('gearguide/', include('gearguide.urls')),
+    path('sportlibrary/', include('sportlibrary.urls')),
+    path('', include('admin_sportpedia.urls')),
+    path('profile/', include('profile_app.urls')),
+    path('accounts/', include('accounts.urls')),
+    path('admin_sportpedia/', include('admin_sportpedia.urls')),
+    path('sportlibrary/', include('sportlibrary.urls')),
+    path('library/', include('sportlibrary.urls', namespace='library')),
+    path('videos/', include('videos.urls')),
 
-    # Landing page / beranda utama
-    path('', include(('landingpage.urls', 'landingpage'), namespace='landingpage')),
-
-
-    # App lain
-    path('gearguide/', include(('gearguide.urls', 'gearguide'), namespace='gearguide')),
-    path('sportlibrary/', include(('sportlibrary.urls', 'sportlibrary'), namespace='sportlibrary')),
-    path('admin_sportpedia/', include(('admin_sportpedia.urls', 'admin_sportpedia'), namespace='admin_sportpedia')),
-    path('profile/', include(('profile_app.urls', 'profile_app'), namespace='profile_app')),
-    path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
 ]
 
 if settings.DEBUG:

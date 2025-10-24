@@ -1,161 +1,244 @@
 <script>
   // --- Ambil CSRF token dari cookie ---
-  window.openEditModal = function(gearId) {
-  console.log("🧩 openEditModal gearId =", gearId);
+// ==========================================
+// SCRIPT EDIT GEAR - CLEAN VERSION
+// ==========================================
 
-  // kalau gearId itu angka (berarti dari JSON), langsung tolak
-  if (!isNaN(gearId)) {
-    // showToast("❌ Gear bawaan sistem tidak bisa diedit.", "error");
-    return;
+// ==========================================
+// SCRIPT EDIT GEAR - DEBUG VERSION
+// ==========================================
+
+(function() {
+  'use strict';
+
+  // Ambil CSRF token dengan lebih robust
+  function getCSRFToken() {
+    // Coba dari input hidden
+    let token = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    
+    // Kalau gak ada, coba dari cookie
+    if (!token) {
+      const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+      token = cookieValue;
+    }
+    
+    console.log('🔑 CSRF Token:', token ? 'Found' : 'NOT FOUND');
+    return token || '';
   }
 
-  // lanjut fetch ke server
-  fetch(`/gearguide/get-gear-json/${gearId}/`, {
-    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-  })
-        .then(response => {
-        console.log("🧩 [DEBUG] Fetch status:", response.status);
-        if (!response.ok) throw new Error('Gagal memuat data gear.');
-        return response.json();
-        })
-        .then(json => {
-        console.log("🧩 [DEBUG] JSON response received:", json);
+  // ==================== OPEN MODAL ====================
+  window.openEditModal = async function(gearId) {
+    console.log("🧩 Opening edit modal for gear:", gearId);
 
-        // pastikan struktur response sesuai
-        if (!json || !json.ok || !json.data) {
-            console.error("🧩 [DEBUG] Invalid JSON format:", json);
-            throw new Error("Data tidak valid atau kosong.");
-        }
-
-        const data = json.data;
-        console.log("🧩 [DEBUG] Parsed data:", data);
-
-        // deteksi sumber
-        const isFromDB = !!data.ecommerce_link || data.source === "DB";
-        console.log("🧩 [DEBUG] Source:", isFromDB ? "DB" : "JSON");
-
-        // prefill form
-        document.getElementById('edit-gear-id').value = data.id || '';
-        document.getElementById('edit-name').value = data.name || '';
-
-        const sportSelect = document.getElementById('edit-sport');
-        if (data.sport_id && sportSelect.querySelector(`option[value="${data.sport_id}"]`)) {
-            sportSelect.value = data.sport_id;
-        } else {
-            sportSelect.value = '';
-        }
-
-        document.getElementById('edit-level').value = data.level || 'beginner';
-        document.getElementById('edit-description').value = data.description || '';
-        document.getElementById('edit-price').value = data.price_range || '';
-        document.getElementById('edit-buy').value = data.ecommerce_link || data.buy_link || '';
-        document.getElementById('edit-tags').value = data.tags_text || (data.tags ? data.tags.join(', ') : '');
-        document.getElementById('edit-function').value = data.function || '';
-        document.getElementById('edit-brands').value = data.recommended_brands_text || (data.recommended_brands ? data.recommended_brands.join(', ') : '');
-        document.getElementById('edit-materials').value = data.materials_text || (data.materials ? data.materials.join(', ') : '');
-        document.getElementById('edit-image').value = data.image || '';
-        document.getElementById('edit-care').value = data.care_tips || '';
-
-        if (errMsg) errMsg.classList.add('hidden');
-
-        // 🚨 Debug apakah modal ketemu
-        if (!editModal) {
-            console.error("🧩 [DEBUG] editModal element not found!");
-            return;
-        }
-
-        console.log("🧩 [DEBUG] Showing modal now!");
-        editModal.classList.remove('hidden');
-        })
-        .catch(error => {
-        console.error("🧩 [DEBUG] Error caught in openEditModal:", error);
-        // showToast(error.message || '❌ Gagal memuat data gear', 'error');
-        });
-    };
-
-  // --- Tutup modal ---
-  window.closeEditModal = function() {
-    const editModal = document.getElementById('editModal');
-    const editForm = document.getElementById('editGearForm');
+    const modal = document.getElementById('editModal');
     const errMsg = document.getElementById('edit-error');
     
-    editModal.classList.add('hidden');
-    if (editForm) editForm.reset();
-    if (errMsg) errMsg.classList.add('hidden');
-  }
-
-  // --- Submit form (AJAX POST) ---
-  document.addEventListener('DOMContentLoaded', function() {
-    const editForm = document.getElementById('editGearForm');
-    const errMsg = document.getElementById('edit-error');
-    
-    if (!editForm) {
-      console.error('Form editGearForm tidak ditemukan!');
+    if (!modal) {
+      console.error("❌ #editModal not found!");
       return;
     }
 
-    editForm.addEventListener('submit', function (e) {
+    try {
+      const url = `/gearguide/get-gear-json/${gearId}/`;
+      console.log('📡 Fetching from:', url);
+      
+      const res = await fetch(url, {
+        headers: { 
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        }
+      });
+
+      console.log('📦 Response status:', res.status);
+      console.log('📦 Response headers:', [...res.headers.entries()]);
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('❌ Response not OK:', text.slice(0, 500));
+        throw new Error(`HTTP ${res.status}`);
+      }
+      
+      const data = await res.json();
+      console.log("✅ Fetched data:", data);
+
+      if (!data.ok || !data.data) {
+        throw new Error(data.error || "Data tidak valid");
+      }
+
+      // Populate form
+      const g = data.data;
+      document.getElementById('edit-gear-id').value = g.id || '';
+      document.getElementById('edit-name').value = g.name || '';
+      document.getElementById('edit-description').value = g.description || '';
+      document.getElementById('edit-sport').value = g.sport_id || '';
+      document.getElementById('edit-level').value = g.level || 'beginner';
+      document.getElementById('edit-price').value = g.price_range || '';
+      document.getElementById('edit-function').value = g.function || '';
+      
+      // Handle array fields
+      const brands = g.recommended_brands_text || (Array.isArray(g.recommended_brands) ? g.recommended_brands.join(', ') : '');
+      const materials = g.materials_text || (Array.isArray(g.materials) ? g.materials.join(', ') : '');
+      const tags = g.tags_text || (Array.isArray(g.tags) ? g.tags.join(', ') : '');
+      
+      document.getElementById('edit-brands').value = brands;
+      document.getElementById('edit-materials').value = materials;
+      document.getElementById('edit-tags').value = tags;
+      
+      document.getElementById('edit-buy').value = g.ecommerce_link || g.buy_link || '';
+      document.getElementById('edit-image').value = g.image || '';
+      document.getElementById('edit-care').value = g.care_tips || '';
+
+      // Hide error & show modal
+      if (errMsg) errMsg.classList.add('hidden');
+      modal.classList.remove('hidden');
+      console.log("✅ Modal opened successfully");
+
+    } catch (err) {
+      console.error("❌ Error fetching gear:", err);
+      if (errMsg) {
+        errMsg.querySelector('p').textContent = err.message || 'Gagal memuat data';
+        errMsg.classList.remove('hidden');
+      }
+      // Still open modal for manual correction
+      modal.classList.remove('hidden');
+    }
+  };
+
+  // ==================== CLOSE MODAL ====================
+  window.closeEditModal = function() {
+    const modal = document.getElementById('editModal');
+    const form = document.getElementById('editGearForm');
+    const errMsg = document.getElementById('edit-error');
+    
+    if (modal) modal.classList.add('hidden');
+    if (form) form.reset();
+    if (errMsg) errMsg.classList.add('hidden');
+  };
+
+  // ==================== FORM SUBMIT ====================
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editGearForm');
+    const errMsg = document.getElementById('edit-error');
+
+    if (!form) {
+      console.error('❌ Form #editGearForm tidak ditemukan!');
+      return;
+    }
+
+    form.addEventListener('submit', async function(e) {
       e.preventDefault();
-      console.log('Form submitted!'); // Debug
+      console.log('📝 Submitting form...');
 
       const gearId = document.getElementById('edit-gear-id').value;
-      const formData = new FormData(editForm);
+      const formData = new FormData(form);
+      const csrftoken = getCSRFToken();
 
-      console.log('Submitting gear ID:', gearId); // Debug
+      console.log('🔑 Using CSRF token:', csrftoken ? 'Yes' : 'NO!');
+      console.log('📤 Form data:', [...formData.entries()]);
 
-      fetch(`/gearguide/edit-gear-ajax/${gearId}/`, {
-        method: 'POST',
-        headers: {
-          'X-CSRFToken': csrftoken,
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: formData
-      })
-        .then(response => {
-          const contentType = response.headers.get('content-type');
-          if (!contentType || !contentType.includes('application/json')) {
-            return response.text().then(text => {
-              console.error('Response is not JSON:', text);
-              throw new Error('Server error. Check console.');
-            });
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log('Response data:', data); // Debug
+      // Show loading state
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '⏳ Menyimpan...';
+
+      try {
+        const url = `/gearguide/edit-gear-ajax/${gearId}/`;
+        console.log('📡 Posting to:', url);
+        
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          },
+          body: formData
+        });
+
+        console.log('📦 Response status:', res.status);
+        console.log('📦 Response content-type:', res.headers.get('content-type'));
+
+        const contentType = res.headers.get('content-type');
+        
+        // Jika bukan JSON, log full response
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await res.text();
+          console.error("🚨 NON-JSON RESPONSE:");
+          console.error(text.slice(0, 1000));
           
-          if (data.ok) {
-            // showToast(data.message, 'success');
-            closeEditModal();
-            setTimeout(() => location.reload(), 1000);
-          } else {
-            const firstError = data.errors ? Object.values(data.errors)[0][0] : 'Validasi gagal';
-            showToast(firstError, 'error');
-            if (errMsg) {
-              errMsg.querySelector('p').textContent = firstError;
-              errMsg.classList.remove('hidden');
-            }
+          // Cek apakah ini redirect ke login
+          if (text.includes('login') || text.includes('csrf')) {
+            throw new Error('Session expired. Silakan refresh halaman dan login kembali.');
           }
-        })
-        .catch((error) => {
-          console.error('Fetch error:', error);
-        //   showToast(error.message || '❌ Terjadi kesalahan', 'error');
+          
+          throw new Error('Server tidak mengembalikan JSON. Cek console untuk detail.');
+        }
+
+        const data = await res.json();
+        console.log('✅ Server response:', data);
+
+        if (data.ok) {
+          console.log('✅ Update berhasil!');
+          
+          // Show success message
           if (errMsg) {
-            errMsg.querySelector('p').textContent = error.message || 'Terjadi kesalahan jaringan.';
+            errMsg.classList.remove('hidden');
+            errMsg.className = 'mt-4 p-4 bg-green-50 border-l-4 border-green-500 rounded-lg';
+            errMsg.querySelector('p').textContent = '✅ ' + (data.message || 'Berhasil diperbarui!');
+            errMsg.querySelector('p').className = 'text-sm text-green-700 font-medium';
+          }
+          
+          // Reload after delay
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          // Show error message
+          const errText = data.errors 
+            ? Object.values(data.errors).flat()[0]
+            : data.message || 'Gagal menyimpan perubahan';
+          
+          if (errMsg) {
+            errMsg.className = 'mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg';
+            errMsg.querySelector('p').textContent = errText;
+            errMsg.querySelector('p').className = 'text-sm text-red-700 font-medium';
             errMsg.classList.remove('hidden');
           }
-        });
-    });
-  });
+          
+          // Restore button
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
 
-  // Close modal when clicking outside
-  document.addEventListener('DOMContentLoaded', function() {
-    const editModal = document.getElementById('editModal');
-    
-    editModal?.addEventListener('click', function(e) {
-      if (e.target === editModal) {
-        closeEditModal();
+      } catch (err) {
+        console.error('❌ Fetch error:', err);
+        if (errMsg) {
+          errMsg.className = 'mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg';
+          errMsg.querySelector('p').textContent = err.message || 'Terjadi kesalahan jaringan';
+          errMsg.querySelector('p').className = 'text-sm text-red-700 font-medium';
+          errMsg.classList.remove('hidden');
+        }
+        
+        // Restore button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
       }
     });
+
+    // Close modal on overlay click
+    const modal = document.getElementById('editModal');
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          closeEditModal();
+        }
+      });
+    }
   });
+
+})();
 </script>
