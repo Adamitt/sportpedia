@@ -4,6 +4,12 @@ from django.contrib import messages
 from gearguide.models import Gear
 from sportlibrary.models import Sport
 from profile_app.models import ActivityLog
+from django.contrib.auth.models import User
+from django.db.models import Q
+from .forms import AdminUserCreationForm, AdminUserChangeForm
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+from django.db import models
 
 # only admin/staff
 def admin_only(user):
@@ -133,46 +139,65 @@ def manage_library(request):
 def add_sport(request):
     """Handles adding a new sport."""
     if request.method == 'POST':
-        # Basic fields
         name = request.POST.get('name')
         category = request.POST.get('category')
         difficulty = request.POST.get('difficulty')
         description = request.POST.get('description')
         history = request.POST.get('history')
 
-        # Process JSONFields (assuming comma-separated input in textareas)
-        rules_str = request.POST.get('rules', '')
-        techniques_str = request.POST.get('techniques', '')
-        benefits_str = request.POST.get('benefits', '')
-        countries_str = request.POST.get('popular_countries', '')
-        tags_str = request.POST.get('tags', '')
-
+        # ✅ versi parse_json_list yang aman dan fleksibel
+        import json
         def parse_json_list(text):
-            if not text: return []
-            return [item.strip() for item in text.split(',') if item.strip()]
+            if not text:
+                return []
+            try:
+                # Kalau user kirim string JSON (misal: '["rule1","rule2"]')
+                data = json.loads(text)
+                if isinstance(data, list):
+                    return [str(item).strip() for item in data if str(item).strip()]
+            except json.JSONDecodeError:
+                # Kalau bukan JSON valid, pisahkan pakai koma
+                return [item.strip() for item in text.split(',') if item.strip()]
+            return []
 
         try:
-            Sport.objects.create(
+            # 🔥 FIX: Get max ID from database and set next ID manually
+            sports_objects = Sport.objects.all()
+            id_sports=[int(sport.id) for sport in sports_objects]
+            id_sports.sort()
+            max_id = id_sports[-1] if id_sports else 0
+            next_id = int(max_id or 0) + 1
+            
+            print(f"🔍 Debug: Max ID = {max_id}, Next ID = {next_id}")  # Debug
+            
+            # Create sport with manual ID
+            new_sport = Sport(
+                id=next_id,
                 name=name,
                 category=category,
                 difficulty=difficulty,
                 description=description,
                 history=history,
-                rules=parse_json_list(rules_str),
-                techniques=parse_json_list(techniques_str),
-                benefits=parse_json_list(benefits_str),
-                popular_countries=parse_json_list(countries_str),
-                tags=parse_json_list(tags_str),
+                rules=parse_json_list(request.POST.get('rules', '')),
+                techniques=parse_json_list(request.POST.get('techniques', '')),
+                benefits=parse_json_list(request.POST.get('benefits', '')),
+                popular_countries=parse_json_list(request.POST.get('popular_countries', '')),
+                tags=parse_json_list(request.POST.get('tags', '')),
             )
+
+            new_sport.save()
+            
             messages.success(request, f'✅ Olahraga "{name}" berhasil ditambahkan!')
             return redirect('admin_sportpedia:manage_library')
+            
         except Exception as e:
+            import traceback
+            print("❌ Error:")
+            print(traceback.format_exc())
             messages.error(request, f'❌ Gagal menambahkan olahraga: {e}')
-            return render(request, 'library_app/sport_form.html', {'edit_mode': False})
 
-    return render(request, 'library_app/sport_form.html', {'edit_mode': False})
+    return render(request, 'library/sport_form.html', {'edit_mode': False})
 
-@user_passes_test(admin_only, login_url='/accounts/login/')
 def edit_sport(request, sport_id):
     """Handles editing an existing sport."""
     sport = get_object_or_404(Sport, id=sport_id)
@@ -206,7 +231,7 @@ def edit_sport(request, sport_id):
             return redirect('admin_sportpedia:manage_library')
         except Exception as e:
              messages.error(request, f'❌ Gagal memperbarui olahraga: {e}')
-             return render(request, 'library_app/sport_form.html', {'sport': sport, 'edit_mode': True})
+             return render(request, 'library/sport_form.html', {'sport': sport, 'edit_mode': True})
 
     context = {
         'sport': sport,
@@ -217,7 +242,7 @@ def edit_sport(request, sport_id):
         'countries_str': ', '.join(sport.popular_countries),
         'tags_str': ', '.join(sport.tags),
     }
-    return render(request, 'library_app/sport_form.html', context)
+    return render(request, 'library/sport_form.html', context)
 
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def delete_sport(request, sport_id):
@@ -233,3 +258,113 @@ def delete_sport(request, sport_id):
         return redirect('admin_sportpedia:manage_library')
 
     return redirect('admin_sportpedia:manage_library')
+
+@user_passes_test(admin_only, login_url='/accounts/login/')
+def manage_admin(request):
+    """Menampilkan halaman tabel admin dan modal."""
+    admins = User.objects.filter(Q(is_staff=True) | Q(is_superuser=True)).exclude(pk=request.user.pk).order_by('username')
+    
+    # --- PENTING: Kirim 'add_form' untuk placeholder modal ---
+    add_form = AdminUserCreationForm() 
+    
+    context = {
+        'admins': admins,
+        'add_form': add_form # <-- Form ini diperlukan oleh template modal
+    }
+    return render(request, 'admin_app/manage_admin.html', context)
+
+@user_passes_test(admin_only, login_url='/accounts/login/')
+@require_POST # Hanya izinkan POST
+def add_admin(request):
+    """Menangani submit AJAX untuk menambah admin."""
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'success': False, 'message': 'Permintaan tidak valid.'}, status=400)
+
+    form = AdminUserCreationForm(request.POST)
+    if form.is_valid():
+        try:
+            new_admin = form.save()
+            ActivityLog.objects.create(
+                user=request.user, action_type='ADMIN_CREATE',
+                description=f"Admin menambahkan admin baru: {new_admin.username}"
+            )
+            return JsonResponse({'success': True, 'message': f'Admin "{new_admin.username}" berhasil ditambahkan!'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'Gagal menambahkan admin: {e}'}, status=500)
+    else:
+        # Kirim error validasi form sebagai JSON
+        return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+@user_passes_test(admin_only, login_url='/accounts/login/')
+@require_POST # Hanya izinkan POST
+def edit_admin(request, admin_id):
+    """Menangani submit AJAX untuk mengedit admin."""
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+         return JsonResponse({'success': False, 'message': 'Permintaan tidak valid.'}, status=400)
+
+    target_admin = get_object_or_404(User, pk=admin_id)
+    if target_admin == request.user:
+         return JsonResponse({'success': False, 'message': 'Anda tidak dapat mengedit akun Anda sendiri.'}, status=403)
+
+    form = AdminUserChangeForm(request.POST, instance=target_admin)
+    if form.is_valid():
+        try:
+            edited_admin = form.save()
+            ActivityLog.objects.create(
+                user=request.user, action_type='ADMIN_UPDATE',
+                description=f"Admin memperbarui admin: {edited_admin.username}"
+            )
+            return JsonResponse({'success': True, 'message': f'Admin "{edited_admin.username}" berhasil diperbarui!'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'Gagal memperbarui admin: {e}'}, status=500)
+    else:
+        # Kirim error validasi form sebagai JSON
+        return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+@user_passes_test(admin_only, login_url='/accounts/login/')
+def get_admin_data(request, admin_id):
+    """API (GET) untuk mengambil data admin untuk modal edit."""
+    
+    # Hanya izinkan request AJAX
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'error': 'Permintaan tidak valid'}, status=400)
+
+    try:
+        # Ambil data user yang akan di-edit
+        target_admin = User.objects.get(pk=admin_id)
+        
+        # Siapkan data untuk dikirim sebagai JSON
+        data = {
+            'id': target_admin.id,
+            'username': target_admin.username,
+            'email': target_admin.email,
+            'is_staff': target_admin.is_staff,
+            'is_superuser': target_admin.is_superuser,
+        }
+        return JsonResponse(data) # Kirim data sebagai JSON
+        
+    except User.DoesNotExist:
+         return JsonResponse({'error': 'User tidak ditemukan'}, status=404)
+    except Exception as e:
+         # Log error jika perlu: print(f"Error in get_admin_data: {e}")
+         return JsonResponse({'error': 'Internal server error'}, status=500)
+
+@user_passes_test(admin_only, login_url='/accounts/login/')
+@require_POST
+def delete_admin(request, admin_id):
+    """Menangani POST delete (non-AJAX, me-reload halaman)."""
+    target_admin = get_object_or_404(User, pk=admin_id)
+    target_username = target_admin.username
+    if target_admin == request.user:
+        messages.error(request, '❌ Anda tidak dapat menghapus akun Anda sendiri.')
+        return redirect('admin_sportpedia:manage_admin')
+    try:
+        target_admin.delete()
+        ActivityLog.objects.create(
+            user=request.user, action_type='ADMIN_DELETE',
+            description=f"Admin menghapus admin: {target_username}"
+        )
+        messages.success(request, f'🗑️ Admin "{target_username}" berhasil dihapus!')
+    except Exception as e:
+        messages.error(request, f'❌ Gagal menghapus admin: {e}')
+    return redirect('admin_sportpedia:manage_admin')

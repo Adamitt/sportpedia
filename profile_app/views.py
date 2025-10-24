@@ -30,13 +30,14 @@ def pengaturan_akun(request):
         new_password = request.POST.get('password')
         olahraga_favorit = request.POST.get('olahraga_favorit')
         preferensi = request.POST.get('preferensi')
-        foto = request.FILES.get('foto_profil')
+        # foto = request.FILES.get('foto_profil')
+        foto_url = request.POST.get('foto_profil')
 
         # --- Update User ---
         if email and email != user.email:
             if User.objects.filter(email=email).exclude(pk=user.pk).exists():
                 messages.error(request, '❌ Email sudah digunakan.')
-                return redirect('pengaturan_akun')
+                return redirect('profile_app:pengaturan_akun')
             user.email = email
 
         if new_password:
@@ -48,12 +49,11 @@ def pengaturan_akun(request):
         # --- Update Profile ---
         profile.olahraga_favorit = olahraga_favorit
         profile.preferensi = preferensi
-        if foto:
-            profile.foto_profil = foto
+        if foto_url:
+            profile.foto_profil = foto_url
         profile.save()
 
-        messages.success(request, '✅ Pengaturan akun berhasil diperbarui!')
-        return redirect('profile_page')
+        return redirect('profile_app:profile_page')
 
     context = {
         'user': user,

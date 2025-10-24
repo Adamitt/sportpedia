@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Add Video - SPORTPEDIA{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-10 rounded-3xl shadow-md mt-12">
+  <h2 class="text-3xl font-bold mb-6 text-[#1E3A5F]">Add New Video 🎥</h2>
+  <form method="POST" class="space-y-5">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="bg-[#1E3A5F] text-white px-6 py-3 rounded-full font-semibold hover:opacity-90 transition">
+      Save Video
+    </button>
+    <a href="{% url 'videos:video_gallery' %}" class="ml-4 text-[#1E3A5F] font-semibold hover:underline">Cancel</a>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Delete Video - SPORTPEDIA{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto bg-white p-10 rounded-3xl shadow-md text-center mt-16">
+  <h2 class="text-2xl font-bold mb-6 text-[#A33B3B]">Are you sure you want to delete this video?</h2>
+  <p class="text-gray-600 mb-8">"{{ video.title }}" will be permanently deleted.</p>
+  <form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="bg-[#A33B3B] text-white px-8 py-3 rounded-full font-semibold hover:opacity-90 transition">
+      Yes, Delete
+    </button>
+    <a href="{% url 'videos:video_detail' video.id %}" class="ml-4 text-[#1E3A5F] font-semibold hover:underline">Cancel</a>
+  </form>
+</div>
+{% endblock %}

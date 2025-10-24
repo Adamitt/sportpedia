@@ -1,10 +1,13 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_http_methods
+from pathlib import Path
 import json
-from django.conf import settings
-from django.http import HttpResponseNotFound
-from django.shortcuts import render
-from django.urls import reverse
-from metrics.utils import bump_view
-from profile_app.models import ActivityLog  # dari branch Angie
+from profile_app.models import ActivityLog
+from django.http import JsonResponse
+from .models import Sport, SavedSport
 
 # -------------------------------------------------
 # Helpers
@@ -51,54 +54,111 @@ def _normalize_id(raw_id: str):
 # Views
 # -------------------------------------------------
 def show_sports(request):
-    sports = _load_sports_json()
-    context = {"sports": sports}
+    # Ambil semua sport dari database
+    sports = Sport.objects.all()
+
+    # Get saved sports for current user
+    saved_count = 0
+    saved_sport_ids = []
+    if request.user.is_authenticated:
+        saved_sports = SavedSport.objects.filter(user=request.user).values_list('sport_id', flat=True)
+        saved_sport_ids = list(saved_sports)
+        saved_count = len(saved_sport_ids)
+
+    context = {
+        "sports": sports,
+        "saved_count": saved_count,
+        "saved_sport_ids": saved_sport_ids
+    }
     return render(request, 'sportlibrary/sportlibrary.html', context)
 
-
 def sport_detail(request, sport_id):
-    sports = _load_sports_json()
+    sport = get_object_or_404(Sport, id=sport_id)
 
-    normalized = _normalize_id(sport_id)
-    sport = None
-
-    if normalized is not None:
-        sport = next(
-            (s for s in sports if str(s.get('id')) == str(normalized) or s.get('id') == normalized),
-            None
-        )
-    if sport is None:
-        sport = next((s for s in sports if str(s.get('id')) == str(sport_id)), None)
-
-    if not sport:
-        return HttpResponseNotFound("⚠️ Sport tidak ditemukan.")
-
-    # ------------------------------
-    # Tambahan dari Angie: ActivityLog
-    # ------------------------------
+    is_saved = False
     if request.user.is_authenticated:
+        is_saved = SavedSport.objects.filter(
+            user=request.user,
+            sport=sport
+        ).exists()
         ActivityLog.objects.create(
             user=request.user,
             action_type='MODULE_ACCESS',
-            description=f"Mengakses Sport Library: {sport.get('name', 'Olahraga Tidak Dikenal')}"
+            description=f"Mengakses Sport Library: {sport.name}"
         )
 
-    # ------------------------------
-    # Tambahan dari Chevinka: bump_view untuk What's Hot
-    # ------------------------------
-    url = reverse('sportlibrary:sport_detail', kwargs={'sport_id': str(sport_id)})
-    title = sport.get('name') or f"Sport #{sport.get('id')}"
-    image = sport.get('image') or sport.get('thumbnail') or ""
-    key = f"sportjson:{sport.get('id')}"
-    bump_view(key, title=title, url=url, category="Library", image=image, request=request)
-
-    # ------------------------------
-    # Render halaman detail
-    # ------------------------------
-    context = {"sport": sport}
+    context = {
+        "sport": sport,
+        "is_saved": is_saved
+    }
     return render(request, 'sportlibrary/detail.html', context)
 
 
 def saved_sports(request):
-    all_sports = _load_sports_json()
-    return render(request, 'bookmarklist.html', {"all_sports_json": json.dumps(all_sports)})
+    if not request.user.is_authenticated:
+        return redirect('accounts:login')
+    
+    saved = SavedSport.objects.filter(user=request.user).select_related('sport')
+    
+    # Calculate stats
+    indoor_count = sum(1 for s in saved if s.sport.category == 'Indoor')
+    outdoor_count = sum(1 for s in saved if s.sport.category == 'Outdoor')
+    
+    context = {
+        'saved_sports': saved,
+        'indoor_count': indoor_count,
+        'outdoor_count': outdoor_count
+    }
+    return render(request, 'bookmarklist.html', context)
+
+@require_http_methods(["POST"])
+def save_sport(request, sport_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    try:
+        # Get or create the sport in database
+        sport = Sport.objects.get(id=sport_id)
+        
+        # Check if already saved
+        saved_sport = SavedSport.objects.filter(user=request.user, sport=sport).first()
+        
+        if saved_sport:
+            # Already saved, so remove it (toggle)
+            saved_sport.delete()
+            return JsonResponse({'status': 'removed', 'message': 'Sport removed from saved list'})
+        else:
+            # Not saved yet, so save it
+            SavedSport.objects.create(user=request.user, sport=sport)
+            return JsonResponse({'status': 'saved', 'message': 'Sport saved successfully'})
+            
+    except Sport.DoesNotExist:
+        return JsonResponse({'error': 'Sport not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@require_http_methods(["POST"])
+def remove_sport(request, saved_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    try:
+        saved_sport = get_object_or_404(
+            SavedSport, 
+            id=saved_id, 
+            user=request.user
+        )
+        saved_sport.delete()
+        return JsonResponse({'status': 'removed', 'message': 'Sport removed successfully'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@require_http_methods(["POST"])
+def clear_all_sports(request):
+    if not request.user.is_authenticated:
+        return redirect('accounts:login')
+    
+    SavedSport.objects.filter(user=request.user).delete()
+    messages.success(request, 'Semua olahraga berhasil dihapus dari simpanan')
+    
+    return redirect('sportlibrary:saved_sports')
