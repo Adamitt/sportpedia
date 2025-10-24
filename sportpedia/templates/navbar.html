@@ -33,7 +33,7 @@
             {# --- START: UPDATED NAVBAR PICTURE LOGIC --- #}
             {% if request.user.profile and request.user.profile.foto_profil %}
               {# Display actual profile picture #}
-              <img src="{{ request.user.profile.foto_profil.url }}" alt="Foto Profil"
+              <img src="{{ request.user.profile.foto_profil }}" alt="Foto Profil"
                    class="w-8 h-8 rounded-full object-cover shadow-sm border border-gray-200"> {# Adjusted size and style for navbar #}
             {% else %}
               {# Fallback to Initial #}

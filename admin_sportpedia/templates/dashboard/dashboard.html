@@ -37,8 +37,6 @@
          class="quick-nav-card block p-6 text-center border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-all duration-300">
         <div class="mb-4">
           <span class="text-5xl">🏋️‍♂️</span> 
-          {% comment %} Or use an SVG/Image if you prefer {% endcomment %}
-          {% comment %} <img src="{% static 'images/gear_icon.png' %}" alt="Gear Icon" class="h-16 w-auto mx-auto mb-3 object-contain"> {% endcomment %}
         </div>
         <h2 class="text-xl font-semibold mb-2" style="color: #1C3264;">
           Kelola Gear
@@ -60,24 +58,6 @@
           Manage sports details, rules, and history.
         </p>
       </a>
-
-      <a href="#" 
-         class="quick-nav-card block p-6 text-center border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-all duration-300 opacity-70 cursor-not-allowed" 
-         aria-disabled="true" 
-         onclick="event.preventDefault(); alert('Fitur ini belum tersedia.');">
-        <div class="mb-4">
-          <span class="text-5xl">🎥</span>
-        </div>
-        <h2 class="text-xl font-semibold mb-2" style="color: #1C3264;">
-          Kelola Video Olahraga
-        </h2>
-        <p class="text-sm text-gray-500">
-          Add or update tutorial and highlight videos. (Coming Soon)
-        </p>
-      </a>
-
-      {% comment %} Add more admin links/cards here as needed {% endcomment %}
-
     </div>
   </div>
 </section>
@@ -85,7 +65,7 @@
 {% endblock %}
 
 {% block head %}
-{{ block.super }} {# Ensures styles from base.html are included #}
+{{ block.super }}
 <style>
   /* You can reuse some styles from home.html if needed, or define specific admin ones */
   .quick-nav-card {
