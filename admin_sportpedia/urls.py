@@ -10,8 +10,8 @@ urlpatterns = [
     # Gear 
     path('dashboard/gears/', views.manage_gear, name='manage_gear'),
     path('dashboard/gears/add/', views.add_gear, name='add_gear'),
-    path('dashboard/gears/edit/<uuid:gear_id>/', views.edit_gear, name='edit_gear'),
-    path('dashboard/gears/delete/<uuid:gear_id>/', views.delete_gear, name='delete_gear'),
+    path('dashboard/gears/edit/<str:gear_id>/', views.edit_gear, name='edit_gear'),
+    path('dashboard/gears/delete/<str:gear_id>/', views.delete_gear, name='delete_gear'),
     
     # Sport Library (pakai INT)
     path('dashboard/library/', views.manage_library, name='manage_library'),
