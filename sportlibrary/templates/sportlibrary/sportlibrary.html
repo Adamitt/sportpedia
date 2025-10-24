@@ -140,7 +140,6 @@
 </head>
 <body class="bg-gray-50">
     
-    <!-- Navbar dari base -->
     {% include 'navbar.html' %}
 
     <!-- Hero Section -->
@@ -156,11 +155,11 @@
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12 fade-in stagger-1">
                 <div class="stat-card rounded-2xl p-6 text-center">
-                    <div class="text-4xl font-bold text-white" id="totalSports">{{ sports|length }}</div>
+                    <div class="text-4xl font-bold text-white">{{ sports|length }}</div>
                     <div class="text-white/90 text-sm font-medium mt-2">Total Olahraga</div>
                 </div>
                 <div class="stat-card rounded-2xl p-6 text-center">
-                    <div class="text-4xl font-bold text-white" id="savedCount">0</div>
+                    <div class="text-4xl font-bold text-white">{{ saved_count }}</div>
                     <div class="text-white/90 text-sm font-medium mt-2">Olahraga Tersimpan</div>
                 </div>
             </div>
@@ -227,19 +226,20 @@
             {% for sport in sports %}
             <div class="card-hover bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100" 
                  data-category="{{ sport.category }}" 
-                 data-difficulty="{{ sport.difficulty }}" 
-                 data-name="{{ sport.name|lower }}">
+                 data-difficulty="{{ sport.difficulty }}">
                 <div class="p-6">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex flex-wrap gap-2">
                             <span class="badge category-{{ sport.category|lower }}">{{ sport.category }}</span>
                             <span class="badge difficulty-{{ sport.difficulty|lower }}">{{ sport.difficulty }}</span>
                         </div>
-                        <button class="save-heart" data-sport-id="{{ sport.id }}" data-sport-name="{{ sport.name|escapejs }}">
+                        {% if user.is_authenticated %}
+                        <button class="save-heart {% if sport.id in saved_sport_ids %}saved{% endif %}" data-sport-id="{{ sport.id }}" data-sport-name="{{ sport.name|escapejs }}">
                             <svg class="w-6 h-6 text-gray-400 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                             </svg>
                         </button>
+                        {% endif %}
                     </div>
 
                     <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ sport.name }}</h3>
@@ -269,7 +269,7 @@
             {% endfor %}
         </div>
 
-        <!-- No Results Message (Hidden by default) -->
+        <!-- No Results Message -->
         <div id="noResults" class="no-results hidden">
             <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -293,38 +293,20 @@
             difficulty: 'all'
         };
 
-        // LocalStorage functions
-        function getSavedSports() {
-            const saved = localStorage.getItem('savedSports');
-            return saved ? JSON.parse(saved) : [];
-        }
-
-        function saveSport(sportId, sportName) {
-            let saved = getSavedSports();
-            sportId = String(sportId);
-            if (!saved.find(s => String(s.id) === sportId)) {
-                saved.push({ id: sportId, name: sportName });
-                localStorage.setItem('savedSports', JSON.stringify(saved));
-                return true;
+        // Get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
             }
-            return false;
-        }
-
-        function removeSport(sportId) {
-            let saved = getSavedSports();
-            sportId = String(sportId);
-            saved = saved.filter(s => String(s.id) !== sportId);
-            localStorage.setItem('savedSports', JSON.stringify(saved));
-        }
-
-        function isSaved(sportId) {
-            sportId = String(sportId);
-            return getSavedSports().some(s => String(s.id) === sportId);
-        }
-
-        function updateSavedCount() {
-            const count = getSavedSports().length;
-            document.getElementById('savedCount').textContent = count;
+            return cookieValue;
         }
 
         function showToast(message) {
@@ -361,55 +343,65 @@
             document.getElementById('noResults').classList.toggle('hidden', visibleCount > 0);
         }
 
-        // Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize saved states untuk tombol love
-            const savedSports = getSavedSports();
-            savedSports.forEach(sport => {
-                const heartBtn = document.querySelector(`.save-heart[data-sport-id="${sport.id}"]`);
-                if (heartBtn) heartBtn.classList.add('saved');
-            });
-            updateSavedCount();
-
-            // Filter buttons - PERBAIKAN UTAMA
+            // Filter buttons
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const type = this.getAttribute('data-type');
                     const filter = this.getAttribute('data-filter');
 
-                    // Remove active dari semua button dengan type yang sama
                     document.querySelectorAll(`.filter-btn[data-type="${type}"]`).forEach(b => {
                         b.classList.remove('active');
                     });
                     
-                    // Add active ke button yang diklik
                     this.classList.add('active');
-
-                    // Update filter
                     currentFilters[type] = filter;
                     filterSports();
                 });
             });
 
-            // Save heart buttons - PERBAIKAN UTAMA
+            // Save heart buttons with AJAX
             document.querySelectorAll('.save-heart').forEach(btn => {
-                btn.addEventListener('click', function(e) {
+                btn.addEventListener('click', async function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     
                     const sportId = this.getAttribute('data-sport-id');
                     const sportName = this.getAttribute('data-sport-name');
+                    const isSaved = this.classList.contains('saved');
                     
-                    if (isSaved(sportId)) {
-                        removeSport(sportId);
-                        this.classList.remove('saved');
-                        showToast(`${sportName} dihapus dari simpanan`);
-                    } else {
-                        saveSport(sportId, sportName);
-                        this.classList.add('saved');
-                        showToast(`${sportName} berhasil disimpan!`);
+                    console.log('Saving sport:', sportId, sportName); // Debug
+                    
+                    try {
+                        const csrfToken = getCookie('csrftoken');
+                        const response = await fetch(`/sportlibrary/${sportId}/save/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': csrfToken,
+                                'Content-Type': 'application/json',
+                            },
+                            credentials: 'same-origin'
+                        });
+                        
+                        const data = await response.json();
+                        console.log('Response:', data); // Debug
+                        
+                        if (response.ok) {
+                            this.classList.toggle('saved');
+                            showToast(isSaved ? `${sportName} dihapus dari simpanan` : `${sportName} berhasil disimpan!`);
+                            
+                            // Update counter
+                            const counter = document.querySelectorAll('.stat-card .text-4xl')[1];
+                            const currentCount = parseInt(counter.textContent);
+                            counter.textContent = isSaved ? currentCount - 1 : currentCount + 1;
+                        } else {
+                            console.error('Error:', data);
+                            showToast(data.error || 'Terjadi kesalahan');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showToast('Terjadi kesalahan, silakan coba lagi');
                     }
-                    updateSavedCount();
                 });
             });
         });

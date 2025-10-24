@@ -42,7 +42,6 @@
         }
 
         .stagger-1 { animation-delay: 0.1s; }
-        .stagger-2 { animation-delay: 0.2s; }
 
         .badge {
             display: inline-flex;
@@ -162,7 +161,6 @@
 </head>
 <body class="bg-gray-50">
     
-    <!-- Navbar dari base -->
     {% include 'navbar.html' %}
 
     <!-- Hero Section -->
@@ -182,27 +180,29 @@
                         </svg>
                         Kembali
                     </a>
-                    <button onclick="confirmClearAll()" id="clearAllBtn" class="clear-all-btn hidden">
+                    {% if saved_sports %}
+                    <button onclick="confirmClearAll()" class="clear-all-btn">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
                         Hapus Semua
                     </button>
+                    {% endif %}
                 </div>
             </div>
 
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 fade-in stagger-1">
                 <div class="stat-card rounded-2xl p-6 text-center">
-                    <div class="text-4xl font-bold text-white" id="savedCount">0</div>
+                    <div class="text-4xl font-bold text-white">{{ saved_sports|length }}</div>
                     <div class="text-white/90 text-sm font-medium mt-2">Olahraga Tersimpan</div>
                 </div>
                 <div class="stat-card rounded-2xl p-6 text-center">
-                    <div class="text-4xl font-bold text-white" id="indoorCount">0</div>
+                    <div class="text-4xl font-bold text-white">{{ indoor_count }}</div>
                     <div class="text-white/90 text-sm font-medium mt-2">Indoor Sports</div>
                 </div>
                 <div class="stat-card rounded-2xl p-6 text-center">
-                    <div class="text-4xl font-bold text-white" id="outdoorCount">0</div>
+                    <div class="text-4xl font-bold text-white">{{ outdoor_count }}</div>
                     <div class="text-white/90 text-sm font-medium mt-2">Outdoor Sports</div>
                 </div>
             </div>
@@ -212,13 +212,48 @@
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 py-12">
         
+        {% if saved_sports %}
         <!-- Saved Sports Grid -->
         <div id="savedSportsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Cards will be dynamically generated here -->
-        </div>
+            {% for saved in saved_sports %}
+            <div class="card-hover bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100" data-saved-id="{{ saved.id }}">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex flex-wrap gap-2">
+                            <span class="badge category-{{ saved.sport.category|lower }}">{{ saved.sport.category }}</span>
+                            <span class="badge difficulty-{{ saved.sport.difficulty|lower }}">{{ saved.sport.difficulty }}</span>
+                        </div>
+                        <form method="POST" action="{% url 'sportlibrary:remove_sport' saved.id %}" class="remove-form">
+                            {% csrf_token %}
+                            <button type="submit" class="remove-btn">
+                                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
 
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ saved.sport.name }}</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">{{ saved.sport.description }}</p>
+
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        {% for tag in saved.sport.tags|slice:":3" %}
+                        <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">#{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <a href="{% url 'sportlibrary:sport_detail' saved.sport.id %}" 
+                       class="block w-full text-center text-white py-3 rounded-xl font-semibold transition-all shadow-md hover:shadow-lg" 
+                       style="background: linear-gradient(135deg, #1C3264 0%, #992626 100%);">
+                        Lihat Detail
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
         <!-- Empty State -->
-        <div id="emptyState" class="no-results hidden">
+        <div class="no-results">
             <svg class="w-32 h-32 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
             </svg>
@@ -231,6 +266,7 @@
                 Jelajahi Sport Library
             </a>
         </div>
+        {% endif %}
     </div>
 
     <!-- Confirmation Modal -->
@@ -248,9 +284,12 @@
                     <button onclick="closeModal()" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-colors">
                         Batal
                     </button>
-                    <button onclick="clearAllSports()" class="px-6 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors">
-                        Ya, Hapus Semua
-                    </button>
+                    <form method="POST" action="{% url 'sportlibrary:clear_all_sports' %}" id="clearAllForm" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="px-6 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors">
+                            Ya, Hapus Semua
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -265,24 +304,20 @@
     </div>
 
     <script>
-        // All sports data from Django
-        const allSportsData = JSON.parse('{{ all_sports_json|escapejs }}');
-
-        // LocalStorage functions
-        function getSavedSports() {
-            const saved = localStorage.getItem('savedSports');
-            return saved ? JSON.parse(saved) : [];
-        }
-
-        function removeSport(sportId) {
-            let saved = getSavedSports();
-            sportId = String(sportId);
-            saved = saved.filter(s => String(s.id) !== sportId);
-            localStorage.setItem('savedSports', JSON.stringify(saved));
-        }
-
-        function clearAllSaves() {
-            localStorage.removeItem('savedSports');
+        // Get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
 
         function showToast(message) {
@@ -304,113 +339,90 @@
             document.getElementById('confirmModal').classList.add('hidden');
         }
 
-        function clearAllSports() {
-            clearAllSaves();
-            closeModal();
-            showToast('Semua olahraga berhasil dihapus');
-            renderSavedSports();
-        }
+        // Handle individual remove with AJAX
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.remove-form').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const card = this.closest('[data-saved-id]');
+                    const sportName = card.querySelector('h3').textContent.trim();
+                    
+                    console.log('Removing sport:', sportName); // Debug
+                    
+                    try {
+                        const csrfToken = getCookie('csrftoken');
+                        const response = await fetch(this.action, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': csrfToken,
+                                'Content-Type': 'application/json',
+                            },
+                            credentials: 'same-origin'
+                        });
+                        
+                        if (response.ok) {
+                            // Tampilkan toast dulu sebelum animasi
+                            showToast(`${sportName} dihapus dari simpanan`);
+                            
+                            // Animasi remove
+                            card.style.transition = 'all 0.3s ease';
+                            card.style.opacity = '0';
+                            card.style.transform = 'scale(0.8)';
+                            
+                            setTimeout(() => {
+                                card.remove();
+                                
+                                // Check if empty
+                                const remaining = document.querySelectorAll('[data-saved-id]').length;
+                                if (remaining === 0) {
+                                    location.reload();
+                                } else {
+                                    // Update stats
+                                    updateStats();
+                                }
+                            }, 300);
+                        } else {
+                            const data = await response.json();
+                            showToast(data.error || 'Terjadi kesalahan');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showToast('Terjadi kesalahan, silakan coba lagi');
+                    }
+                });
+            });
 
-        function removeSportFromList(sportId, sportName) {
-            removeSport(sportId);
-            showToast(`${sportName} dihapus dari simpanan`);
-            renderSavedSports();
-        }
+            // Close modal when clicking outside
+            const modal = document.getElementById('confirmModal');
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target.id === 'confirmModal') {
+                        closeModal();
+                    }
+                });
+            }
+        });
 
-        function createSportCard(sport) {
-            const difficultyClass = `difficulty-${sport.difficulty.toLowerCase()}`;
-            const categoryClass = `category-${sport.category.toLowerCase()}`;
-
-            return `
-                <div class="card-hover bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="flex flex-wrap gap-2">
-                                <span class="badge ${categoryClass}">${sport.category}</span>
-                                <span class="badge ${difficultyClass}">${sport.difficulty}</span>
-                            </div>
-                            <button onclick="removeSportFromList(${sport.id}, '${sport.name.replace(/'/g, "\\'")}')" class="remove-btn">
-                                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <h3 class="text-2xl font-bold text-gray-900 mb-3">${sport.name}</h3>
-                        <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">${sport.description}</p>
-
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            ${sport.tags.slice(0, 3).map(tag => `
-                                <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">#${tag}</span>
-                            `).join('')}
-                        </div>
-
-                        <a href="/sportlibrary/${sport.id}/" 
-                           class="block w-full text-center text-white py-3 rounded-xl font-semibold transition-all shadow-md hover:shadow-lg" 
-                           style="background: linear-gradient(135deg, #1C3264 0%, #992626 100%);">
-                            Lihat Detail
-                        </a>
-                    </div>
-                </div>
-            `;
-        }
-
-        function updateStats(savedSports, allSports) {
-            const savedCount = savedSports.length;
+        function updateStats() {
+            const cards = document.querySelectorAll('[data-saved-id]');
             let indoorCount = 0;
             let outdoorCount = 0;
 
-            savedSports.forEach(saved => {
-                const sport = allSports.find(s => String(s.id) === String(saved.id));
-                if (sport) {
-                    if (sport.category === 'Indoor') indoorCount++;
-                    if (sport.category === 'Outdoor') outdoorCount++;
-                }
+            cards.forEach(card => {
+                const badges = card.querySelectorAll('.badge');
+                badges.forEach(badge => {
+                    if (badge.classList.contains('category-indoor')) indoorCount++;
+                    if (badge.classList.contains('category-outdoor')) outdoorCount++;
+                });
             });
 
-            document.getElementById('savedCount').textContent = savedCount;
-            document.getElementById('indoorCount').textContent = indoorCount;
-            document.getElementById('outdoorCount').textContent = outdoorCount;
+            const statCards = document.querySelectorAll('.stat-card .text-4xl');
+            statCards[0].textContent = cards.length;
+            statCards[1].textContent = indoorCount;
+            statCards[2].textContent = outdoorCount;
         }
-
-        function renderSavedSports() {
-            const savedSports = getSavedSports();
-            const grid = document.getElementById('savedSportsGrid');
-            const emptyState = document.getElementById('emptyState');
-            const clearAllBtn = document.getElementById('clearAllBtn');
-
-            if (savedSports.length === 0) {
-                grid.innerHTML = '';
-                emptyState.classList.remove('hidden');
-                clearAllBtn.classList.add('hidden');
-                updateStats([], allSportsData);
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-            clearAllBtn.classList.remove('hidden');
-
-            // Get full sport data for saved sports
-            const savedSportsData = savedSports.map(saved => {
-                return allSportsData.find(sport => String(sport.id) === String(saved.id));
-            }).filter(sport => sport !== undefined);
-
-            grid.innerHTML = savedSportsData.map(sport => createSportCard(sport)).join('');
-            updateStats(savedSports, allSportsData);
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            renderSavedSports();
-        });
-
-        // Close modal when clicking outside
-        document.getElementById('confirmModal').addEventListener('click', (e) => {
-            if (e.target.id === 'confirmModal') {
-                closeModal();
-            }
-        });
     </script>
-
 </body>
 </html>
