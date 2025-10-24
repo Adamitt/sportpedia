@@ -9,7 +9,35 @@ from profile_app.models import ActivityLog
 from .models import Sport, SavedSport
 
 def show_sports(request):
-    # Ambil semua sport dari database
+    # Kalau database kosong, sync dari JSON
+    if Sport.objects.count() == 0:
+        from pathlib import Path
+        import json
+
+        base_dir = Path(__file__).resolve().parent.parent
+        data_path = base_dir / 'database' / 'sports.json'
+        
+        with open(data_path, 'r', encoding='utf-8') as file:
+            sports_json = json.load(file)
+        
+        for s in sports_json:
+            Sport.objects.get_or_create(
+                id=s['id'],
+                defaults={
+                    'name': s['name'],
+                    'category': s['category'],
+                    'difficulty': s['difficulty'],
+                    'description': s['description'],
+                    'history': s['history'],
+                    'rules': s.get('rules', []),
+                    'techniques': s.get('techniques', []),
+                    'benefits': s.get('benefits', []),
+                    'popular_countries': s.get('popular_countries', []),
+                    'tags': s.get('tags', []),
+                }
+            )
+
+    # Setelah itu ambil semua sport dari database
     sports = Sport.objects.all()
 
     # Get saved sports for current user
