@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'metrics',
     'videos',
     'widget_tweaks',
+    'sportforum',
 ]
 
 LOGIN_URL = '/login/'  # biar decorator login_required tahu harus redirect ke sini
