@@ -1,12 +1,12 @@
 from django.db import models
 from sportlibrary.models import Sport
-import uuid
-from django.contrib.auth.models import User
-
+from django.conf import settings  # ⬅️ TAMBAHKAN INI
+# import uuid  # (opsional: hapus kalau tak dipakai)
+# from django.contrib.auth.models import User  # (opsional: tidak dipakai)
 
 class Gear(models.Model):
     id = models.AutoField(primary_key=True)
-    sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name="gear_items")  # Ganti `related_name`
+    sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name="gear_items")
 
     name = models.CharField(max_length=100)
     function = models.TextField(blank=True, null=True)
@@ -31,12 +31,10 @@ class Gear(models.Model):
     materials = models.JSONField(blank=True, null=True, default=list)
     care_tips = models.TextField(blank=True, null=True)
     tags = models.JSONField(blank=True, null=True, default=list)
+
     owner = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='gears',
-        null=True,
-        blank=True
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name='gears'
     )
 
     class Meta:
@@ -60,4 +58,3 @@ class Gear(models.Model):
             "buy_link": self.ecommerce_link,
             "image": self.image,
         }
-

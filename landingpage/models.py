@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
+from django.db import models
+from django.contrib.auth.models import User
 
 User = get_user_model()
 
@@ -28,25 +30,26 @@ class PageHit(models.Model):
 # =======================================================
 #                      TESTIMONIAL
 # =======================================================
+# landingpage/models.py
+
 class Testimonial(models.Model):
-    CATEGORY_CHOICES = [
-        ("library",   "Sports Library"),
-        ("community", "Community"),
-        ("gearguide", "Gear Guide"),
-        ("video",     "Video"),
-    ]
+    CATEGORY_CHOICES = (
+        ('library', 'Sports Library'),
+        ('community', 'Community'),
+        ('gearguide', 'Gear Guide'),
+        ('video', 'Video'),
+    )
 
-    user        = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="testimonials")
-    title       = models.CharField(max_length=120)
-    text        = models.TextField()
-    category    = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="library", db_index=True)
-    image       = models.ImageField(upload_to="testimonials/", blank=True, null=True)
-    rating      = models.PositiveSmallIntegerField(default=5)
-    is_approved = models.BooleanField(default=True)
-    created_at  = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    title = models.CharField(max_length=120)
+    text = models.TextField()
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='library')
 
-    class Meta:
-        ordering = ["-created_at"]
+    # URL saja (tidak ada FileField `image`)
+    image_url = models.URLField(blank=True, default="")
+
+    is_approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.title} ({self.get_category_display()})"

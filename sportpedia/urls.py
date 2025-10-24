@@ -12,7 +12,7 @@ urlpatterns = [
     path('profile/', include('profile_app.urls')),
     path('accounts/', include('accounts.urls')),
     path('admin_sportpedia/', include('admin_sportpedia.urls')),
-    path('sportlibrary/', include('sportlibrary.urls')),
+    # path('sportlibrary/', include('sportlibrary.urls')),
     path('library/', include('sportlibrary.urls', namespace='library')),
     path('videos/', include('videos.urls')),
 
