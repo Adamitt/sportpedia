@@ -16,6 +16,7 @@ urlpatterns = [
     path('library/', include('sportlibrary.urls', namespace='library')),
     path('videos/', include('videos.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('forum/', include('sportforum.urls'))
 ]
 
 if settings.DEBUG:

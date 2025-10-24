@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ post.title }} - SportForum{% endblock %}
+{% block title %}Post Detail - SportForum{% endblock %}
 
 {% block content %}
 <style>
@@ -46,248 +46,321 @@
     }
 </style>
 
-<div class="max-w-4xl mx-auto px-4 py-6">
-    <!-- Back Button -->
-    <div class="mb-4">
-        <a href="{% url 'sportforum:show_forum' %}" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+<div class="bg-gray-50 w-full pt-16 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 py-6">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="{% url 'sportforum:show_forum' %}" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Forum
+            </a>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="bg-white rounded-lg border border-gray-200 p-12 text-center">
+            <svg class="animate-spin h-8 w-8 text-blue-600 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
             </svg>
-            Back to Forum
-        </a>
-    </div>
+            <p class="text-gray-600 mt-3">Loading post...</p>
+        </div>
 
-    <!-- Post Content -->
-    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <!-- Category Badge -->
-        <div class="px-6 pt-5 pb-3 border-b border-gray-100">
-            <div class="flex items-center gap-2 mb-3">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-black shadow-sm" style="background: #ffdd78;">
-                    {{ post.sport }}
-                </span>
-            </div>
-            
-            <!-- Title -->
-            <h1 class="text-2xl font-bold text-gray-900 mb-3">{{ post.title }}</h1>
-            
-            <!-- Author & Date with Edit/Delete Buttons -->
-            <div class="flex items-center justify-between">
-                <div class="flex items-center text-sm text-gray-500">
-                    <span class="font-medium text-gray-700">{{ post.author }}</span>
-                    <span class="mx-2">•</span>
-                    <span>{{ post.date_posted|date:"d M Y" }}</span>
-                </div>
-                
-                <!-- Edit/Delete buttons - only for author and database posts -->
-                {% if user.is_authenticated and post.source == 'database' and user.username == post.author %}
-                <div class="flex space-x-2">
-                    <a href="{% url 'sportforum:edit_post' post.id %}" 
-                       class="text-gray-600 hover:text-gray-700 text-sm transition-colors">
-                        Edit
-                    </a>
-                    <a href="{% url 'sportforum:delete_post' post.id %}" 
-                       class="text-red-600 hover:text-red-700 text-sm transition-colors" 
-                       onclick="return confirm('Are you sure you want to delete this post?')">
-                        Delete
-                    </a>
-                </div>
-                {% endif %}
-            </div>
+        <!-- Error State -->
+        <div id="error" class="hidden bg-white rounded-lg border border-red-200 p-12 text-center">
+            <div class="text-red-600 text-4xl mb-4">⚠️</div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Post not found</h3>
+            <p class="text-gray-500 mb-6">The post you're looking for doesn't exist or has been removed.</p>
+            <a href="{% url 'sportforum:show_forum' %}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                Back to Forum
+            </a>
         </div>
-        
-        <div class="p-6">
-            <div class="post-content text-black-700 leading-relaxed mb-4">
-                {{ post.content|linebreaks }}
-            </div>
-            
-            <!-- Tags -->
-            {% if post.tags %}
-            <div class="flex flex-wrap gap-2 mt-4 items-center">
-                <span class="text-gray-400 text-xs">Tags:</span>
-                {% for tag in post.tags %}
-                <span class="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-md text-xs font-medium hover:bg-gray-200 transition">
-                    {{ tag }}
-                </span>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
-        
-        <!-- Like Section dengan AJAX -->
-        <div class="bg-gradient-to-r from-red-50 via-yellow-50 to-blue-50 px-6 py-4 border-t-2 border-red-700">
-            {% if user.is_authenticated and post.source == 'database' %}
-            <div class="like-section">
-                <button 
-                    class="like-btn bg-white border-2 border-red-700 hover:bg-red-700 hover:text-white transition rounded-lg px-4 py-2" 
-                    data-post-id="{{ post.id }}"
-                    data-liked="{% if user in post.post_object.likes.all %}true{% else %}false{% endif %}">
-                    
-                    <span class="like-icon {% if user in post.post_object.likes.all %}text-red-500{% else %}text-gray-400{% endif %}">
-                        ❤️
-                    </span>
-                    
-                    <span class="like-count font-bold text-red-700">{{ post.likes }}</span>
-                    <span class="like-text text-gray-700">{% if user in post.post_object.likes.all %}Unlike{% else %}Like{% endif %}</span>
-                </button>
-            </div>
-            {% elif post.source == 'json' %}
-            <p class="text-gray-600">
-                <span class="font-bold text-red-700">{{ post.likes }}</span> likes • 💬 This is an archived post (read-only)
-            </p>
-            {% else %}
-            <p class="text-gray-600">
-                <a href="{% url 'main:login' %}" class="text-red-700 hover:text-blue-900 font-semibold hover:underline">Login</a> untuk memberikan like
-            </p>
-            {% endif %}
-        </div>
-    </div>
 
-    <!-- Replies Section -->
-    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden mt-4">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">Replies ({{ replies|length }})</h2>
-        </div>
-        <div class="p-6">
-            {% if replies %}
-                {% for reply in replies %}
-                <div class="reply-item mb-4 pb-4 {% if not forloop.last %}border-b border-gray-100{% endif %}">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="font-medium text-gray-900">{{ reply.user }}</span>
-                        <small class="text-xs text-gray-500">
-                            {{ reply.date|date:"d M Y" }}
-                        </small>
-                    </div>
-                    <p class="text-gray-700 text-sm leading-relaxed">{{ reply.comment|linebreaks }}</p>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="text-center text-gray-400 py-8">
-                    <div class="text-4xl mb-2">�</div>
-                    <p class="text-sm text-gray-500">No replies yet. Be the first!</p>
-                </div>
-            {% endif %}
+        <!-- Post Content Container -->
+        <div id="post-container" class="hidden"></div>
 
-            <!-- Reply Form -->
-            {% if user.is_authenticated and not is_readonly %}
-            <div class="mt-6 pt-6 border-t border-gray-200">
-                <h3 class="text-sm font-semibold mb-3 text-gray-900">Add Reply</h3>
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <textarea 
-                            name="comment" 
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" 
-                            rows="4" 
-                            placeholder="Write your reply here..."
-                            required></textarea>
-                    </div>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg transition text-sm">
-                        Post Reply
-                    </button>
-                </form>
-            </div>
-            {% elif is_readonly %}
-            <div class="text-center mt-6 pt-6 border-t border-gray-200">
-                <p class="text-sm text-gray-500">
-                    This is an archived post. Replies are disabled.
-                </p>
-            </div>
-            {% else %}
-            <div class="text-center mt-6 pt-6 border-t border-gray-200">
-                <p class="text-sm text-gray-600">
-                    <a href="{% url 'main:login' %}" class="text-blue-600 hover:text-blue-700 font-medium">
-                        Login
-                    </a> to reply to this topic
-                </p>
-            </div>
-            {% endif %}
-        </div>
+        <!-- Replies Container -->
+        <div id="replies-container" class="hidden"></div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 <script>
-    // JavaScript untuk AJAX like functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        // Ambil semua tombol like
-        const likeButtons = document.querySelectorAll('.like-btn');
-        
-        likeButtons.forEach(button => {
-            button.addEventListener('click', async function(e) {
-                e.preventDefault();
-                
-                const postId = this.dataset.postId;
-                const likeIcon = this.querySelector('.like-icon');
-                const likeCount = this.querySelector('.like-count');
-                const likeText = this.querySelector('.like-text');
-                
-                // Disable button sementara untuk prevent double click
-                this.disabled = true;
-                this.style.opacity = '0.6';
-                
-                try {
-                    // Kirim request AJAX ke server
-                    const response = await fetch(`/sportforum/like/${postId}/`, {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRFToken': getCookie('csrftoken'),
-                            'Content-Type': 'application/json',
-                        },
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    
-                    const data = await response.json();
-                    
-                    // Update tampilan button dengan animasi
-                    if (data.liked) {
-                        likeIcon.classList.remove('text-gray-400');
-                        likeIcon.classList.add('text-red-500');
-                        likeText.textContent = 'Unlike';
-                        this.dataset.liked = 'true';
-                    } else {
-                        likeIcon.classList.remove('text-red-500');
-                        likeIcon.classList.add('text-gray-400');
-                        likeText.textContent = 'Like';
-                        this.dataset.liked = 'false';
-                    }
-                    
-                    // Update jumlah likes
-                    likeCount.textContent = data.total_likes;
-                    
-                    // Tambah animasi pop
-                    likeIcon.classList.add('pop-animation');
-                    setTimeout(() => likeIcon.classList.remove('pop-animation'), 300);
-                    
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('❌ Failed to like post. Please make sure you are logged in and try again.');
-                } finally {
-                    // Re-enable button
-                    this.disabled = false;
-                    this.style.opacity = '1';
-                }
-            });
-        });
-    });
+// Configuration
+const POST_ID = "{{ id }}";
+const POST_API_ENDPOINT = `/forum/post/json/${POST_ID}/`;
+const LIKE_API_ENDPOINT = `/forum/post/${POST_ID}/like`;
+const CURRENT_USER = "{{ user.username|default:'' }}";
+const IS_AUTHENTICATED = "{{ user.is_authenticated|yesno:'true,false' }}";
 
-    // Function untuk ambil CSRF token dari cookie
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
+// DOM Elements
+const loadingSpinner = document.getElementById('loading');
+const errorMessage = document.getElementById('error');
+const postContainer = document.getElementById('post-container');
+const repliesContainer = document.getElementById('replies-container');
+
+// State
+let postData = null;
+
+// Show/hide sections
+function displaySection({ showLoading = false, showError = false, showPost = false }) {
+    loadingSpinner.classList.toggle('hidden', !showLoading);
+    errorMessage.classList.toggle('hidden', !showError);
+    postContainer.classList.toggle('hidden', !showPost);
+    repliesContainer.classList.toggle('hidden', !showPost);
+}
+
+// Format date
+function formatDate(isoDate) {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+    });
+}
+
+// Build post HTML
+function buildPostHTML(post) {
+    const title = DOMPurify.sanitize(post.title);
+    const content = DOMPurify.sanitize(post.content);
+    const sport = DOMPurify.sanitize(post.sport);
+    const author = DOMPurify.sanitize(post.author);
+    const datePosted = formatDate(post.date_posted);
+    const likes = post.likes;
+    const userHasLiked = post.user_has_liked;
+    const canEdit = post.can_edit;
+
+    const tagsHTML = post.tags && post.tags.length > 0
+        ? `<div class="flex flex-wrap gap-2 mt-4 items-center">
+            <span class="text-gray-400 text-xs">Tags:</span>
+            ${post.tags.map(tag => `<span class="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-md text-xs font-medium hover:bg-gray-200 transition">${DOMPurify.sanitize(tag)}</span>`).join('')}
+          </div>`
+        : '';
+
+    const editDeleteHTML = canEdit
+        ? `<div class="flex space-x-2">
+            <a href="/forum/post/${post.id}/edit" class="text-gray-600 hover:text-gray-700 text-sm transition-colors">Edit</a>
+            <a href="/forum/post/${post.id}/delete" class="text-red-600 hover:text-red-700 text-sm transition-colors" onclick="return confirm('Are you sure you want to delete this post?')">Delete</a>
+          </div>`
+        : '';
+
+    const likeButtonHTML = IS_AUTHENTICATED
+        ? `<button 
+            class="like-btn bg-white border-2 border-red-700 hover:bg-red-700 hover:text-white transition rounded-lg px-4 py-2" 
+            data-post-id="${post.id}"
+            data-liked="${userHasLiked}">
+            <span class="like-icon ${userHasLiked ? 'text-red-500' : 'text-gray-400'}">❤️</span>
+            <span class="like-count font-bold text-red-700">${likes}</span>
+            <span class="like-text text-gray-700">${userHasLiked ? 'Unlike' : 'Like'}</span>
+          </button>`
+        : `<p class="text-gray-600">
+            <span class="font-bold text-red-700">${likes}</span> likes • 
+            <a href="{% url 'accounts:login' %}" class="text-red-700 hover:text-blue-900 font-semibold hover:underline">Login</a> to like
+          </p>`;
+
+    return `
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div class="px-6 pt-5 pb-3 border-b border-gray-100">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-black shadow-sm" style="background: #ffdd78;">
+                        ${sport}
+                    </span>
+                </div>
+                
+                <h1 class="text-2xl font-bold text-gray-900 mb-3">${title}</h1>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center text-sm text-gray-500">
+                        <span class="font-medium text-gray-700">${author}</span>
+                        <span class="mx-2">•</span>
+                        <span>${datePosted}</span>
+                    </div>
+                    ${editDeleteHTML}
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <div class="post-content text-black-700 leading-relaxed mb-4" style="white-space: pre-wrap;">${content}</div>
+                ${tagsHTML}
+            </div>
+            
+            <div class="bg-gradient-to-r from-red-50 via-yellow-50 to-blue-50 px-6 py-4 border-t-2 border-red-700">
+                ${likeButtonHTML}
+            </div>
+        </div>
+    `;
+}
+
+// Build replies HTML
+function buildRepliesHTML(replies) {
+    const repliesCount = replies.length;
+    
+    const repliesListHTML = replies.length > 0
+        ? replies.map(reply => `
+            <div class="reply-item mb-4 pb-4 border-b border-gray-100">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="font-medium text-gray-900">${DOMPurify.sanitize(reply.user)}</span>
+                    <small class="text-xs text-gray-500">${formatDate(reply.date)}</small>
+                </div>
+                <p class="text-gray-700 text-sm leading-relaxed" style="white-space: pre-wrap;">${DOMPurify.sanitize(reply.comment)}</p>
+            </div>
+          `).join('')
+        : `<div class="text-center text-gray-400 py-8">
+            <div class="text-4xl mb-2">💬</div>
+            <p class="text-sm text-gray-500">No replies yet. Be the first!</p>
+          </div>`;
+
+    const replyFormHTML = IS_AUTHENTICATED
+        ? `<div class="mt-6 pt-6 border-t border-gray-200">
+            <h3 class="text-sm font-semibold mb-3 text-gray-900">Add Reply</h3>
+            <form method="POST" action="/forum/post/${POST_ID}/">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">
+                <div class="mb-3">
+                    <textarea 
+                        name="comment" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" 
+                        rows="4" 
+                        placeholder="Write your reply here..."
+                        required></textarea>
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg transition text-sm">
+                    Post Reply
+                </button>
+            </form>
+          </div>`
+        : `<div class="text-center mt-6 pt-6 border-t border-gray-200">
+            <p class="text-sm text-gray-600">
+                <a href="{% url 'accounts:login' %}" class="text-blue-600 hover:text-blue-700 font-medium">Login</a> to reply to this topic
+            </p>
+          </div>`;
+
+    return `
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden mt-4">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Replies (${repliesCount})</h2>
+            </div>
+            <div class="p-6">
+                ${repliesListHTML}
+                ${replyFormHTML}
+            </div>
+        </div>
+    `;
+}
+
+// Handle like button click
+async function handleLikeClick(button) {
+    const postId = button.dataset.postId;
+    const likeIcon = button.querySelector('.like-icon');
+    const likeCount = button.querySelector('.like-count');
+    const likeText = button.querySelector('.like-text');
+    
+    button.disabled = true;
+    button.style.opacity = '0.6';
+    
+    try {
+        const response = await fetch(LIKE_API_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+        });
+        
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            
+            if (data.authenticated === false || data.error) {
+                alert('' + (data.error || 'Please login first to like this post!'));
+                return;
+            }
+            
+            if (data.liked) {
+                likeIcon.classList.remove('text-gray-400');
+                likeIcon.classList.add('text-red-500');
+                likeText.textContent = 'Unlike';
+                button.dataset.liked = 'true';
+            } else {
+                likeIcon.classList.remove('text-red-500');
+                likeIcon.classList.add('text-gray-400');
+                likeText.textContent = 'Like';
+                button.dataset.liked = 'false';
+            }
+            
+            likeCount.textContent = data.total_likes;
+            
+            likeIcon.classList.add('pop-animation');
+            setTimeout(() => likeIcon.classList.remove('pop-animation'), 300);
+        } else {
+            alert('Failed to like post. Please try again.');
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to like post. Please try again.');
+    } finally {
+        button.disabled = false;
+        button.style.opacity = '1';
+    }
+}
+
+// Fetch post data
+async function fetchPostData() {
+    try {
+        displaySection({ showLoading: true });
+        
+        const response = await fetch(POST_API_ENDPOINT, {
+            headers: { 'Accept': 'application/json' },
+        });
+
+        if (!response.ok) {
+            throw new Error('Post not found');
+        }
+
+        postData = await response.json();
+        
+        // Render post
+        postContainer.innerHTML = buildPostHTML(postData);
+        repliesContainer.innerHTML = buildRepliesHTML(postData.replies || []);
+        
+        // Attach like button event listener
+        const likeButton = postContainer.querySelector('.like-btn');
+        if (likeButton) {
+            likeButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                handleLikeClick(this);
+            });
+        }
+        
+        displaySection({ showPost: true });
+    } catch (error) {
+        console.error('Error loading post:', error);
+        displaySection({ showError: true });
+    }
+}
+
+// Get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
             }
         }
-        return cookieValue;
     }
+    return cookieValue;
+}
+
+// Initialize
+fetchPostData();
 </script>
 
 {% endblock content %}

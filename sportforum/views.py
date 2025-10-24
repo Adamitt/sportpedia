@@ -10,6 +10,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from sportforum.models import ForumPost, Reply, Tag
 from sportforum.forms import ReplyForm, ForumPostForm
 from datetime import datetime
+from django.utils import timezone
 from pathlib import Path
 import uuid
 import json
@@ -30,78 +31,15 @@ def load_forum_json():
 
 # Tampilkan semua forum post
 def show_forum(request):
-    """Menampilkan semua forum post dengan filter kategori opsional (dari DB + JSON)"""
-    # Filter berdasarkan kategori jika ada query parameter
-    sport_filter = request.GET.get('sport')
-    
-    # Ambil data dari database SQL
-    sql_posts = ForumPost.objects.all()
-    if sport_filter:
-        sql_posts = sql_posts.filter(sport=sport_filter)
-    
-    posts_list = []
-    
-    # Convert database posts ke format dict
-    for post in sql_posts:
-        posts_list.append({
-            'id': str(post.id),
-            'sport': post.get_sport_display(),
-            'sport_slug': post.sport,
-            'title': post.title,
-            'author': post.author.username,
-            'content': post.content,
-            'likes': post.total_likes,
-            'views': post.views,
-            'date_posted': post.date_posted,
-            'tags': [tag.name for tag in post.tags.all()],
-            'replies_count': post.replies.count(),
-            'source': 'database',
-            'post_object': post,  \
-        })
-    
-    # Ambil data dari JSON
-    json_posts = load_forum_json()
-    for json_post in json_posts:
-        # Filter berdasarkan sport jika ada
-        if sport_filter:
-            sport_slug = json_post.get('sport', '').lower().replace(' ', '-')
-            if sport_slug != sport_filter:
-                continue
-        
-        posts_list.append({
-            'id': f"json_{json_post['id']}",
-            'sport': json_post.get('sport', ''),
-            'sport_slug': json_post.get('sport', '').lower().replace(' ', '-'),
-            'title': json_post.get('title', ''),
-            'author': json_post.get('author', 'Anonymous'),
-            'content': json_post.get('content', ''),
-            'likes': json_post.get('likes', 0),
-            'views': json_post.get('views', 0),
-            'date_posted': datetime.strptime(json_post.get('date_posted', '2025-01-01'), '%Y-%m-%d'),
-            'tags': json_post.get('tags', []),
-            'replies_count': len(json_post.get('replies', [])),
-            'source': 'json',
-        })
-    
-    # Sort by date_posted (newest first)
-    posts_list.sort(key=lambda x: x['date_posted'], reverse=True)
-    
-    # Implementasi Pagination (6 posts per halaman)
-    paginator = Paginator(posts_list, 6)  # 6 posts per page
-    page_number = request.GET.get('page', 1)
-    
-    try:
-        posts_page = paginator.get_page(page_number)
-    except PageNotAnInteger:
-        posts_page = paginator.get_page(1)
-    except EmptyPage:
-        posts_page = paginator.get_page(paginator.num_pages)
-    
+    """Menampilkan halaman forum (data dimuat via AJAX)"""
+    # Get categories for filter
     categories = [
         {'name': label, 'slug': value}
         for value, label in ForumPost.SPORT_CHOICES
     ]
     
+    # Add JSON sports to categories
+    json_posts = load_forum_json()
     existing_slugs = {cat['slug'] for cat in categories}
     json_sports = set()
     for json_post in json_posts:
@@ -111,7 +49,6 @@ def show_forum(request):
             if sport_slug not in existing_slugs:
                 json_sports.add((sport_slug, sport_name))
     
-    # Add JSON sports to categories
     for slug, name in json_sports:
         categories.append({
             'name': name,
@@ -119,131 +56,71 @@ def show_forum(request):
             'source': 'json'
         })
     
-    # Sort berdasarkan nama
     categories.sort(key=lambda x: x['name'])
     
     context = {
-        'posts': posts_page, 
-        'categories': categories,  
-        'selected_sport': sport_filter,
-        'paginator': paginator,
+        'categories': categories,
+        'selected_sport': request.GET.get('sport', ''),
     }
     return render(request, "sportforum/forum_post.html", context)
 
 
 #Detail satu forum post (termasuk balasan)
 def post_detail(request, id):
-    """Menampilkan satu post beserta balasan (dari DB atau JSON)"""
-    post_data = None
-    
-    # Check if id is from JSON:
-    # Has prefix "json_" OR
-    # Is a simple integer (not UUID format)
-    is_json_post = False
-    json_id = None
-    
-    if str(id).startswith('json_'):
-        is_json_post = True
-        json_id = int(str(id).replace('json_', ''))
-    else:
-        # Try to convert to int - if success, it's from JSON
-        try:
-            json_id = int(id)
-            is_json_post = True
-        except (ValueError, TypeError):
-            is_json_post = False
-    
-    if is_json_post:
-        json_posts = load_forum_json()
+    """Menampilkan satu post beserta balasan menggunakan AJAX"""
+    # Handle POST request for adding replies (for database posts only) FIRST
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return HttpResponseRedirect(reverse('accounts:login'))
         
-        for post in json_posts:
-            if post['id'] == json_id:
-                post_data = {
-                    'id': f"json_{post['id']}",
-                    'sport': post.get('sport', ''),
-                    'title': post.get('title', ''),
-                    'author': post.get('author', 'Anonymous'),
-                    'content': post.get('content', ''),
-                    'likes': post.get('likes', 0),
-                    'views': post.get('views', 0),
-                    'date_posted': datetime.strptime(post.get('date_posted', '2025-01-01'), '%Y-%m-%d'),
-                    'tags': post.get('tags', []),
-                    'replies': [
-                        {
-                            'user': reply.get('user', 'Anonymous'),
-                            'comment': reply.get('comment', ''),
-                            'date': datetime.strptime(reply.get('date', '2025-01-01'), '%Y-%m-%d')
-                        }
-                        for reply in post.get('replies', [])
-                    ],
-                    'source': 'json',
-                    'is_readonly': True
-                }
-                break
-    else:
+        # Only allow replies on database posts (not JSON posts)
+        if str(id).startswith('json_'):
+            messages.warning(request, "Cannot reply to this post.")
+            return HttpResponseRedirect(request.path)
+        
         try:
             post = ForumPost.objects.get(pk=id)
-            post.views += 1
-            post.save()
-            
-            replies = Reply.objects.filter(post=post).order_by('date')
-            
-            post_data = {
-                'id': str(post.id),
-                'sport': post.get_sport_display(),
-                'title': post.title,
-                'author': post.author.username,
-                'content': post.content,
-                'likes': post.total_likes,
-                'views': post.views,
-                'date_posted': post.date_posted,
-                'tags': [tag.name for tag in post.tags.all()],
-                'replies': [
-                    {
-                        'user': reply.user.username,
-                        'comment': reply.comment,
-                        'date': reply.date
-                    }
-                    for reply in replies
-                ],
-                'source': 'database',
-                'is_readonly': False,
-                'post_object': post
-            }
+            form = ReplyForm(request.POST)
+            if form.is_valid():
+                Reply.objects.create(
+                    post=post,
+                    user=request.user,
+                    comment=form.cleaned_data['comment']
+                )
+                messages.success(request, "Reply added successfully!")
+                # Redirect back to same post using the post's actual ID
+                return HttpResponseRedirect(request.path)
         except ForumPost.DoesNotExist:
+            messages.warning(request, "Post not found.")
+            return HttpResponseRedirect(reverse('sportforum:show_forum'))
+    
+    # Validate post exists (database or JSON) for GET requests
+    post_exists = False
+    
+    # Check if it's a JSON post
+    if str(id).startswith('json_'):
+        json_posts = load_forum_json()
+        json_id = str(id).replace('json_', '')
+        try:
+            json_id_int = int(json_id)
+            json_post = next((p for p in json_posts if p['id'] == json_id_int), None)
+            if json_post:
+                post_exists = True
+        except (ValueError, StopIteration):
             pass
+    else:
+        # Check if it's a database post
+        post_exists = ForumPost.objects.filter(pk=id).exists()
     
-    if not post_data:
-        raise Http404("Post not found")
+    # If post doesn't exist, redirect to forum list
+    if not post_exists:
+        messages.warning(request, "Post not found or has been deleted.")
+        return HttpResponseRedirect(reverse('sportforum:show_forum'))
     
-    form = ReplyForm()
-
-    # Handle POST request (hanya untuk database posts)
-    if request.method == 'POST':
-        if post_data['source'] == 'json':
-            from django.contrib import messages
-            messages.warning(request, "Cannot add reply to archived posts from JSON.")
-            return HttpResponseRedirect(reverse('sportforum:post_detail', args=[id]))
-        
-        if not request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('main:login'))
-        
-        form = ReplyForm(request.POST)
-        if form.is_valid() and 'post_object' in post_data:
-            Reply.objects.create(
-                post=post_data['post_object'],
-                user=request.user,
-                comment=form.cleaned_data['comment']
-            )
-            return HttpResponseRedirect(reverse('sportforum:post_detail', args=[id]))
-    
+    # For GET request, just render the template with AJAX
     context = {
-        'post': post_data,
-        'replies': post_data.get('replies', []),
-        'form': form,
-        'is_readonly': post_data.get('is_readonly', False)
+        'id': id,
     }
-
     return render(request, "sportforum/post_detail.html", context)
 
 
@@ -274,10 +151,20 @@ def new_post(request):
     }
     return render(request, "sportforum/new_post.html", context)
 
-@login_required
 def toggle_like(request, id):
+    """Toggle like untuk post - dengan pengecekan manual untuk AJAX"""
     if request.method != 'POST':
-        return HttpResponseRedirect(reverse('post_detail', args=[id]))
+        return HttpResponseRedirect(reverse('sportforum:post_detail', args=[id]))
+    
+    # Check authentication manually for better AJAX handling
+    if not request.user.is_authenticated:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'error': 'You must be logged in to like posts',
+                'authenticated': False
+            }, status=403)
+        else:
+            return HttpResponseRedirect(reverse('accounts:login'))
     
     post = get_object_or_404(ForumPost, pk=id)
     
@@ -293,11 +180,12 @@ def toggle_like(request, id):
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return JsonResponse({
             'liked': liked,
-            'total_likes': post.total_likes
+            'total_likes': post.total_likes,
+            'authenticated': True
         })
     
     # Redirect untuk non-AJAX request
-    return HttpResponseRedirect(reverse('post_detail', args=[id]))
+    return HttpResponseRedirect(reverse('sportforum:post_detail', args=[id]))
 
 @login_required
 def edit_post(request, id):
@@ -354,3 +242,143 @@ def delete_post(request, id):
     
     post.delete()
     return HttpResponseRedirect(reverse('sportforum:show_forum'))
+
+
+def show_json(request):
+    """Return all forum posts as JSON (from database + JSON files)"""
+    sport_filter = request.GET.get('sport')
+    
+    # Get SQL posts
+    sql_posts = ForumPost.objects.all()
+    if sport_filter:
+        sql_posts = sql_posts.filter(sport=sport_filter)
+    
+    data = []
+    
+    # Convert database posts
+    for post in sql_posts:
+        data.append({
+            'id': str(post.id),
+            'sport': post.get_sport_display(),
+            'sport_slug': post.sport,
+            'title': post.title,
+            'author': post.author.username,
+            'content': post.content,
+            'likes': post.total_likes,
+            'views': post.views,
+            'date_posted': post.date_posted.isoformat() if post.date_posted else None,
+            'tags': [tag.name for tag in post.tags.all()],
+            'replies_count': post.replies.count(),
+            'source': 'database',
+        })
+    
+    # Get JSON posts
+    json_posts = load_forum_json()
+    for json_post in json_posts:
+        # Filter by sport if needed
+        if sport_filter:
+            sport_slug = json_post.get('sport', '').lower().replace(' ', '-')
+            if sport_slug != sport_filter:
+                continue
+        
+        data.append({
+            'id': f"json_{json_post['id']}",
+            'sport': json_post.get('sport', ''),
+            'sport_slug': json_post.get('sport', '').lower().replace(' ', '-'),
+            'title': json_post.get('title', ''),
+            'author': json_post.get('author', 'Anonymous'),
+            'content': json_post.get('content', ''),
+            'likes': json_post.get('likes', 0),
+            'views': json_post.get('views', 0),
+            'date_posted': json_post.get('date_posted', '2025-01-01'),
+            'tags': json_post.get('tags', []),
+            'replies_count': len(json_post.get('replies', [])),
+            'source': 'json',
+        })
+    
+    # Sort by date (newest first)
+    data.sort(key=lambda x: x['date_posted'], reverse=True)
+    
+    return JsonResponse(data, safe=False)
+
+
+def show_json_by_id(request, id):
+    """Return single forum post by ID as JSON"""
+    # Check if it's a JSON file post (ID starts with 'json_')
+    if str(id).startswith('json_'):
+        json_posts = load_forum_json()
+        json_id = str(id).replace('json_', '')
+        
+        try:
+            json_id_int = int(json_id)
+            json_post = next((p for p in json_posts if p['id'] == json_id_int), None)
+            
+            if json_post:
+                data = {
+                    'id': f"json_{json_post['id']}",
+                    'sport': json_post.get('sport', ''),
+                    'sport_slug': json_post.get('sport', '').lower().replace(' ', '-'),
+                    'title': json_post.get('title', ''),
+                    'author': json_post.get('author', 'Anonymous'),
+                    'content': json_post.get('content', ''),
+                    'likes': json_post.get('likes', 0),
+                    'views': json_post.get('views', 0),
+                    'date_posted': json_post.get('date_posted', '2025-01-01'),
+                    'tags': json_post.get('tags', []),
+                    'replies': json_post.get('replies', []),
+                    'replies_count': len(json_post.get('replies', [])),
+                    'user_has_liked': False,  # JSON posts can't be liked
+                    'can_edit': False,  # JSON posts can't be edited
+                    'source': 'json',
+                }
+                return JsonResponse(data)
+        except (ValueError, StopIteration):
+            pass
+        
+        return JsonResponse({'detail': 'Not found'}, status=404)
+    
+    # Handle database posts
+    try:
+        post = ForumPost.objects.select_related('author').prefetch_related('tags', 'replies').get(pk=id)
+        
+        # Increment view count
+        post.views += 1
+        post.save(update_fields=['views'])
+        
+        # Get replies data
+        replies_data = [
+            {
+                'user': reply.user.username,
+                'comment': reply.comment,
+                'date': reply.date.isoformat() if reply.date else None,
+            }
+            for reply in post.replies.all()
+        ]
+        
+        # Check if current user has liked the post
+        user_has_liked = False
+        if request.user.is_authenticated:
+            user_has_liked = post.likes.filter(id=request.user.id).exists()
+        
+        data = {
+            'id': str(post.id),
+            'sport': post.get_sport_display(),
+            'sport_slug': post.sport,
+            'title': post.title,
+            'author': post.author.username,
+            'content': post.content,
+            'likes': post.total_likes,
+            'views': post.views,
+            'date_posted': post.date_posted.isoformat() if post.date_posted else None,
+            'tags': [tag.name for tag in post.tags.all()],
+            'replies': replies_data,
+            'replies_count': len(replies_data),
+            'user_has_liked': user_has_liked,
+            'can_edit': request.user.is_authenticated and request.user == post.author,
+            'source': 'database',
+        }
+        
+        return JsonResponse(data)
+    except ForumPost.DoesNotExist:
+        return JsonResponse({'detail': 'Not found'}, status=404)
+

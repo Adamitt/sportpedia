@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('profile_app', '0006_remove_userprofile_achievements_and_more'),
-        ('sportlibrary', '0004_savedsport'),
+        ('sportlibrary', '0001_initial'),  # Fixed: 0004_savedsport doesn't exist, use 0001_initial
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
