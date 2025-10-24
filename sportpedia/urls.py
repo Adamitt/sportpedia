@@ -22,4 +22,5 @@ urlpatterns = [
     path('', include('main.urls')),
     path('gearguide/', include('gearguide.urls')), 
     path('videos/', include('videos.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]

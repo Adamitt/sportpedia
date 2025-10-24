@@ -13,7 +13,7 @@
                 <a href="/sportlibrary/" class="text-gray-700 hover:text-[#1E3A5F] font-medium transition-colors">Sports Library</a>
                 <a href="/community/" class="text-gray-700 hover:text-[#1E3A5F] font-medium transition-colors">Community</a>
                 <a href="/gearguide/" class="text-gray-700 hover:text-[#1E3A5F] font-medium transition-colors">Gear Guide</a>
-                <a href="{% url 'videos:gallery' %}" class="font-medium transition-colors {% if request.resolver_match.url_name == 'gallery' %}text-[#1E3A5F]{% else %}text-gray-700 hover:text-[#1E3A5F]{% endif %}">Video Gallery</a>
+                <a href="{% url 'videos:video_gallery' %}" class="font-medium transition-colors {% if request.resolver_match.url_name == 'gallery' %}text-[#1E3A5F]{% else %}text-gray-700 hover:text-[#1E3A5F]{% endif %}">Video Gallery</a>
             </div>
 
             <!-- Right side - Search, Notification, Profile -->
