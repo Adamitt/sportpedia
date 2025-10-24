@@ -10,6 +10,8 @@ from .forms import AdminUserCreationForm, AdminUserChangeForm
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.db import models
+import json
+from pathlib import Path
 
 # only admin/staff
 def admin_only(user):
@@ -19,16 +21,106 @@ def admin_only(user):
 def dashboard(request):
     total_gears = Gear.objects.count()
     total_sports = Sport.objects.count()
+
+    # Tambahan: hitung gear dari JSON
+    base_dir = Path(__file__).resolve().parent.parent
+    data_path = base_dir / 'database' / 'gears.json'
+    json_gears_count = 0
+    if data_path.exists():
+        with open(data_path, 'r', encoding='utf-8') as f:
+            json_gears = json.load(f)
+            json_gears_count = len(json_gears)
+
+    total_all_gears = total_gears + json_gears_count
+
     return render(request, 'dashboard/dashboard.html', {
-        'total_gears': total_gears,
+        'total_gears': total_all_gears,
         'total_sports': total_sports,
     })
 
 
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def manage_gear(request):
-    gears = Gear.objects.select_related('sport').all()
-    return render(request, 'gear_app/manage_gear.html', {'gears': gears})
+    """Halaman admin untuk mengelola semua gear (gabung DB & JSON)."""
+    base_dir = Path(__file__).resolve().parent.parent
+    data_path = base_dir / 'database' / 'gears.json'
+
+    # 1️⃣ Ambil semua gear dari DB
+    db_gears = list(Gear.objects.select_related('sport').all())
+
+    # 2️⃣ Ambil semua gear dari JSON
+    json_gears = []
+    if data_path.exists():
+        try:
+            with open(data_path, 'r', encoding='utf-8') as f:
+                gears_data = json.load(f)
+                for g in gears_data:
+                    sport_name = (
+                        g.get("category")
+                        or (g.get("sport", {}) or {}).get("category")
+                        or (g.get("sport", {}) or {}).get("name")
+                        or g.get("sport")
+                        or "Tidak diketahui"
+                    )
+
+                    json_gears.append({
+                        "id": g.get("id"),
+                        "name": g.get("name", "Tanpa Nama"),
+                        "sport": sport_name,
+                        "level": (g.get("level") or "-").capitalize(),
+                        "price_range": g.get("price_range", "-"),
+                        "is_from_db": False,
+                        "owner": None,
+                    })
+        except Exception as e:
+            print(f"⚠️ Gagal baca gears.json: {e}")
+
+    # 3️⃣ Format DB gears biar match
+    formatted_db_gears = []
+    for g in db_gears:
+        # 🔥 DEBUGGING - Print ke console
+        print(f"🔍 Gear: {g.name}")
+        print(f"   - ID: {g.id}")
+        print(f"   - Has 'user' attr?: {hasattr(g, 'user')}")
+        print(f"   - Has 'owner' attr?: {hasattr(g, 'owner')}")
+        print(f"   - Has 'created_by' attr?: {hasattr(g, 'created_by')}")
+        
+        # Coba berbagai kemungkinan field name
+        owner_username = None
+        if hasattr(g, 'user') and g.user:
+            owner_username = g.user.username
+            print(f"   - Owner (from user): {owner_username}")
+        elif hasattr(g, 'owner') and g.owner:
+            owner_username = g.owner.username
+            print(f"   - Owner (from owner): {owner_username}")
+        elif hasattr(g, 'created_by') and g.created_by:
+            owner_username = g.created_by.username
+            print(f"   - Owner (from created_by): {owner_username}")
+        else:
+            print(f"   - Owner: None (no user field found)")
+        
+        formatted_db_gears.append({
+            "id": str(g.id),
+            "name": g.name,
+            "sport": g.sport.name if g.sport else "Tidak diketahui",
+            "level": g.get_level_display() if hasattr(g, "get_level_display") else g.level,
+            "price_range": g.price_range or "-",
+            "is_from_db": True,
+            "owner": owner_username,
+        })
+        
+        print(f"   - Final owner value: {owner_username}")
+        print("---")
+
+    # 4️⃣ Gabungkan semuanya
+    all_gears = formatted_db_gears + json_gears
+    
+    # 🔥 Print current user
+    print(f"🔥 Current user: {request.user.username}")
+    print(f"🔥 Is staff?: {request.user.is_staff}")
+    print(f"🔥 Is superuser?: {request.user.is_superuser}")
+
+    return render(request, 'gear_app/manage_gear.html', {'gears': all_gears})
 
 
 @user_passes_test(admin_only, login_url='/accounts/login/')
@@ -36,50 +128,50 @@ def add_gear(request):
     sports = Sport.objects.all()
 
     if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description')
-        sport_id = request.POST.get('sport')
-        sport = Sport.objects.get(id=sport_id) if sport_id else None
-        function = request.POST.get('function')
-        required = request.POST.get('required') == 'on'
-        image = request.POST.get('image')
-        price_range = request.POST.get('price_range')
-        ecommerce_link = request.POST.get('ecommerce_link')
-        level = request.POST.get('level') or 'beginner'
-        recommended_brands = request.POST.getlist('recommended_brands')
-        materials = request.POST.getlist('materials')
-        care_tips = request.POST.get('care_tips')
-        tags = request.POST.getlist('tags')
-
-        Gear.objects.create(
-            sport=sport,
-            name=name,
-            description=description,
-            function=function,
-            required=required,
-            image=image,
-            price_range=price_range,
-            ecommerce_link=ecommerce_link,
-            level=level,
-            recommended_brands=recommended_brands,
-            materials=materials,
-            care_tips=care_tips,
-            tags=tags,
-        )
-
         try:
+            name = request.POST.get('name')
+            description = request.POST.get('description')
+            sport_id = request.POST.get('sport')
+            sport = Sport.objects.get(id=sport_id) if sport_id else None
+            function = request.POST.get('function')
+            image = request.POST.get('image')
+            price_range = request.POST.get('price_range')
+            ecommerce_link = request.POST.get('ecommerce_link')
+            level = request.POST.get('level') or 'beginner'
+            recommended_brands = [b.strip() for b in request.POST.get('recommended_brands', '').split(',') if b.strip()]
+            materials = [m.strip() for m in request.POST.get('materials', '').split(',') if m.strip()]
+            care_tips = request.POST.get('care_tips')
+            tags = [t.strip() for t in request.POST.get('tags', '').split(',') if t.strip()]
+
+            new_gear = Gear.objects.create(
+                sport=sport,
+                name=name,
+                description=description,
+                function=function,
+                image=image,
+                price_range=price_range,
+                ecommerce_link=ecommerce_link,
+                level=level,
+                recommended_brands=recommended_brands,
+                materials=materials,
+                care_tips=care_tips,
+                tags=tags,
+            )
+
+            # Log activity (opsional)
             ActivityLog.objects.create(
                 user=request.user,
                 action_type='ADMIN_CREATE',
                 description=f"Admin menambahkan Gear: {new_gear.name}"
             )
+
             messages.success(request, '✅ Gear berhasil ditambahkan!')
             return redirect('admin_sportpedia:manage_gear')
-        except Exception as e:
-             messages.error(request, f'❌ Gagal menambahkan gear: {e}')
 
-        messages.success(request, '✅ Gear berhasil ditambahkan!')
-        return redirect('manage_gear')
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            messages.error(request, f'❌ Gagal menambahkan gear: {e}')
 
     return render(request, 'gear_app/gear_form.html', {'sports': sports, 'edit_mode': False})
 
@@ -90,25 +182,28 @@ def edit_gear(request, gear_id):
     sports = Sport.objects.all()
 
     if request.method == 'POST':
-        gear.name = request.POST.get('name')
-        gear.description = request.POST.get('description')
-        gear.function = request.POST.get('function')
-        sport_id = request.POST.get('sport')
-        if sport_id:
-            gear.sport = Sport.objects.get(id=sport_id)
-        gear.required = request.POST.get('required') == 'on'
-        gear.image = request.POST.get('image')
-        gear.price_range = request.POST.get('price_range')
-        gear.ecommerce_link = request.POST.get('ecommerce_link')
-        gear.level = request.POST.get('level')
-        gear.recommended_brands = request.POST.getlist('recommended_brands')
-        gear.materials = request.POST.getlist('materials')
-        gear.care_tips = request.POST.get('care_tips')
-        gear.tags = request.POST.getlist('tags')
-        gear.save()
+        try:
+            gear.name = request.POST.get('name')
+            gear.description = request.POST.get('description')
+            gear.function = request.POST.get('function')
+            sport_id = request.POST.get('sport')
+            if sport_id:
+                gear.sport = Sport.objects.get(id=sport_id)
+            gear.image = request.POST.get('image')
+            gear.price_range = request.POST.get('price_range')
+            gear.ecommerce_link = request.POST.get('ecommerce_link')
+            gear.level = request.POST.get('level')
+            gear.recommended_brands = [b.strip() for b in request.POST.get('recommended_brands', '').split(',') if b.strip()]
+            gear.materials = [m.strip() for m in request.POST.get('materials', '').split(',') if m.strip()]
+            gear.care_tips = request.POST.get('care_tips')
+            gear.tags = [t.strip() for t in request.POST.get('tags', '').split(',') if t.strip()]
+            gear.save()
 
-        messages.success(request, '✏️ Gear berhasil diperbarui!')
-        return redirect('manage_gear')
+            messages.success(request, '✏️ Gear berhasil diperbarui!')
+            return redirect('admin_sportpedia:manage_gear')
+
+        except Exception as e:
+            messages.error(request, f'❌ Gagal memperbarui gear: {e}')
 
     return render(request, 'gear_app/gear_form.html', {
         'gear': gear,
@@ -117,16 +212,15 @@ def edit_gear(request, gear_id):
     })
 
 
+
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def delete_gear(request, gear_id):
     gear = get_object_or_404(Gear, id=gear_id)
     if request.method == 'POST':
+        gear_name = gear.name
         gear.delete()
-        messages.success(request, '🗑️ Gear berhasil dihapus!')
-        return redirect('manage_gear')
-
-    # optional: show a confirmation page; here we redirect back if not POST
-    return redirect('manage_gear')
+        messages.success(request, f'🗑️ Gear "{gear_name}" berhasil dihapus!')
+    return redirect('admin_sportpedia:manage_gear')
 
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def manage_library(request):

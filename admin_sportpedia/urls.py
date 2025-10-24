@@ -10,9 +10,15 @@ urlpatterns = [
     # Gear 
     path('dashboard/gears/', views.manage_gear, name='manage_gear'),
     path('dashboard/gears/add/', views.add_gear, name='add_gear'),
+<<<<<<< HEAD
     path('dashboard/gears/edit/<uuid:gear_id>/', views.edit_gear, name='edit_gear'),
     path('dashboard/gears/delete/<uuid:gear_id>/', views.delete_gear, name='delete_gear'),
 
+=======
+    path('dashboard/gears/edit/<str:gear_id>/', views.edit_gear, name='edit_gear'),
+    path('dashboard/gears/delete/<str:gear_id>/', views.delete_gear, name='delete_gear'),
+    
+>>>>>>> origin/angie
     # Sport Library (pakai INT)
     path('dashboard/library/', views.manage_library, name='manage_library'),
     path('dashboard/library/add/', views.add_sport, name='add_sport'),
