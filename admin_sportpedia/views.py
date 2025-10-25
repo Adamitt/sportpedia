@@ -19,108 +19,43 @@ def admin_only(user):
 
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def dashboard(request):
+    """Halaman utama dashboard admin"""
     total_gears = Gear.objects.count()
     total_sports = Sport.objects.count()
 
-    # Tambahan: hitung gear dari JSON
-    base_dir = Path(__file__).resolve().parent.parent
-    data_path = base_dir / 'database' / 'gears.json'
-    json_gears_count = 0
-    if data_path.exists():
-        with open(data_path, 'r', encoding='utf-8') as f:
-            json_gears = json.load(f)
-            json_gears_count = len(json_gears)
-
-    total_all_gears = total_gears + json_gears_count
-
     return render(request, 'dashboard/dashboard.html', {
-        'total_gears': total_all_gears,
+        'total_gears': total_gears,
         'total_sports': total_sports,
     })
 
 
+
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def manage_gear(request):
-    """Halaman admin untuk mengelola semua gear (gabung DB & JSON)."""
-    base_dir = Path(__file__).resolve().parent.parent
-    data_path = base_dir / 'database' / 'gears.json'
+    db_gears = Gear.objects.select_related('sport').all().order_by('name')
 
-    # 1️⃣ Ambil semua gear dari DB
-    db_gears = list(Gear.objects.select_related('sport').all())
-
-    # 2️⃣ Ambil semua gear dari JSON
-    json_gears = []
-    if data_path.exists():
-        try:
-            with open(data_path, 'r', encoding='utf-8') as f:
-                gears_data = json.load(f)
-                for g in gears_data:
-                    sport_name = (
-                        g.get("category")
-                        or (g.get("sport", {}) or {}).get("category")
-                        or (g.get("sport", {}) or {}).get("name")
-                        or g.get("sport")
-                        or "Tidak diketahui"
-                    )
-
-                    json_gears.append({
-                        "id": g.get("id"),
-                        "name": g.get("name", "Tanpa Nama"),
-                        "sport": sport_name,
-                        "level": (g.get("level") or "-").capitalize(),
-                        "price_range": g.get("price_range", "-"),
-                        "is_from_db": False,
-                        "owner": None,
-                    })
-        except Exception as e:
-            print(f"⚠️ Gagal baca gears.json: {e}")
-
-    # 3️⃣ Format DB gears biar match
-    formatted_db_gears = []
+    formatted_gears = []
     for g in db_gears:
-        # 🔥 DEBUGGING - Print ke console
-        print(f"🔍 Gear: {g.name}")
-        print(f"   - ID: {g.id}")
-        print(f"   - Has 'user' attr?: {hasattr(g, 'user')}")
-        print(f"   - Has 'owner' attr?: {hasattr(g, 'owner')}")
-        print(f"   - Has 'created_by' attr?: {hasattr(g, 'created_by')}")
-        
-        # Coba berbagai kemungkinan field name
+        # Ambil owner
         owner_username = None
         if hasattr(g, 'user') and g.user:
             owner_username = g.user.username
-            print(f"   - Owner (from user): {owner_username}")
         elif hasattr(g, 'owner') and g.owner:
             owner_username = g.owner.username
-            print(f"   - Owner (from owner): {owner_username}")
         elif hasattr(g, 'created_by') and g.created_by:
             owner_username = g.created_by.username
-            print(f"   - Owner (from created_by): {owner_username}")
-        else:
-            print(f"   - Owner: None (no user field found)")
-        
-        formatted_db_gears.append({
+
+        formatted_gears.append({
             "id": str(g.id),
             "name": g.name,
             "sport": g.sport.name if g.sport else "Tidak diketahui",
-            "level": g.get_level_display() if hasattr(g, "get_level_display") else g.level,
+            "level": getattr(g, "get_level_display", lambda: g.level)(),
             "price_range": g.price_range or "-",
             "is_from_db": True,
             "owner": owner_username,
         })
-        
-        print(f"   - Final owner value: {owner_username}")
-        print("---")
 
-    # 4️⃣ Gabungkan semuanya
-    all_gears = formatted_db_gears + json_gears
-    
-    # 🔥 Print current user
-    print(f"🔥 Current user: {request.user.username}")
-    print(f"🔥 Is staff?: {request.user.is_staff}")
-    print(f"🔥 Is superuser?: {request.user.is_superuser}")
-
-    return render(request, 'gear_app/manage_gear.html', {'gears': all_gears})
+    return render(request, 'gear_app/manage_gear.html', {'gears': formatted_gears})
 
 
 @user_passes_test(admin_only, login_url='/accounts/login/')
@@ -158,7 +93,6 @@ def add_gear(request):
                 tags=tags,
             )
 
-            # Log activity (opsional)
             ActivityLog.objects.create(
                 user=request.user,
                 action_type='ADMIN_CREATE',
@@ -227,7 +161,6 @@ def manage_library(request):
     """Lists all sports for admin management."""
     sports = Sport.objects.all().order_by('name') # Order alphabetically
     return render(request, 'library/manage_library.html', {'sports': sports})
-    return render(request, 'gear_app/manage_gear.html', {'gears': gears})
 
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def add_sport(request):
@@ -239,32 +172,25 @@ def add_sport(request):
         description = request.POST.get('description')
         history = request.POST.get('history')
 
-        # ✅ versi parse_json_list yang aman dan fleksibel
         import json
         def parse_json_list(text):
             if not text:
                 return []
             try:
-                # Kalau user kirim string JSON (misal: '["rule1","rule2"]')
                 data = json.loads(text)
                 if isinstance(data, list):
                     return [str(item).strip() for item in data if str(item).strip()]
             except json.JSONDecodeError:
-                # Kalau bukan JSON valid, pisahkan pakai koma
                 return [item.strip() for item in text.split(',') if item.strip()]
             return []
 
         try:
-            # 🔥 FIX: Get max ID from database and set next ID manually
             sports_objects = Sport.objects.all()
             id_sports=[int(sport.id) for sport in sports_objects]
             id_sports.sort()
             max_id = id_sports[-1] if id_sports else 0
             next_id = int(max_id or 0) + 1
             
-            print(f"🔍 Debug: Max ID = {max_id}, Next ID = {next_id}")  # Debug
-            
-            # Create sport with manual ID
             new_sport = Sport(
                 id=next_id,
                 name=name,
