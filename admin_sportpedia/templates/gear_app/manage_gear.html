@@ -37,53 +37,38 @@
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
       <div class="overflow-x-auto">
         <table class="w-full min-w-[640px] text-sm text-left text-gray-700">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-100" style="border-bottom: 2px solid #e5e7eb;">
+          <thead>
             <tr>
-              <th scope="col" class="px-6 py-4 font-semibold">Nama Gear</th>
-              <th scope="col" class="px-6 py-4 font-semibold">Olahraga Terkait</th>
-              <th scope="col" class="px-6 py-4 font-semibold">Tingkat</th>
-              <th scope="col" class="px-6 py-4 font-semibold">Kisaran Harga</th>
-              <th scope="col" class="px-6 py-4 font-semibold text-center">Aksi</th>
+              <th class="px-6 py-4 font-semibold">Nama Gear</th>
+              <th class="px-6 py-4 font-semibold">Tingkat</th>
+              <th class="px-6 py-4 font-semibold">Kisaran Harga</th>
+              <th class="px-6 py-4 font-semibold text-center">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {% for g in gears %}
             <tr class="bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
-              <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                {{ g.name }}
-              </td>
-              <td class="px-6 py-4">
-                {{ g.sport.name|default:"-" }}
-              </td>
-              <td class="px-6 py-4 capitalize">
-                {{ g.level|default:"-" }}
-              </td>
-              <td class="px-6 py-4">
-                {{ g.price_range|default:"-" }}
-              </td>
-              <td class="px-6 py-4 text-center whitespace-nowrap">
-                <a href="{% url 'admin_sportpedia:edit_gear' g.id %}" 
-                   class="font-medium text-blue-600 hover:text-blue-800 transition-colors mr-3">
-                   ✏️ Edit
-                </a>
-                <form action="{% url 'admin_sportpedia:delete_gear' g.id %}" method="post" class="inline-block"
-                      onsubmit="return confirm('Anda yakin ingin menghapus gear \'{{ g.name|escapejs }}\'? Tindakan ini tidak dapat dibatalkan.');">
-                  {% csrf_token %}
-                  <button type="submit" 
-                          class="font-medium text-red-600 hover:text-red-800 transition-colors">
-                    🗑️ Hapus
-                  </button>
-                </form>
+              <td class="px-6 py-4 font-medium">{{ g.name }}</td>
+              <td class="px-6 py-4">{{ g.level }}</td>
+              <td class="px-6 py-4">{{ g.price_range }}</td>
+              <td class="px-6 py-4 text-center">
+                {% if g.is_from_db %}
+                  <a href="{% url 'admin_sportpedia:edit_gear' g.id %}" class="text-blue-600 hover:text-blue-800 mr-2">✏️ Edit</a>
+                  <form method="POST" action="{% url 'admin_sportpedia:delete_gear' g.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="text-red-600 hover:text-red-800">🗑️ Hapus</button>
+                  </form>
+                {% else %}
+                  <span class="text-gray-400 italic">Gear bawaan (tidak bisa diedit)</span>
+                {% endif %}
               </td>
             </tr>
             {% empty %}
-            <tr class="bg-white">
-              <td colspan="5" class="px-6 py-10 text-center text-gray-500 italic">
-                Belum ada gear yang ditambahkan. Silakan klik tombol "+ Tambah Gear Baru".
-              </td>
-            </tr>
+            <tr><td colspan="4" class="text-center py-10 text-gray-500 italic">Belum ada gear ditambahkan.</td></tr>
             {% endfor %}
           </tbody>
+
+
         </table>
       </div>
     </div> {# End table container #}

@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'metrics',
     'videos',
     'widget_tweaks',
+    'sportforum',
 ]
 
 LOGIN_URL = '/login/'  # biar decorator login_required tahu harus redirect ke sini
@@ -151,7 +152,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Jakarta'
 
 USE_I18N = True
 

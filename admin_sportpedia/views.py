@@ -10,6 +10,8 @@ from .forms import AdminUserCreationForm, AdminUserChangeForm
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.db import models
+import json
+from pathlib import Path
 
 # only admin/staff
 def admin_only(user):
@@ -17,18 +19,43 @@ def admin_only(user):
 
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def dashboard(request):
+    """Halaman utama dashboard admin"""
     total_gears = Gear.objects.count()
     total_sports = Sport.objects.count()
+
     return render(request, 'dashboard/dashboard.html', {
         'total_gears': total_gears,
         'total_sports': total_sports,
     })
 
 
+
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def manage_gear(request):
-    gears = Gear.objects.select_related('sport').all()
-    return render(request, 'gear_app/manage_gear.html', {'gears': gears})
+    db_gears = Gear.objects.select_related('sport').all().order_by('name')
+
+    formatted_gears = []
+    for g in db_gears:
+        # Ambil owner
+        owner_username = None
+        if hasattr(g, 'user') and g.user:
+            owner_username = g.user.username
+        elif hasattr(g, 'owner') and g.owner:
+            owner_username = g.owner.username
+        elif hasattr(g, 'created_by') and g.created_by:
+            owner_username = g.created_by.username
+
+        formatted_gears.append({
+            "id": str(g.id),
+            "name": g.name,
+            "sport": g.sport.name if g.sport else "Tidak diketahui",
+            "level": getattr(g, "get_level_display", lambda: g.level)(),
+            "price_range": g.price_range or "-",
+            "is_from_db": True,
+            "owner": owner_username,
+        })
+
+    return render(request, 'gear_app/manage_gear.html', {'gears': formatted_gears})
 
 
 @user_passes_test(admin_only, login_url='/accounts/login/')
@@ -36,50 +63,49 @@ def add_gear(request):
     sports = Sport.objects.all()
 
     if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description')
-        sport_id = request.POST.get('sport')
-        sport = Sport.objects.get(id=sport_id) if sport_id else None
-        function = request.POST.get('function')
-        required = request.POST.get('required') == 'on'
-        image = request.POST.get('image')
-        price_range = request.POST.get('price_range')
-        ecommerce_link = request.POST.get('ecommerce_link')
-        level = request.POST.get('level') or 'beginner'
-        recommended_brands = request.POST.getlist('recommended_brands')
-        materials = request.POST.getlist('materials')
-        care_tips = request.POST.get('care_tips')
-        tags = request.POST.getlist('tags')
-
-        Gear.objects.create(
-            sport=sport,
-            name=name,
-            description=description,
-            function=function,
-            required=required,
-            image=image,
-            price_range=price_range,
-            ecommerce_link=ecommerce_link,
-            level=level,
-            recommended_brands=recommended_brands,
-            materials=materials,
-            care_tips=care_tips,
-            tags=tags,
-        )
-
         try:
+            name = request.POST.get('name')
+            description = request.POST.get('description')
+            sport_id = request.POST.get('sport')
+            sport = Sport.objects.get(id=sport_id) if sport_id else None
+            function = request.POST.get('function')
+            image = request.POST.get('image')
+            price_range = request.POST.get('price_range')
+            ecommerce_link = request.POST.get('ecommerce_link')
+            level = request.POST.get('level') or 'beginner'
+            recommended_brands = [b.strip() for b in request.POST.get('recommended_brands', '').split(',') if b.strip()]
+            materials = [m.strip() for m in request.POST.get('materials', '').split(',') if m.strip()]
+            care_tips = request.POST.get('care_tips')
+            tags = [t.strip() for t in request.POST.get('tags', '').split(',') if t.strip()]
+
+            new_gear = Gear.objects.create(
+                sport=sport,
+                name=name,
+                description=description,
+                function=function,
+                image=image,
+                price_range=price_range,
+                ecommerce_link=ecommerce_link,
+                level=level,
+                recommended_brands=recommended_brands,
+                materials=materials,
+                care_tips=care_tips,
+                tags=tags,
+            )
+
             ActivityLog.objects.create(
                 user=request.user,
                 action_type='ADMIN_CREATE',
                 description=f"Admin menambahkan Gear: {new_gear.name}"
             )
+
             messages.success(request, '✅ Gear berhasil ditambahkan!')
             return redirect('admin_sportpedia:manage_gear')
-        except Exception as e:
-             messages.error(request, f'❌ Gagal menambahkan gear: {e}')
 
-        messages.success(request, '✅ Gear berhasil ditambahkan!')
-        return redirect('manage_gear')
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            messages.error(request, f'❌ Gagal menambahkan gear: {e}')
 
     return render(request, 'gear_app/gear_form.html', {'sports': sports, 'edit_mode': False})
 
@@ -90,25 +116,28 @@ def edit_gear(request, gear_id):
     sports = Sport.objects.all()
 
     if request.method == 'POST':
-        gear.name = request.POST.get('name')
-        gear.description = request.POST.get('description')
-        gear.function = request.POST.get('function')
-        sport_id = request.POST.get('sport')
-        if sport_id:
-            gear.sport = Sport.objects.get(id=sport_id)
-        gear.required = request.POST.get('required') == 'on'
-        gear.image = request.POST.get('image')
-        gear.price_range = request.POST.get('price_range')
-        gear.ecommerce_link = request.POST.get('ecommerce_link')
-        gear.level = request.POST.get('level')
-        gear.recommended_brands = request.POST.getlist('recommended_brands')
-        gear.materials = request.POST.getlist('materials')
-        gear.care_tips = request.POST.get('care_tips')
-        gear.tags = request.POST.getlist('tags')
-        gear.save()
+        try:
+            gear.name = request.POST.get('name')
+            gear.description = request.POST.get('description')
+            gear.function = request.POST.get('function')
+            sport_id = request.POST.get('sport')
+            if sport_id:
+                gear.sport = Sport.objects.get(id=sport_id)
+            gear.image = request.POST.get('image')
+            gear.price_range = request.POST.get('price_range')
+            gear.ecommerce_link = request.POST.get('ecommerce_link')
+            gear.level = request.POST.get('level')
+            gear.recommended_brands = [b.strip() for b in request.POST.get('recommended_brands', '').split(',') if b.strip()]
+            gear.materials = [m.strip() for m in request.POST.get('materials', '').split(',') if m.strip()]
+            gear.care_tips = request.POST.get('care_tips')
+            gear.tags = [t.strip() for t in request.POST.get('tags', '').split(',') if t.strip()]
+            gear.save()
 
-        messages.success(request, '✏️ Gear berhasil diperbarui!')
-        return redirect('manage_gear')
+            messages.success(request, '✏️ Gear berhasil diperbarui!')
+            return redirect('admin_sportpedia:manage_gear')
+
+        except Exception as e:
+            messages.error(request, f'❌ Gagal memperbarui gear: {e}')
 
     return render(request, 'gear_app/gear_form.html', {
         'gear': gear,
@@ -117,23 +146,21 @@ def edit_gear(request, gear_id):
     })
 
 
+
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def delete_gear(request, gear_id):
     gear = get_object_or_404(Gear, id=gear_id)
     if request.method == 'POST':
+        gear_name = gear.name
         gear.delete()
-        messages.success(request, '🗑️ Gear berhasil dihapus!')
-        return redirect('manage_gear')
-
-    # optional: show a confirmation page; here we redirect back if not POST
-    return redirect('manage_gear')
+        messages.success(request, f'🗑️ Gear "{gear_name}" berhasil dihapus!')
+    return redirect('admin_sportpedia:manage_gear')
 
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def manage_library(request):
     """Lists all sports for admin management."""
     sports = Sport.objects.all().order_by('name') # Order alphabetically
     return render(request, 'library/manage_library.html', {'sports': sports})
-    return render(request, 'gear_app/manage_gear.html', {'gears': gears})
 
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def add_sport(request):
@@ -145,32 +172,25 @@ def add_sport(request):
         description = request.POST.get('description')
         history = request.POST.get('history')
 
-        # ✅ versi parse_json_list yang aman dan fleksibel
         import json
         def parse_json_list(text):
             if not text:
                 return []
             try:
-                # Kalau user kirim string JSON (misal: '["rule1","rule2"]')
                 data = json.loads(text)
                 if isinstance(data, list):
                     return [str(item).strip() for item in data if str(item).strip()]
             except json.JSONDecodeError:
-                # Kalau bukan JSON valid, pisahkan pakai koma
                 return [item.strip() for item in text.split(',') if item.strip()]
             return []
 
         try:
-            # 🔥 FIX: Get max ID from database and set next ID manually
             sports_objects = Sport.objects.all()
             id_sports=[int(sport.id) for sport in sports_objects]
             id_sports.sort()
             max_id = id_sports[-1] if id_sports else 0
             next_id = int(max_id or 0) + 1
             
-            print(f"🔍 Debug: Max ID = {max_id}, Next ID = {next_id}")  # Debug
-            
-            # Create sport with manual ID
             new_sport = Sport(
                 id=next_id,
                 name=name,

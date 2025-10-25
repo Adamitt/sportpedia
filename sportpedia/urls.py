@@ -8,7 +8,6 @@ urlpatterns = [
     path('', include('landingpage.urls')),
     path('gearguide/', include('gearguide.urls')),
     path('sportlibrary/', include('sportlibrary.urls')),
-    path('', include('admin_sportpedia.urls')),
     path('profile/', include('profile_app.urls')),
     path('accounts/', include('accounts.urls')),
     path('admin_sportpedia/', include('admin_sportpedia.urls')),
@@ -16,7 +15,8 @@ urlpatterns = [
     path('library/', include('sportlibrary.urls', namespace='library')),
     path('videos/', include('videos.urls')),
     # path('accounts/', include('django.contrib.auth.urls')),
-
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('forum/', include('sportforum.urls'))
 ]
 
 if settings.DEBUG:

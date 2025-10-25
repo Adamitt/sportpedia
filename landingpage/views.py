@@ -14,56 +14,111 @@ from metrics.models import ViewCounter
 from .models import Testimonial
 from gearguide.models import Gear
 from sportlibrary.models import Sport
-
+import re
 
 # =======================================================
 #               HALAMAN UTAMA & PENCARIAN
 # =======================================================
 
-def _normalize_terms(q: str):
-    """Mengubah query pencarian menjadi satu set istilah yang relevan."""
-    query = (q or "").strip().lower()
-    if not query:
-        return set()
-    alias_groups = [
-        {"tenis", "tennis"},
-        {"bulu tangkis", "badminton", "bulutangkis", "shuttle", "shuttlecock"},
-        {"sepak bola", "sepakbola", "bola", "soccer", "football"},
-        {"basket", "basketball", "bola basket"},
-        {"voli", "volley", "volleyball"},
-        {"renang", "swimming", "swim"},
-        {"lari", "running", "track"},
-    ]
-    for group in alias_groups:
-        if query in group:
-            return group
-    return {query}
+def _normalize_terms(query):
+    # A simple normalizer. Adjust as needed.
+    terms = re.split(r'[^\w-]+', query.lower()) # Split by non-word chars
+    return [term for term in terms if len(term) > 1] # Ignore short terms
 
+
+# --- THIS IS THE CORRECTED SEARCH VIEW ---
 def search(request):
-    """Menangani logika pencarian untuk Gear dan Sport dari database."""
+    """Menangani logika pencarian untuk Gear dan Sport dari database DAN JSON."""
     q = request.GET.get("q", "").strip()
     terms = _normalize_terms(q)
 
-    if not terms:
-        return render(request, "landingpage/search_page.html", {
-            "query": q, "gear_results": [], "sport_results": []
+    # --- 1. Load Data (Hybrid Logic from show_all_gears) ---
+    
+    # Load Sports JSON first (for mapping)
+    sports_path = settings.BASE_DIR / "database" / "sports.json"
+    json_sports = []
+    if sports_path.exists():
+        with open(sports_path, "r", encoding="utf-8") as f:
+            json_sports = json.load(f)
+    sport_map = {str(s["id"]): s["name"] for s in json_sports}
+
+    # Load Gears JSON
+    gears_path = settings.BASE_DIR / "database" / "gears.json"
+    json_gears = []
+    if gears_path.exists():
+        with open(gears_path, "r", encoding="utf-8") as f:
+            json_gears = json.load(f)
+
+    # Combine all gears into one list of dictionaries
+    combined_gears = []
+
+    # ===== Dari JSON =====
+    for g in json_gears:
+        sport_id = str(g.get("sport_id", ""))
+        combined_gears.append({
+            "id": g.get("id"),
+            "sport": {"name": sport_map.get(sport_id, g.get("sport", "Unknown"))}, # Embed as dict
+            "name": g.get("name", ""),
+            "description": g.get("description", ""),
+            "function": g.get("function", ""),
+            "level": g.get("level", ""),
+            "price_range": g.get("price_range", ""),
+            "image": g.get("image", ""),
+            # Add any other fields you want to search
         })
 
-    # Buat query pencarian dinamis
-    gear_q = Q()
-    sport_q = Q()
-    for t in terms:
-        gear_q |= (Q(name__icontains=t) | Q(description__icontains=t) | Q(sport__name__icontains=t))
-        sport_q |= (Q(name__icontains=t) | Q(description__icontains=t))
+    # ===== Dari DB =====
+    for g in Gear.objects.select_related("sport").all():
+        combined_gears.append({
+            "id": str(g.id),
+            "sport": {"name": g.sport.name if g.sport else "Unknown"}, # Embed as dict
+            "name": g.name or "",
+            "description": g.description or "",
+            "function": g.function or "",
+            "level": g.get_level_display() or "",
+            "price_range": g.price_range or "",
+            "image": g.image.url if g.image else "", # Handle ImageField
+            # Add any other fields you want to search
+        })
+        
+    # Load Sports from DB (for Sport search results)
+    sport_results_db = Sport.objects.all()
 
-    # Eksekusi query ke database
-    gear_results = Gear.objects.filter(gear_q).select_related('sport').distinct()
-    sport_results = Sport.objects.filter(sport_q).distinct()
+    # --- 2. Perform Search (In-Memory Python Filtering) ---
 
+    gear_results = []
+    sport_results = []
+
+    if terms:
+        for gear in combined_gears:
+            # Build a searchable text string for each gear
+            search_text = " ".join([
+                gear.get('name', ''),
+                gear.get('description', ''),
+                gear.get('function', ''),
+                gear.get('sport', {}).get('name', '')
+            ]).lower()
+            
+            # Check if any search term is in the text
+            if any(term in search_text for term in terms):
+                gear_results.append(gear)
+
+        for sport in sport_results_db:
+            # Build a searchable text string for each sport
+            search_text = " ".join([
+                sport.name,
+                sport.description,
+                sport.history
+            ]).lower()
+            
+            if any(term in search_text for term in terms):
+                sport_results.append(sport)
+
+    # --- 3. Render Results ---
     return render(request, "landingpage/search_page.html", {
         "query": q,
-        "gear_results": gear_results,
-        "sport_results": sport_results,
+        "gear_results": gear_results,   # This is now a list of dicts
+        "sport_results": sport_results, # This is a QuerySet/list of Sport objects
     })
 
 def _norm_cat(cat: str) -> str:

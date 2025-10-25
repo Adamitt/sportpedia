@@ -1,6 +1,3 @@
-<!-- ================================ -->
-<!-- MODAL EDIT GEAR (Clean Version) -->
-<!-- ================================ -->
 <style>
 #editModal {
   backdrop-filter: none;
@@ -18,70 +15,95 @@
   from {opacity: 0; transform: translateY(30px) scale(0.95);}
   to {opacity: 1; transform: translateY(0) scale(1);}
 }
+
+/* 💙 HEADER BARU: gradient biru elegan + tombol X center align */
 #editModal .modal-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e3a8a 0%, #992626 100%);
   border-bottom: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 #editModal .modal-header h3 {
   color: white !important; 
   font-size: 26px;
+  font-weight: 700;
 }
 #editModal .modal-header button {
-  background: rgba(255,255,255,0.15); 
-  border-radius:10px; 
-  width:40px; 
-  height:40px; 
-  color:white;
-  transition: all 0.2s ease;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  width: 42px;
+  height: 42px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
 }
 #editModal .modal-header button:hover {
-  background:rgba(255,255,255,0.25); 
-  transform:rotate(90deg);
+  background: rgba(255,255,255,0.25);
+  transform: rotate(90deg);
 }
+
+/* 💙 FORM */
 #editGearForm {
-  max-height:calc(90vh - 180px); 
-  overflow-y:auto;
+  max-height: calc(90vh - 180px);
+  overflow-y: auto;
 }
 #editGearForm::-webkit-scrollbar {
-  width:8px;
+  width: 8px;
 }
 #editGearForm::-webkit-scrollbar-thumb {
-  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); 
-  border-radius:10px;
+  background: linear-gradient(135deg,#1e3a8a 0%,#992626 100%);
+  border-radius: 10px;
 }
 #editGearForm input, 
 #editGearForm textarea, 
 #editGearForm select {
-  border:2px solid #e2e8f0; 
-  border-radius:12px; 
-  padding:13px 16px;
-  font-size:15px; 
-  transition:all 0.2s ease; 
-  background:white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  background: white;
 }
 #editGearForm input:focus, 
 #editGearForm textarea:focus, 
 #editGearForm select:focus {
-  outline:none; 
-  border-color:#667eea; 
-  box-shadow:0 0 0 4px rgba(102,126,234,0.1);
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.1);
 }
+
+/* 💙 BUTTON */
 #editGearForm button[type="submit"] {
-  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-  color:white; 
-  padding:13px 28px; 
-  border-radius:12px; 
-  font-weight:600;
-  box-shadow:0 4px 12px rgba(102,126,234,0.3);
+  background: linear-gradient(135deg, #1e3a8a 0%, #992626 100%);
+  color: white;
+  padding: 13px 28px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(59,130,246,0.3);
   transition: all 0.2s ease;
 }
 #editGearForm button[type="submit"]:hover:not(:disabled) {
-  box-shadow:0 6px 20px rgba(102,126,234,0.4); 
-  transform:translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59,130,246,0.4);
+  transform: translateY(-2px);
 }
 #editGearForm button[type="submit"]:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* 💙 ERROR BOX (ubah merah → biru elegan) */
+#edit-error {
+  background: #eff6ff;
+  border-left: 4px solid #3b82f6;
+}
+#edit-error svg {
+  color: #2563eb;
+}
+#edit-error p {
+  color: #1e3a8a !important;
 }
 </style>
 
@@ -92,8 +114,9 @@
     
     <!-- Modal Box -->
     <div class="modal-container relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-auto my-8 z-10">
-      <!-- Header -->
-      <div class="modal-header flex items-center justify-between p-6">
+      
+      <!-- 💙 Header -->
+      <div class="modal-header p-6">
         <h3 class="text-2xl font-bold">✏️ Edit Gear</h3>
         <button type="button" onclick="closeEditModal()" title="Tutup">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,10 +154,10 @@
 
         <div>
           <label class="block text-sm font-semibold mb-2">Level *</label>
-          <select id="edit-level" name="level" required class="w-full">
-            <option value="beginner">🌱 Pemula</option>
-            <option value="intermediate">⚡ Menengah</option>
-            <option value="advanced">🏆 Lanjutan</option>
+            <select id="edit-level">
+              <option value="beginner">Pemula</option>
+              <option value="intermediate">Menengah</option>
+              <option value="advanced">Profesional</option>
           </select>
         </div>
 
@@ -189,13 +212,13 @@
           <p class="text-xs text-gray-500 mt-1">Pisahkan dengan koma</p>
         </div>
 
-        <!-- Error Message -->
-        <div id="edit-error" class="hidden mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+        <!-- 💙 Error Message -->
+        <div id="edit-error" class="hidden mt-4 p-4 rounded-lg">
           <div class="flex items-start">
-            <svg class="w-5 h-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-5 h-5 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
             </svg>
-            <p class="text-sm text-red-700 font-medium"></p>
+            <p class="text-sm font-medium"></p>
           </div>
         </div>
 
@@ -211,7 +234,6 @@
           </button>
         </div>
       </form>
-
     </div>
   </div>
 </div>
