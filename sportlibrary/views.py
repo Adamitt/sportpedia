@@ -8,6 +8,9 @@ import json
 from profile_app.models import ActivityLog
 from django.http import JsonResponse
 from .models import Sport, SavedSport
+from django.urls import reverse
+from metrics.utils import bump_view
+
 
 # -------------------------------------------------
 # Helpers
@@ -102,6 +105,17 @@ def show_sports(request):
 
 def sport_detail(request, sport_id):
     sport = get_object_or_404(Sport, id=sport_id)
+        # Naikkan counter untuk What's Hot
+    bump_view(
+        key=f"sport:{sport.id}",
+        title=sport.name,
+        url=reverse('sportlibrary:sport_detail', kwargs={'sport_id': sport.id}),
+        category="Library",       # konsisten
+        image="",                 # isi kalau ada cover
+        request=request,
+        dedupe_seconds=60,        # turunin dulu buat test; nanti naikkan lagi
+    )
+
 
     is_saved = False
     if request.user.is_authenticated:

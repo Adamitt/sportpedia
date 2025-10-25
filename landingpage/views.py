@@ -138,7 +138,7 @@ def _norm_cat(cat: str) -> str:
 def home(request):
     """Menampilkan halaman utama dengan section 'What's Hot'."""
     # Ambil semua kategori yang relevan
-    hot_qs = (ViewCounter.objects.filter(category__in=["Library", "Gear", "Gear Guide"]).order_by("-views", "-id")[:3])
+    hot_qs = (ViewCounter.objects.filter(category__in=["Library", "Gear", "Gear Guide"]).order_by("-views", "-last_seen")[:3])   
 
     # Siapkan map sport JSON (untuk excerpt Library)
     sports_map = {}

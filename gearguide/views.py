@@ -7,6 +7,8 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from uuid import UUID
 import traceback
+from django.urls import reverse
+from metrics.utils import bump_view
 
 from sportlibrary.models import Sport
 from profile_app.models import ActivityLog
@@ -91,6 +93,17 @@ def show_gear_detail(request, gear_id):
     try:
         gear = get_object_or_404(Gear, id=gear_id)
         _log_activity(request, gear.name)
+                # Naikkan counter untuk What's Hot
+        bump_view(
+            key=f"gear:{gear.id}",
+            title=gear.name,
+            url=reverse('gearguide:card_details', kwargs={'gear_id': gear.id}),
+            category="Gear",   # pilih salah satu dan konsisten, di home kita include keduanya
+            image=(gear.image.url if getattr(gear, "image", None) and hasattr(gear.image, "url") else (gear.image or "")),
+            request=request,
+            dedupe_seconds=60,  # turunin dulu buat test
+        )
+
         return render(request, "gearguide/card_details.html", {
             "gear": gear,
             "is_from_db": True
