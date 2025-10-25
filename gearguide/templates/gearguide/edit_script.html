@@ -1,5 +1,4 @@
 <script>
-
 (function() {
   'use strict';
 
@@ -18,6 +17,9 @@
     return token || '';
   }
 
+  // ==============================================================
+  // 🧩 OPEN MODAL — fetch data dan isi field edit
+  // ==============================================================
   window.openEditModal = async function(gearId) {
     console.log("🧩 Opening edit modal for gear:", gearId);
 
@@ -62,7 +64,18 @@
       document.getElementById('edit-name').value = g.name || '';
       document.getElementById('edit-description').value = g.description || '';
       document.getElementById('edit-sport').value = g.sport_id || '';
-      document.getElementById('edit-level').value = g.level || 'beginner';
+
+      // 🧭 MAPPING untuk isi dropdown Level
+      const levelMap = {
+        'Pemula': 'beginner',
+        'Menengah': 'intermediate',
+        'Profesional': 'advanced',
+        'beginner': 'beginner',
+        'intermediate': 'intermediate',
+        'advanced': 'advanced'
+      };
+      document.getElementById('edit-level').value = levelMap[g.level?.trim()] || 'beginner';
+
       document.getElementById('edit-price').value = g.price_range || '';
       document.getElementById('edit-function').value = g.function || '';
       
@@ -95,6 +108,9 @@
     }
   };
 
+  // ==============================================================
+  // ❌ CLOSE MODAL
+  // ==============================================================
   window.closeEditModal = function() {
     const modal = document.getElementById('editModal');
     const form = document.getElementById('editGearForm');
@@ -105,6 +121,9 @@
     if (errMsg) errMsg.classList.add('hidden');
   };
 
+  // ==============================================================
+  // 💾 HANDLE SUBMIT FORM
+  // ==============================================================
   document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('editGearForm');
     const errMsg = document.getElementById('edit-error');
@@ -120,6 +139,18 @@
 
       const gearId = document.getElementById('edit-gear-id').value;
       const formData = new FormData(form);
+
+      // 🔁 MAPPING KEBALIKAN (user → backend)
+      const levelMapReverse = {
+        'Pemula': 'beginner',
+        'Menengah': 'intermediate',
+        'Profesional': 'advanced'
+      };
+
+      const currentLevel = formData.get('level');
+      const mappedLevel = levelMapReverse[currentLevel] || currentLevel;
+      formData.set('level', mappedLevel);
+
       const csrftoken = getCSRFToken();
 
       console.log('🔑 Using CSRF token:', csrftoken ? 'Yes' : 'NO!');
@@ -150,13 +181,10 @@
 
         const contentType = res.headers.get('content-type');
         
-        // Jika bukan JSON, log full response
         if (!contentType || !contentType.includes('application/json')) {
           const text = await res.text();
-          console.error("🚨 NON-JSON RESPONSE:");
-          console.error(text.slice(0, 1000));
+          console.error("🚨 NON-JSON RESPONSE:", text.slice(0, 1000));
           
-          // Cek apakah ini redirect ke login
           if (text.includes('login') || text.includes('csrf')) {
             throw new Error('Session expired. Silakan refresh halaman dan login kembali.');
           }
@@ -170,7 +198,6 @@
         if (data.ok) {
           console.log('✅ Update berhasil!');
           
-          // Show success message
           if (errMsg) {
             errMsg.classList.remove('hidden');
             errMsg.className = 'mt-4 p-4 bg-green-50 border-l-4 border-green-500 rounded-lg';
@@ -178,12 +205,10 @@
             errMsg.querySelector('p').className = 'text-sm text-green-700 font-medium';
           }
           
-          // Reload after delay
           setTimeout(() => {
             window.location.reload();
           }, 1000);
         } else {
-          // Show error message
           const errText = data.errors 
             ? Object.values(data.errors).flat()[0]
             : data.message || 'Gagal menyimpan perubahan';
@@ -195,7 +220,6 @@
             errMsg.classList.remove('hidden');
           }
           
-          // Restore button
           submitBtn.disabled = false;
           submitBtn.innerHTML = originalText;
         }
@@ -209,7 +233,6 @@
           errMsg.classList.remove('hidden');
         }
         
-        // Restore button
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
       }
