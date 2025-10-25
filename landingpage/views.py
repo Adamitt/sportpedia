@@ -15,7 +15,7 @@ from .models import Testimonial
 from gearguide.models import Gear
 from sportlibrary.models import Sport
 import re
-
+from django.urls import reverse #cika
 # =======================================================
 #               HALAMAN UTAMA & PENCARIAN
 # =======================================================
@@ -29,7 +29,9 @@ def _normalize_terms(query):
 # --- THIS IS THE CORRECTED SEARCH VIEW ---
 def search(request):
     """Menangani logika pencarian untuk Gear dan Sport dari database DAN JSON."""
-    q = request.GET.get("q", "").strip()
+    # landingpage/views.py (di fungsi search)
+    q = (request.GET.get("q") or request.GET.get("query") or request.GET.get("search") or "").strip()
+
     terms = _normalize_terms(q)
 
     # --- 1. Load Data (Hybrid Logic from show_all_gears) ---
@@ -57,29 +59,30 @@ def search(request):
         sport_id = str(g.get("sport_id", ""))
         combined_gears.append({
             "id": g.get("id"),
-            "sport": {"name": sport_map.get(sport_id, g.get("sport", "Unknown"))}, # Embed as dict
+            "sport": {"name": sport_map.get(sport_id, g.get("sport", "Unknown"))},
             "name": g.get("name", ""),
             "description": g.get("description", ""),
             "function": g.get("function", ""),
             "level": g.get("level", ""),
             "price_range": g.get("price_range", ""),
             "image": g.get("image", ""),
-            # Add any other fields you want to search
+            "is_db": False,                    # <— TAMBAH INI
         })
 
     # ===== Dari DB =====
     for g in Gear.objects.select_related("sport").all():
         combined_gears.append({
             "id": str(g.id),
-            "sport": {"name": g.sport.name if g.sport else "Unknown"}, # Embed as dict
+            "sport": {"name": g.sport.name if g.sport else "Unknown"},
             "name": g.name or "",
             "description": g.description or "",
             "function": g.function or "",
             "level": g.get_level_display() or "",
             "price_range": g.price_range or "",
-            "image": g.image.url if g.image else "", # Handle ImageField
-            # Add any other fields you want to search
+            "image": g.image.url if getattr(g, "image", None) else "",
+            "is_db": True,                     # <— TAMBAH INI
         })
+
         
     # Load Sports from DB (for Sport search results)
     sport_results_db = Sport.objects.all()
@@ -132,9 +135,7 @@ def _norm_cat(cat: str) -> str:
 def home(request):
     """Menampilkan halaman utama dengan section 'What's Hot'."""
     # Ambil semua kategori yang relevan
-    hot_qs = (ViewCounter.objects
-              .filter(category__in=["Library", "Gear", "Gear Guide"])  # ← tambah "Gear"
-              .order_by("-views")[:3])  # boleh 3/6 sesuai layout
+    hot_qs = (ViewCounter.objects.filter(category__in=["Library", "Gear", "Gear Guide"]).order_by("-views", "-id")[:3])
 
     # Siapkan map sport JSON (untuk excerpt Library)
     sports_map = {}
