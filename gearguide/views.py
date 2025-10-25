@@ -52,23 +52,22 @@ def show_gear_detail(request, gear_id):
     base_dir = Path(__file__).resolve().parent.parent.parent
     data_path = base_dir / 'database' / 'gears.json'
 
-    # 1️⃣ Coba cari di database (UUID)
     try:
         gear = Gear.objects.get(id=gear_id)
+        _log_activity(request, gear.name)  # ✅ Tambahkan ini
         return render(request, 'gearguide/card_details.html', {'gear': gear, 'is_from_db': True})
     except Gear.DoesNotExist:
         pass
 
-    # 2️⃣ Kalau gak ketemu, cari di JSON file
     if data_path.exists():
         with open(data_path, 'r', encoding='utf-8') as f:
             gears = json.load(f)
             for g in gears:
                 if str(g.get("id")) == str(gear_id):
+                    _log_activity(request, g["name"])  # ✅ Tambahkan juga di sini
                     return render(request, 'gearguide/card_details.html', {'gear': g, 'is_from_db': False})
-
-    # 3️⃣ Kalau gak ada di dua-duanya, raise 404
     raise Http404("Gear not found.")
+
 
 
 def show_all_gears(request):
@@ -87,7 +86,6 @@ def show_all_gears(request):
     sport_map = {str(s["id"]): s["name"] for s in json_sports}
     combined_gears = []
 
-    # ===== Dari JSON =====
     for g in json_gears:
         sport_id = str(g.get("sport_id", ""))
         combined_gears.append({
@@ -107,8 +105,6 @@ def show_all_gears(request):
             "is_from_db": False,
             "owner": None,
         })
-
-    # ===== Dari DB =====
     for g in Gear.objects.select_related("sport").all():
         combined_gears.append({
             "id": str(g.id),
@@ -128,7 +124,6 @@ def show_all_gears(request):
             "owner": g.owner.username if g.owner else None,
         })
 
-    # ========== FILTER berdasarkan parameter GET ==========
     selected_sport = request.GET.get("sport", "").strip().lower()
     selected_level = request.GET.get("level", "").strip()
 
@@ -142,7 +137,6 @@ def show_all_gears(request):
             g for g in combined_gears if g["level"].lower() == selected_level.lower()
         ]
 
-    # ========== Filter view (your/all) ==========
     view_filter = request.GET.get("view", "all")
     if view_filter == "your" and request.user.is_authenticated:
         combined_gears = [g for g in combined_gears if g.get("owner") == request.user.username]
@@ -167,8 +161,6 @@ def add_gear(request):
             name = request.POST.get("name")
             description = request.POST.get("description")
             sport_input = request.POST.get("sport")
-
-            # 🧩 Coba cari sport berdasarkan ID atau nama
             sport = None
             if sport_input:
                 sport = Sport.objects.filter(id=sport_input).first()
@@ -185,7 +177,6 @@ def add_gear(request):
             care_tips = request.POST.get("care_tips")
             tags = [t.strip() for t in request.POST.get("tags", "").split(",") if t.strip()]
 
-            # 🛠️ Buat gear baru (siapa pun boleh)
             new_gear = Gear.objects.create(
             sport=sport,
             name=name,
@@ -199,18 +190,14 @@ def add_gear(request):
             materials=materials,
             care_tips=care_tips,
             tags=tags,
-            owner=request.user,  # ✅ HARUS USER IANSTANCE
+            owner=request.user, 
             )
             
-
-            # 📝 Log aktivitas
             ActivityLog.objects.create(
                 user=request.user,
                 action_type="CREATE",
                 description=f"User '{request.user.username}' menambahkan gear '{new_gear.name}'"
             )
-
-            messages.success(request, "✅ Gear berhasil ditambahkan!")
             return redirect("gearguide:show_all_gears")
 
         except Exception as e:
@@ -227,7 +214,6 @@ from django.http import JsonResponse, HttpResponseForbidden
 def edit_gear(request, gear_id):
     gear = get_object_or_404(Gear, id=gear_id)
 
-    # 🧠 Cek hak akses
     if not (request.user.is_staff or request.user.is_superuser or gear.owner == request.user.username):
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
             return JsonResponse({"ok": False, "message": "❌ Hanya admin atau pemilik gear yang dapat mengedit gear ini."}, status=403)
@@ -259,18 +245,17 @@ def edit_gear(request, gear_id):
 
 
 @login_required
-@csrf_exempt  # biar request fetch tanpa form masih diterima
+@csrf_exempt
 def delete_gear(request, gear_id):
     gear = get_object_or_404(Gear, id=gear_id)
 
-    # ❌ Kalau bukan admin/superuser
+
     if not (request.user.is_staff or request.user.is_superuser):
         return JsonResponse({
             "ok": False,
             "message": "❌ Hanya admin yang dapat menghapus gear."
         }, status=403)
 
-    # ✅ Kalau admin
     if request.method == "POST":
         gear_name = gear.name
         gear.delete()

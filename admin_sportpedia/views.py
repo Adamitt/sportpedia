@@ -17,7 +17,6 @@ def dashboard(request):
     total_gears = Gear.objects.count()
     total_sports = Sport.objects.count()
 
-    # Tambahan: hitung gear dari JSON
     base_dir = Path(__file__).resolve().parent.parent
     data_path = base_dir / 'database' / 'gears.json'
     json_gears_count = 0
@@ -40,10 +39,8 @@ def manage_gear(request):
     base_dir = Path(__file__).resolve().parent.parent
     data_path = base_dir / 'database' / 'gears.json'
 
-    # 1️⃣ Ambil semua gear dari DB
     db_gears = list(Gear.objects.select_related('sport').all())
 
-    # 2️⃣ Ambil semua gear dari JSON
     json_gears = []
     if data_path.exists():
         try:
@@ -70,17 +67,9 @@ def manage_gear(request):
         except Exception as e:
             print(f"⚠️ Gagal baca gears.json: {e}")
 
-    # 3️⃣ Format DB gears biar match
     formatted_db_gears = []
     for g in db_gears:
-        # 🔥 DEBUGGING - Print ke console
-        print(f"🔍 Gear: {g.name}")
-        print(f"   - ID: {g.id}")
-        print(f"   - Has 'user' attr?: {hasattr(g, 'user')}")
-        print(f"   - Has 'owner' attr?: {hasattr(g, 'owner')}")
-        print(f"   - Has 'created_by' attr?: {hasattr(g, 'created_by')}")
         
-        # Coba berbagai kemungkinan field name
         owner_username = None
         if hasattr(g, 'user') and g.user:
             owner_username = g.user.username
@@ -107,13 +96,7 @@ def manage_gear(request):
         print(f"   - Final owner value: {owner_username}")
         print("---")
 
-    # 4️⃣ Gabungkan semuanya
     all_gears = formatted_db_gears + json_gears
-    
-    # 🔥 Print current user
-    print(f"🔥 Current user: {request.user.username}")
-    print(f"🔥 Is staff?: {request.user.is_staff}")
-    print(f"🔥 Is superuser?: {request.user.is_superuser}")
 
     return render(request, 'gear_app/manage_gear.html', {'gears': all_gears})
 
@@ -153,7 +136,6 @@ def add_gear(request):
                 tags=tags,
             )
 
-            # Log activity (opsional)
             ActivityLog.objects.create(
                 user=request.user,
                 action_type='ADMIN_CREATE',
@@ -222,7 +204,6 @@ def manage_library(request):
     """Lists all sports for admin management."""
     sports = Sport.objects.all().order_by('name') # Order alphabetically
     return render(request, 'library/manage_library.html', {'sports': sports})
-    return render(request, 'gear_app/manage_gear.html', {'gears': gears})
 
 @user_passes_test(admin_only, login_url='/accounts/login/')
 def add_sport(request):
@@ -234,32 +215,25 @@ def add_sport(request):
         description = request.POST.get('description')
         history = request.POST.get('history')
 
-        # ✅ versi parse_json_list yang aman dan fleksibel
         import json
         def parse_json_list(text):
             if not text:
                 return []
             try:
-                # Kalau user kirim string JSON (misal: '["rule1","rule2"]')
                 data = json.loads(text)
                 if isinstance(data, list):
                     return [str(item).strip() for item in data if str(item).strip()]
             except json.JSONDecodeError:
-                # Kalau bukan JSON valid, pisahkan pakai koma
                 return [item.strip() for item in text.split(',') if item.strip()]
             return []
 
         try:
-            # 🔥 FIX: Get max ID from database and set next ID manually
             sports_objects = Sport.objects.all()
             id_sports=[int(sport.id) for sport in sports_objects]
             id_sports.sort()
             max_id = id_sports[-1] if id_sports else 0
             next_id = int(max_id or 0) + 1
             
-            print(f"🔍 Debug: Max ID = {max_id}, Next ID = {next_id}")  # Debug
-            
-            # Create sport with manual ID
             new_sport = Sport(
                 id=next_id,
                 name=name,
