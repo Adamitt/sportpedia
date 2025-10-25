@@ -2,29 +2,24 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.urls import reverse
 from uuid import UUID
 import json
 import traceback
 from pathlib import Path
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
-
-from metrics.utils import bump_view
 from sportlibrary.models import Sport
 from profile_app.models import ActivityLog
 from .models import Gear
 
 
 def admin_only(user):
-    """Hanya admin/staff yang lolos"""
     return user.is_staff or user.is_superuser
 
 
 def _log_activity(request, gear_name):
-    """Log user activity if authenticated"""
     if request.user.is_authenticated:
         ActivityLog.objects.create(
             user=request.user,

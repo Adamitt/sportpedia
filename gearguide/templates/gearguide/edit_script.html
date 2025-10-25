@@ -1,22 +1,11 @@
 <script>
-  // --- Ambil CSRF token dari cookie ---
-// ==========================================
-// SCRIPT EDIT GEAR - CLEAN VERSION
-// ==========================================
-
-// ==========================================
-// SCRIPT EDIT GEAR - DEBUG VERSION
-// ==========================================
 
 (function() {
   'use strict';
 
-  // Ambil CSRF token dengan lebih robust
   function getCSRFToken() {
-    // Coba dari input hidden
     let token = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
     
-    // Kalau gak ada, coba dari cookie
     if (!token) {
       const cookieValue = document.cookie
         .split('; ')
@@ -29,7 +18,6 @@
     return token || '';
   }
 
-  // ==================== OPEN MODAL ====================
   window.openEditModal = async function(gearId) {
     console.log("🧩 Opening edit modal for gear:", gearId);
 
@@ -107,7 +95,6 @@
     }
   };
 
-  // ==================== CLOSE MODAL ====================
   window.closeEditModal = function() {
     const modal = document.getElementById('editModal');
     const form = document.getElementById('editGearForm');
@@ -118,7 +105,6 @@
     if (errMsg) errMsg.classList.add('hidden');
   };
 
-  // ==================== FORM SUBMIT ====================
   document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('editGearForm');
     const errMsg = document.getElementById('edit-error');
