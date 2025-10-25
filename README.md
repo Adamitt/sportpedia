@@ -24,8 +24,7 @@
 ---
 
 ## 🧩 1. Cerita Aplikasi  
-
-Banyak orang memiliki keinginan terpendam untuk mencoba olahraga baru, entah itu bulu tangkis, tenis, panahan, yoga, atau bahkan wall climbing. Namun, keinginan ini seringkali terhenti oleh satu pertanyaan besar yang bercabang:  
+Banyak orang memiliki keinginan terpendam untuk mencoba olahraga baru, entah itu bulu tangkis, tenis, panahan, yoga, atau bahkan wall climbing. Namun, keinginan ini seringkali terhenti oleh satu pertanyaan besar yang bercabang: 
 **"Harus mulai dari mana?"**
 
 Ketidaktahuan ini menciptakan penghalang yang besar. Mereka tidak tahu aturan dasarnya, teknik paling fundamental, atau istilah-istilah umum yang digunakan. Lebih jauh lagi, kebingungan terbesar seringkali datang saat memilih peralatan. Apa saja yang wajib dibeli? Merek apa yang bagus untuk pemula? Berapa anggaran yang harus disiapkan agar tidak salah beli?  
@@ -69,11 +68,11 @@ Platform **SportPedia** dilengkapi dengan beberapa fitur inti berikut:
 
 ### 🏠 **1. Modul Beranda & Navigasi Utama**
 **Fitur-Fitur:**
-- Hero Section: menampilkan tagline *“Gerbang Olahragamu. Langkah Pertama Menuju Arena.”*  
-- Search Bar: memudahkan pengguna mencari olahraga secara langsung.  
-- Kategori Populer: menampilkan olahraga yang paling sering diakses.  
-- Highlight Mingguan: menampilkan konten olahraga yang sedang trending.  
-- Navigasi Cepat: tombol menuju Pustaka, Video, Gear Guide, Forum, dan Profil.  
+- Hero Section: menampilkan tagline *“Satu langkah ke arena, Seribu peluang beraksi"*  
+- Search Bar: memudahkan pengguna mencari olahraga dan alat secara langsung.  
+- Kategori Populer: menampilkan laman yang paling sering diakses.  
+- Navigasi Cepat: tombol menuju Pustaka, Video, Gear Guide, Forum, dan Profil. 
+- Testimoni: menampilkan testimoni pengguna setelah menggunakan website ini.   
 
 ---
 
@@ -84,8 +83,9 @@ Modul ini berfungsi sebagai pusat informasi utama yang berisi kumpulan pengetahu
 **Fitur-Fitur:**
 - Daftar Olahraga: ditampilkan dalam bentuk kartu interaktif.  
 - Filter dan Sortir: berdasarkan kategori olahraga, tingkat kesulitan, atau jenis aktivitas (indoor/outdoor).  
-- Halaman Detail: berisi sejarah singkat, aturan dasar, teknik fundamental, dan link menuju video tutorial.  
-- Bookmark Olahraga: pengguna dapat menyimpan olahraga yang ingin dipelajari.  
+- Halaman Detail: berisi sejarah singkat, aturan dasar, dan teknik fundamental.
+- Bookmark Olahraga: pengguna dapat menyimpan olahraga yang diminati/dipelajari.  
+- Admin page : bisa mengedit dan mengubah tampilan dari pustaka olahraga
 
 ---
 
@@ -94,9 +94,8 @@ Modul ini berfungsi sebagai pusat informasi utama yang berisi kumpulan pengetahu
 Modul ini menyediakan video pembelajaran untuk setiap cabang olahraga. Video dikurasi dan disusun berdasarkan tingkat kesulitan agar mudah dipahami oleh pemula.  
 
 **Fitur-Fitur:**
-- Katalog Video: kumpulan video tutorial dengan thumbnail dan deskripsi singkat.  
-- Filter Video: berdasarkan olahraga atau tingkat kesulitan.  
-- Pemutar Video Terintegrasi: pengguna dapat menonton video langsung di platform.  
+- Katalog Video: kumpulan video tutorial dengan thumbnail dan deskripsi singkat serta bisa mengarah ke aplikasi Youtube.  
+- Filter Video: berdasarkan olahraga atau tingkat kesulitan.   
 - Komentar & Rating: memberi ruang pengguna untuk memberi umpan balik pada video.  
 
 ---
@@ -120,7 +119,6 @@ Modul ini menjadi ruang diskusi dan interaksi antar pengguna SportPedia. Penggun
 
 **Fitur-Fitur:**
 - Forum Diskusi: pengguna dapat membuat topik baru atau membalas diskusi.  
-- Q&A Corner: wadah tanya jawab langsung antar pengguna atau pelatih tamu.  
 - Sistem Like & Balasan: mendukung interaksi sosial antar pengguna.  
 - Highlight Komunitas: menampilkan kisah inspiratif atau diskusi paling aktif.  
 
@@ -128,7 +126,7 @@ Modul ini menjadi ruang diskusi dan interaksi antar pengguna SportPedia. Penggun
 
 ### 👤 **6. Modul Profil & Perjalanan Olahraga**
 **Deskripsi:**  
-Modul ini berfungsi untuk menampilkan data pengguna, aktivitas yang telah dilakukan, serta perkembangan belajar olahraga. Didesain agar pengguna dapat melacak kemajuan mereka secara visual dan termotivasi untuk terus berlatih.
+Modul ini berfungsi untuk menampilkan data pengguna, aktivitas yang telah dilakukan, serta perkembangan belajar olahraga. Didesain agar pengguna dapat melacak kemajuan mereka secara visual dan termotivasi untuk terus berlatih. 
 
 **Fitur-Fitur:**
 - Profil Pengguna: berisi identitas dasar, olahraga favorit, dan preferensi pengguna.
