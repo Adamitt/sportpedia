@@ -52,20 +52,20 @@ def search(request):
     # Combine all gears into one list of dictionaries
     combined_gears = []
 
-    # ===== Dari JSON =====
-    for g in json_gears:
-        sport_id = str(g.get("sport_id", ""))
-        combined_gears.append({
-            "id": g.get("id"),
-            "sport": {"name": sport_map.get(sport_id, g.get("sport", "Unknown"))}, # Embed as dict
-            "name": g.get("name", ""),
-            "description": g.get("description", ""),
-            "function": g.get("function", ""),
-            "level": g.get("level", ""),
-            "price_range": g.get("price_range", ""),
-            "image": g.get("image", ""),
-            # Add any other fields you want to search
-        })
+    # # ===== Dari JSON =====
+    # for g in json_gears:
+    #     sport_id = str(g.get("sport_id", ""))
+    #     combined_gears.append({
+    #         "id": g.get("id"),
+    #         "sport": {"name": sport_map.get(sport_id, g.get("sport", "Unknown"))}, # Embed as dict
+    #         "name": g.get("name", ""),
+    #         "description": g.get("description", ""),
+    #         "function": g.get("function", ""),
+    #         "level": g.get("level", ""),
+    #         "price_range": g.get("price_range", ""),
+    #         "image": g.get("image", ""),
+    #         # Add any other fields you want to search
+    #     })
 
     # ===== Dari DB =====
     for g in Gear.objects.select_related("sport").all():
@@ -77,7 +77,7 @@ def search(request):
             "function": g.function or "",
             "level": g.get_level_display() or "",
             "price_range": g.price_range or "",
-            "image": g.image.url if g.image else "", # Handle ImageField
+            "image": g.image or "", # Handle ImageField
             # Add any other fields you want to search
         })
         
