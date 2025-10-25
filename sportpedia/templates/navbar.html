@@ -67,7 +67,7 @@
 
     <div class="flex justify-center gap-10 py-3 text-base font-semibold text-gray-800">
       <a href="{% url 'sportlibrary:show_sports' %}" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Sports Library</a>
-      <a href="/forum/" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Community</a>
+      <a href="{% url 'sportforum:show_forum' %}" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Community</a>
       <a href="{% url 'gearguide:show_all_gears' %}" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Gear Guide</a>
       <a href="/videos/" class="hover:text-blue-900 pb-1 border-b-4 border-transparent hover:border-blue-900 transition-all duration-200">Video Gallery</a>
       {% if request.user.is_staff or request.user.is_superuser %}
