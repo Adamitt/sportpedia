@@ -96,7 +96,7 @@
                         type="text" 
                         name="tags" 
                         id="{{ form.tags.id_for_label }}"
-                        value="{{ form.tags.value|default:'' }}"
+                        value="{{ initial_tags|default:'' }}"
                         class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                         placeholder="e.g., technique, equipment, training">
                     <p class="mt-1 text-sm text-gray-500">Separate tags with commas</p>
