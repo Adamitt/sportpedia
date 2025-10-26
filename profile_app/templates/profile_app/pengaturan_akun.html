@@ -54,11 +54,16 @@
            <div class="space-y-4">
             <div>
               <label for="foto_profil" class="block text-sm font-medium text-gray-700 mb-1">Foto Profil</label>
-              <input type="file" id="foto_profil" name="foto_profil" accept="image/*"
-                     class="block w-full text-sm text-gray-500 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition duration-150 ease-in-out">
-              {% if profile.foto_profil %}
-                <p class="mt-1 text-xs text-gray-500">File saat ini: <a href="{{ profile.foto_profil.url }}" target="_blank" class="text-indigo-600 hover:underline">{{ profile.foto_profil.name|truncatechars:30 }}</a></p>
-              {% endif %}
+              <input type="url" id="foto_profil" name="foto_profil"
+                placeholder="https://contoh.com/foto.jpg"
+                value="{{ profile.foto_profil|default:'' }}"
+                class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out sm:text-sm">
+            {% if profile.foto_profil %}
+            <p class="mt-1 text-xs text-gray-500">
+                Gambar saat ini: <a href="{{ profile.foto_profil }}" target="_blank" class="text-indigo-600 hover:underline">{{ profile.foto_profil|truncatechars:40 }}</a>
+            </p>
+            {% endif %}
+
             </div>
             <div>
               <label for="olahraga_favorit" class="block text-sm font-medium text-gray-700 mb-1">Olahraga Favorit</label>

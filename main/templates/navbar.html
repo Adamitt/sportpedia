@@ -1,5 +1,4 @@
 {% load static %}
-<<<<<<< HEAD
 <nav class="bg-white shadow-md sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-6 lg:px-12">
 
@@ -16,7 +15,7 @@
 
       <!-- Search Bar -->
       <div class="hidden md:flex flex-grow max-w-2xl mx-8">
-        <form action="/search/" method="get" class="w-full relative">
+        <form action="{% url 'landingpage:search' %}" method="get" class="w-full relative">
           <input 
             type="text" 
             name="q"
@@ -66,61 +65,3 @@
 
   </div>
 </nav>
-=======
-<nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-8 py-4">
-        <div class="flex items-center justify-between">
-            <!-- Logo -->
-            <div class="flex items-center gap-3">
-                <img src="{% static 'images/sportpedia_logo.png' %}" alt="SportPedia Logo" class="w-12 h-12 rounded-lg">
-                <span class="text-xl font-bold" style="color: #1E3A5F;">SPORTPEDIA</span>
-            </div>
-
-            <!-- Navigation Menu -->
-            <div class="hidden md:flex items-center gap-8">
-                <a href="/sportlibrary/" class="text-gray-700 hover:text-[#1E3A5F] font-medium transition-colors">Sports Library</a>
-                <a href="/community/" class="text-gray-700 hover:text-[#1E3A5F] font-medium transition-colors">Community</a>
-                <a href="/gearguide/" class="text-gray-700 hover:text-[#1E3A5F] font-medium transition-colors">Gear Guide</a>
-                <a href="{% url 'videos:gallery' %}" class="font-medium transition-colors {% if request.resolver_match.url_name == 'gallery' %}text-[#1E3A5F]{% else %}text-gray-700 hover:text-[#1E3A5F]{% endif %}">Video Gallery</a>
-            </div>
-
-            <!-- Right side - Search, Notification, Profile -->
-            <div class="flex items-center gap-4">
-                <!-- Search Button -->
-                <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    <i data-lucide="search" class="h-5 w-5 text-gray-600"></i>
-                </button>
-                
-                <!-- Notification Button -->
-                <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    <i data-lucide="bell" class="h-5 w-5 text-gray-600"></i>
-                </button>
-                
-                <!-- Profile Dropdown -->
-                {% if user.is_authenticated %}
-                <div class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors">
-                    <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-200">
-                        {% if user.profile_picture %}
-                            <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="w-full h-full object-cover">
-                        {% else %}
-                            <div class="w-full h-full flex items-center justify-center text-white font-semibold" style="background-color: #1E3A5F;">
-                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="hidden lg:block">
-                        <div class="text-sm font-semibold text-gray-800">{{ user.get_full_name }}</div>
-                        <div class="text-xs text-gray-500">{{ user.email }}</div>
-                    </div>
-                    <i data-lucide="chevron-down" class="h-4 w-4 text-gray-600"></i>
-                </div>
-                {% else %}
-                <!-- Login/Register buttons if not authenticated -->
-                <a href="/login/" class="text-gray-700 hover:text-[#1E3A5F] font-medium transition-colors">Sign in</a>
-                <a href="/register/" class="bg-[#1E3A5F] text-white px-6 py-2.5 rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-md">Sign up</a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</nav>
->>>>>>> origin/kalista

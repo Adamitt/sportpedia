@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="min-h-screen bg-gray-50">
-  
+
   <!-- Breadcrumb -->
   <div class="bg-white border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-6 lg:px-8 py-4">
@@ -20,13 +20,13 @@
   </div>
 
   <div class="max-w-7xl mx-auto px-6 lg:px-8 py-10">
-    
+
     <!-- Main Product Section -->
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-10">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
-        
+
         <!-- Left: Product Image -->
-        <div class="space-y-4">
+        <div>
           <div class="bg-gradient-to-br from-gray-100 to-gray-50 rounded-2xl overflow-hidden border-2 border-gray-200 aspect-square flex items-center justify-center">
             {% if gear.image %}
               <img src="{{ gear.image }}" alt="{{ gear.name }}" class="w-full h-full object-cover">
@@ -39,57 +39,50 @@
               </div>
             {% endif %}
           </div>
-
-          <!-- Image Gallery Placeholder -->
-          <div class="grid grid-cols-4 gap-3">
-            <div class="aspect-square bg-gray-100 rounded-lg border-2 border-blue-900"></div>
-            <div class="aspect-square bg-gray-100 rounded-lg border border-gray-200 hover:border-blue-900 cursor-pointer transition-colors"></div>
-            <div class="aspect-square bg-gray-100 rounded-lg border border-gray-200 hover:border-blue-900 cursor-pointer transition-colors"></div>
-            <div class="aspect-square bg-gray-100 rounded-lg border border-gray-200 hover:border-blue-900 cursor-pointer transition-colors"></div>
-          </div>
+          <!-- 4 placeholder thumbnails dihapus -->
         </div>
 
         <!-- Right: Product Details -->
         <div class="space-y-6">
-          
+
           <!-- Title & Category -->
           <div>
-            <div class="flex items-center gap-3 mb-3">
+            <div class="flex items-center gap-3 mb-3 flex-wrap">
               <span class="bg-blue-100 text-blue-900 text-sm font-bold px-4 py-1.5 rounded-full">
                 {{ gear.sport|default:"Sport Equipment" }}
               </span>
               <span class="bg-green-100 text-green-800 text-sm font-semibold px-4 py-1.5 rounded-full">
-                ✓ In Stock
+                In Stock
               </span>
+              {% if gear.tags %}
+                {% for tag in gear.tags %}
+                  <span class="bg-gray-100 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full">
+                    #{{ tag }}
+                  </span>
+                {% endfor %}
+              {% endif %}
             </div>
             <h1 class="text-4xl font-extrabold text-gray-900 mb-2">{{ gear.name }}</h1>
 
             {% if gear.is_from_db %}
-                {% if gear.owner %}
-                  <p class="text-sm text-gray-500 mt-1">Added by <span class="font-semibold">@{{ gear.owner }}</span></p>
-                {% else %}
-                  <p class="text-sm text-gray-500 mt-1">Added by <span class="font-semibold">Anonymous User</span></p>
-                {% endif %}
+              {% if gear.owner %}
+                <p class="text-sm text-gray-500 mt-1">Added by <span class="font-semibold">@{{ gear.owner }}</span></p>
               {% else %}
-                <p class="text-sm text-gray-500 mt-1">From <span class="font-semibold text-blue-900">SportPedia Collection</span></p>
+                <p class="text-sm text-gray-500 mt-1">Added by <span class="font-semibold">Anonymous User</span></p>
               {% endif %}
+            {% else %}
+              <p class="text-sm text-gray-500 mt-1">From <span class="font-semibold text-blue-900">SportPedia Collection</span></p>
+            {% endif %}
           </div>
 
           <!-- Rating -->
           <div class="flex items-center gap-4 py-3 border-y border-gray-200">
             <div class="flex items-center gap-1">
-              <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-              </svg>
-              <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-              </svg>
-              <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-              </svg>
-              <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-              </svg>
+              {% for i in "1234" %}
+                <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                  <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                </svg>
+              {% endfor %}
               <svg class="w-5 h-5 text-gray-300 fill-current" viewBox="0 0 20 20">
                 <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
               </svg>
@@ -118,10 +111,18 @@
                 <span class="text-green-600 mt-1">✓</span>
                 <span class="text-gray-700">Level: <strong class="text-gray-900">{{ gear.level|default:"Semua Level" }}</strong></span>
               </li>
+              {% if gear.function %}
               <li class="flex items-start gap-3">
                 <span class="text-green-600 mt-1">✓</span>
-                <span class="text-gray-700">Material berkualitas tinggi dan tahan lama</span>
+                <span class="text-gray-700">Fungsi: <strong class="text-gray-900">{{ gear.function }}</strong></span>
               </li>
+              {% endif %}
+              {% if gear.materials %}
+              <li class="flex items-start gap-3">
+                <span class="text-green-600 mt-1">✓</span>
+                <span class="text-gray-700">Material: <strong class="text-gray-900">{{ gear.materials }}</strong></span>
+              </li>
+              {% endif %}
               <li class="flex items-start gap-3">
                 <span class="text-green-600 mt-1">✓</span>
                 <span class="text-gray-700">Desain ergonomis untuk performa maksimal</span>
@@ -135,8 +136,9 @@
 
           <!-- CTA Buttons -->
           <div class="space-y-3 pt-4">
-            {% if gear.buy_link %}
-              <a href="{{ gear.buy_link }}" target="_blank" class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-blue-900 to-blue-800 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-blue-800 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+            {% if gear.ecommerce_link %}
+              <a href="{{ gear.ecommerce_link }}" target="_blank"
+                 class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-blue-900 to-blue-800 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-blue-800 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
@@ -146,12 +148,6 @@
                 </svg>
               </a>
             {% endif %}
-            <button class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 text-gray-900 px-8 py-4 rounded-xl font-bold text-lg hover:border-blue-900 hover:text-blue-900 transition-all">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-              </svg>
-              Tambah ke Wishlist
-            </button>
           </div>
 
           <!-- Trust Badges -->
@@ -184,24 +180,55 @@
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-10">
       <div class="border-b border-gray-200">
         <div class="flex">
-          <button class="px-8 py-4 font-bold text-blue-900 border-b-4 border-blue-900">Deskripsi</button>
-          <button class="px-8 py-4 font-semibold text-gray-600 hover:text-gray-900 transition-colors">Spesifikasi</button>
-          <button class="px-8 py-4 font-semibold text-gray-600 hover:text-gray-900 transition-colors">Reviews (128)</button>
+          <button onclick="showTab('description')" id="tab-description" class="px-8 py-4 font-bold text-blue-900 border-b-4 border-blue-900">Deskripsi</button>
+          <button onclick="showTab('specifications')" id="tab-specifications" class="px-8 py-4 font-semibold text-gray-600 hover:text-gray-900 transition-colors">Spesifikasi</button>
+          <button onclick="showTab('reviews')" id="tab-reviews" class="px-8 py-4 font-semibold text-gray-600 hover:text-gray-900 transition-colors">Reviews (128)</button>
         </div>
       </div>
-      <div class="p-8">
+
+      <!-- Tab: Deskripsi -->
+      <div id="content-description" class="p-8">
         <h2 class="text-2xl font-bold text-gray-900 mb-4">Tentang Produk Ini</h2>
         <div class="prose max-w-none text-gray-700 space-y-4 leading-relaxed">
           <p>{{ gear.description }}</p>
+
+          {% if gear.function %}
+          <div class="bg-blue-50 border-l-4 border-blue-900 p-4 rounded-r-lg my-4">
+            <h4 class="font-bold text-blue-900 mb-1">Fungsi Utama:</h4>
+            <p class="text-gray-800">{{ gear.function }}</p>
+          </div>
+          {% endif %}
+
           <p>Perlengkapan olahraga ini dirancang khusus untuk memberikan performa terbaik dalam setiap latihan dan kompetisi. Dibuat dari material berkualitas tinggi yang telah teruji oleh atlet profesional di berbagai negara.</p>
-          <p>Dengan desain ergonomis dan teknologi terkini, produk ini memberikan kenyamanan maksimal dan daya tahan yang luar biasa. Cocok untuk pemula hingga atlet profesional yang menginginkan peralatan terbaik untuk mencapai target mereka.</p>
-          
+
+          {% if gear.recommended_brands %}
+          <div class="bg-purple-50 border-l-4 border-purple-600 p-4 rounded-r-lg my-4">
+            <h4 class="font-bold text-purple-900 mb-1">Brand Rekomendasi:</h4>
+            <p class="text-gray-800">
+              {% for b in gear.recommended_brands|slice:"::-1"|slice:"1:" %}
+                {{ b }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </p>
+          </div>
+          {% endif %}
+
           <h3 class="text-xl font-bold text-gray-900 mt-6 mb-3">Keunggulan Produk:</h3>
           <ul class="space-y-2">
+            {% if gear.materials %}
+            <li class="flex items-start gap-3">
+              <span class="text-blue-900 font-bold">•</span>
+              <span>Terbuat dari
+                {% for m in gear.materials|slice:"::-1"|slice:"1:" %}
+                  {{ m }}{% if not forloop.last %} dan {% endif %}
+                {% endfor %}
+                berkualitas premium</span>
+            </li>
+            {% else %}
             <li class="flex items-start gap-3">
               <span class="text-blue-900 font-bold">•</span>
               <span>Material premium yang tahan lama dan mudah perawatan</span>
             </li>
+            {% endif %}
             <li class="flex items-start gap-3">
               <span class="text-blue-900 font-bold">•</span>
               <span>Desain modern yang tetap fungsional dan nyaman digunakan</span>
@@ -215,82 +242,97 @@
               <span>Sudah memenuhi standar internasional untuk keamanan dan kualitas</span>
             </li>
           </ul>
+
+          {% if gear.care_tips %}
+          <div class="bg-green-50 border-l-4 border-green-600 p-4 rounded-r-lg my-4">
+            <h4 class="font-bold text-green-900 mb-2">Tips Perawatan:</h4>
+            <div class="text-gray-800">{{ gear.care_tips|linebreaks }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Tab: Spesifikasi -->
+      <div id="content-specifications" class="p-8 hidden">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Spesifikasi Produk</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-500 mb-1">Nama Produk</h3>
+            <p class="text-lg font-bold text-gray-900">{{ gear.name }}</p>
+          </div>
+          <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-500 mb-1">Kategori Olahraga</h3>
+            <p class="text-lg font-bold text-gray-900">{{ gear.sport|default:"Sport Equipment" }}</p>
+          </div>
+          <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-500 mb-1">Level Pengguna</h3>
+            <p class="text-lg font-bold text-gray-900">{{ gear.level|default:"Semua Level"|capfirst }}</p>
+
+          </div>
+          {% if gear.materials %}
+          <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-500 mb-1">Material</h3>
+            <p class="text-lg font-bold text-gray-900">
+              {% for m in gear.materials|slice:"::-1"|slice:"1:" %}
+                {{ m }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </p>
+          </div>
+          {% endif %}
+          {% if gear.function %}
+          <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-500 mb-1">Fungsi Utama</h3>
+            <p class="text-lg font-bold text-gray-900">{{ gear.function }}</p>
+          </div>
+          {% endif %}
+          <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-500 mb-1">Harga Range</h3>
+            <p class="text-lg font-bold text-gray-900">{{ gear.price_range|default:"Rp 500.000 - Rp 2.000.000" }}</p>
+          </div>
+          {% if gear.recommended_brands %}
+          <div class="border border-gray-200 rounded-lg p-4 md:col-span-2">
+            <h3 class="text-sm font-semibold text-gray-500 mb-1">Brand Rekomendasi</h3>
+            <p class="text-lg font-bold text-gray-900">
+              {% for b in gear.recommended_brands|slice:"::-1"|slice:"1:" %}
+                {{ b }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Tab: Reviews -->
+      <div id="content-reviews" class="p-8 hidden">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
+        <div class="space-y-6">
+          <div class="border-b border-gray-200 pb-6">
+            <div class="flex items-center gap-4 mb-3">
+              <div class="flex items-center gap-1">
+                {% for i in "12345" %}<svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>{% endfor %}
+              </div>
+              <span class="font-bold text-gray-900">Budi Santoso</span>
+              <span class="text-sm text-gray-500">2 minggu yang lalu</span>
+            </div>
+            <p class="text-gray-700">Produk berkualitas tinggi! Sangat puas dengan pembelian ini. Material terasa premium dan nyaman digunakan.</p>
+          </div>
+
+          <div class="border-b border-gray-200 pb-6">
+            <div class="flex items-center gap-4 mb-3">
+              <div class="flex items-center gap-1">
+                {% for i in "1234" %}<svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>{% endfor %}
+                <svg class="w-5 h-5 text-gray-300 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+              </div>
+              <span class="font-bold text-gray-900">Siti Rahayu</span>
+              <span class="text-sm text-gray-500">1 bulan yang lalu</span>
+            </div>
+            <p class="text-gray-700">Recommended! Sesuai dengan deskripsi dan harga worth it banget.</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Recommended Products -->
-    <div class="mb-10">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-3xl font-extrabold text-gray-900">Produk Rekomendasi</h2>
-        <a href="/gearguide/" class="text-blue-900 font-semibold hover:text-blue-700 flex items-center gap-2">
-          Lihat Semua
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-          </svg>
-        </a>
-      </div>
-      
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Recommended Card 1 -->
-        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
-          <div class="bg-gradient-to-br from-blue-100 to-indigo-100 h-48 flex items-center justify-center">
-            <svg class="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-            </svg>
-          </div>
-          <div class="p-4">
-            <h3 class="font-bold text-gray-900 mb-2">Sepatu Lari Pro</h3>
-            <p class="text-sm text-gray-600 mb-3">Rp 1.200.000 - Rp 2.500.000</p>
-            <a href="#" class="text-sm font-semibold text-blue-900 hover:text-blue-700">Lihat Detail →</a>
-          </div>
-        </div>
-
-        <!-- Recommended Card 2 -->
-        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
-          <div class="bg-gradient-to-br from-green-100 to-teal-100 h-48 flex items-center justify-center">
-            <svg class="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-            </svg>
-          </div>
-          <div class="p-4">
-            <h3 class="font-bold text-gray-900 mb-2">Raket Badminton Elite</h3>
-            <p class="text-sm text-gray-600 mb-3">Rp 800.000 - Rp 1.800.000</p>
-            <a href="#" class="text-sm font-semibold text-blue-900 hover:text-blue-700">Lihat Detail →</a>
-          </div>
-        </div>
-
-        <!-- Recommended Card 3 -->
-        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
-          <div class="bg-gradient-to-br from-purple-100 to-pink-100 h-48 flex items-center justify-center">
-            <svg class="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-            </svg>
-          </div>
-          <div class="p-4">
-            <h3 class="font-bold text-gray-900 mb-2">Bola Basket Premium</h3>
-            <p class="text-sm text-gray-600 mb-3">Rp 300.000 - Rp 900.000</p>
-            <a href="#" class="text-sm font-semibold text-blue-900 hover:text-blue-700">Lihat Detail →</a>
-          </div>
-        </div>
-
-        <!-- Recommended Card 4 -->
-        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
-          <div class="bg-gradient-to-br from-orange-100 to-red-100 h-48 flex items-center justify-center">
-            <svg class="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-            </svg>
-          </div>
-          <div class="p-4">
-            <h3 class="font-bold text-gray-900 mb-2">Jersey Training Set</h3>
-            <p class="text-sm text-gray-600 mb-3">Rp 250.000 - Rp 600.000</p>
-            <a href="#" class="text-sm font-semibold text-blue-900 hover:text-blue-700">Lihat Detail →</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FAQ Section -->
+    <!-- FAQ Section (sama lebar dengan tab) -->
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-10">
       <div class="p-8">
         <h2 class="text-3xl font-extrabold text-gray-900 mb-6 flex items-center gap-3">
@@ -334,4 +376,23 @@
 
   </div>
 </div>
+
+<script>
+function showTab(tabName) {
+  document.getElementById('content-description').classList.add('hidden');
+  document.getElementById('content-specifications').classList.add('hidden');
+  document.getElementById('content-reviews').classList.add('hidden');
+
+  document.getElementById('tab-description').classList.remove('text-blue-900','border-b-4','border-blue-900');
+  document.getElementById('tab-description').classList.add('text-gray-600');
+  document.getElementById('tab-specifications').classList.remove('text-blue-900','border-b-4','border-blue-900');
+  document.getElementById('tab-specifications').classList.add('text-gray-600');
+  document.getElementById('tab-reviews').classList.remove('text-blue-900','border-b-4','border-blue-900');
+  document.getElementById('tab-reviews').classList.add('text-gray-600');
+
+  document.getElementById('content-' + tabName).classList.remove('hidden');
+  document.getElementById('tab-' + tabName).classList.remove('text-gray-600');
+  document.getElementById('tab-' + tabName).classList.add('text-blue-900','border-b-4','border-blue-900');
+}
+</script>
 {% endblock %}

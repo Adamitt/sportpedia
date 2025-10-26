@@ -1,342 +1,39 @@
-from django.urls import reverse #
-from metrics.utils import bump_view #
-from django.conf import settings #
-import json
-from pathlib import Path
-from uuid import UUID
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden, Http404
 from django.views.decorators.http import require_http_methods
-from .models import Gear
-from .forms import GearForm
-from sportlibrary.models import Sport
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from uuid import UUID
+import traceback
+
+from sportlibrary.models import Sport
 from profile_app.models import ActivityLog
+from .models import Gear
 
 
-# ======================= DETAIL VIEW =======================
-def show_gear_detail(request, gear_id):
-    gear = get_object_or_404(Gear, id=gear_id)
+# ==============================================================
+# HELPER FUNCTIONS
+# ==============================================================
 
-    # ✅ catat view (gear dari DB)
-    key = f"gear:{gear.id}"
-    url = reverse("gearguide:card_details", kwargs={"gear_id": str(gear.id)})
-    bump_view(
-        key,
-        title=gear.name,
-        url=url,
-        category="Gear Guide",
-        image=(gear.image or ""),
-        request=request,
-    )
-
-    context = {
-        "title": gear.name,
-        "gear": gear,
-    }
-    return render(request, "gearguide/gear_detail.html", context)
+def admin_only(user):
+    """Cek user admin/superuser"""
+    return user.is_staff or user.is_superuser
 
 
-# ======================= SHOW ALL GEARS =======================
-def show_all_gears(request):
-    db_gears = list(Gear.objects.select_related('sport').all())
-
-    BASE_DIR = Path(__file__).resolve().parent.parent.parent
-    data_path = BASE_DIR / 'database' / 'gears.json'
-
-    json_gears = []
-    if data_path.exists():
-        with open(data_path, 'r', encoding='utf-8') as file:
-            json_gears = json.load(file)
-    # 2️⃣ Ambil dari JSON
-    data_path = settings.BASE_DIR / 'database' / 'gears.json'
-    with open(data_path, 'r', encoding='utf-8') as file:
-        json_gears = json.load(file)
-
-    combined_gears = []
-
-    # === JSON ITEMS ===
-    for g in json_gears:
-        sport_id = str(g.get("sport_id"))
-        sport_name = sport_map.get(sport_id, g.get("sport", "Unknown"))
-
-        combined_gears.append({
-            "id": g.get("id"),  # Tetap integer untuk JSON
-            "sport": sport_name,
-            "name": g.get("name"),
-            "function": g.get("function"),
-            "description": g.get("description"),
-            "level": g.get("level"),
-            "price_range": g.get("price_range"),
-            "recommended_brands": g.get("recommended_brands", []),
-            "materials": g.get("materials", []),
-            "care_tips": g.get("care_tips", ""),
-            "buy_link": g.get("buy_link", ""),
-            "tags": g.get("tags", []),
-            "image": g.get("image", ""),
-            "is_from_db": False,
-            "owner": None,
-        })
-
-    # === DB ITEMS ===
-    for g in db_gears:
-        combined_gears.append({
-            "id": g.id,  # ✅ UUID object langsung, bukan string!
-            "sport": g.sport.name if g.sport else "Unknown",
-            "name": g.name,
-            "function": g.function,
-            "description": g.description,
-            "level": g.get_level_display(),
-            "price_range": g.price_range,
-            "recommended_brands": g.recommended_brands or [],
-            "materials": g.materials or [],
-            "care_tips": g.care_tips,
-            "buy_link": g.ecommerce_link,
-            "tags": g.tags or [],
-            "image": g.image or "",
-            "is_from_db": True,
-            "owner": (
-                g.owner.username if hasattr(g, "owner") and g.owner
-                else "Anonymous"
-            ),
-        })
-
-    # === FILTERS ===
-    sport_filter = request.GET.get('sport')
-    level_filter = request.GET.get('level')
-    view_filter = request.GET.get('view', 'all')
-
-    if sport_filter:
-        combined_gears = [
-            g for g in combined_gears
-            if sport_filter.lower() == str(g.get("sport", "")).lower()
-        ]
-
-    if level_filter:
-        combined_gears = [
-            g for g in combined_gears
-            if g.get("level", "").lower() == level_filter.lower()
-        ]
-
-    if view_filter == "your":
-        if request.user.is_authenticated:
-            combined_gears = [
-                g for g in combined_gears
-                if g["is_from_db"] and g.get("owner") == request.user.username
-            ]
-        else:
-            combined_gears = []
-
-    # === Dropdown dari sports.json ===
-    sports = sorted(set(s['name'] for s in json_sports if s.get('name')))
-    
-    # ✅ all_sports untuk modal edit
-    all_sports_list = []
-    
-    # Dari DB
-    for sport in Sport.objects.all():
-        all_sports_list.append({
-            'id': str(sport.id),
-            'name': sport.name
-        })
-    
-    # Dari JSON (yang belum ada di DB)
-    db_sport_ids = [str(s.id) for s in Sport.objects.all()]
-    for s in json_sports:
-        if str(s['id']) not in db_sport_ids:
-            all_sports_list.append({
-                'id': str(s['id']),
-                'name': s['name']
-            })
-
-    return render(request, "gearguide/gearguide.html", {
-        "title": "Gear Guide",
-        "gears": combined_gears,
-        "sports": sports,
-        "all_sports": all_sports_list,
-        "view_filter": view_filter,
-    })
-
-
-# ======================= CARD DETAILS =======================
-# ======================= CARD DETAILS =======================
-def card_details(request, gear_id):
-    try:
-        _ = UUID(str(gear_id))
-        gear = Gear.objects.select_related('sport').filter(id=gear_id).first()
-        if gear:
-            context = {
-                "title": gear.name,
-                "gear": {
-                    "id": str(gear.id),
-                    "sport": gear.sport.name if gear.sport else "Unknown",
-                    "name": gear.name,
-                    "function": gear.function,
-                    "description": gear.description,
-                    "level": gear.get_level_display(),
-                    "price_range": gear.price_range,
-                    "recommended_brands": gear.recommended_brands or [],
-                    "materials": gear.materials or [],
-                    "care_tips": gear.care_tips,
-                    "buy_link": gear.ecommerce_link,
-                    "tags": gear.tags or [],
-                    "image": gear.image or "",
-                    "is_from_db": True
-                }
-            }
-
-            # ✅ catat view (gear dari DB)
-            key = f"gear:{gear.id}"
-            url = reverse("gearguide:card_details", kwargs={"gear_id": str(gear.id)})
-            bump_view(
-                key,
-                title=gear.name,
-                url=url,
-                category="Gear Guide",
-                image=(gear.image or ""),
-                request=request,
-            )
-
-            return render(request, "gearguide/card_details.html", context)
-    except ValueError:
-        pass
-
-    base_dir = Path(__file__).resolve().parent.parent.parent
-    data_path = base_dir / 'database' / 'gears.json'
-    # 2) Cek JSON
-    data_path = settings.BASE_DIR / 'database' / 'gears.json'     
-    with open(data_path, 'r', encoding='utf-8') as file:
-        gears = json.load(file)
-
-    gear = next((g for g in gears if str(g['id']) == str(gear_id)), None)
-    if not gear:
-        return render(request, "404.html", status=404)
-
-    # ⭐ Ambil nama sport dari database berdasarkan sport_id
-    sport_name = "Unknown"
-    sport_id = gear.get("sport_id")
-    if sport_id:
-        try:
-            sport_obj = Sport.objects.get(id=sport_id)
-            sport_name = sport_obj.name
-        except Sport.DoesNotExist:
-            sport_name = gear.get("sport", "Unknown")
-    else:
-        sport_name = gear.get("sport", "Unknown")
-
-    gear['is_from_db'] = False
-    gear['sport'] = sport_name
-
-    # ✅ catat view (gear dari JSON)
-    key = f"gearjson:{gear['id']}"
-    url = reverse("gearguide:card_details", kwargs={"gear_id": str(gear['id'])})
-    bump_view(
-        key,
-        title=gear["name"],
-        url=url,
-        category="Gear Guide",
-        image=gear.get("image", ""),
-        request=request,
-    )
-
+def _log_activity(request, gear_name):
+    """Log aktivitas user"""
     if request.user.is_authenticated:
         ActivityLog.objects.create(
-        user=request.user,
-        action_type='MODULE_ACCESS',
-        description=f"Mengakses Gear: {gear.get('name', 'Olahraga Tidak Dikenal')}"
+            user=request.user,
+            action_type="MODULE_ACCESS",
+            description=f"Mengakses Gear: {gear_name}"
         )
 
-    context = {"title": gear["name"], "gear": gear}
-    return render(request, "gearguide/card_details.html", context)
 
-
-# ======================= ADD GEAR =======================
-@login_required(login_url='login')
-def add_gear(request):
-    if request.method == "POST":
-        form = GearForm(request.POST)
-        if form.is_valid():
-            gear = form.save(commit=False)  # ✅ Belum save ke DB
-            
-            # ✅ Ambil sport dari form (string ID)
-            sport_value = form.cleaned_data.get("sport")
-
-            # 🧩 Konversi string ID ke Sport instance
-            if isinstance(sport_value, str):
-                from uuid import UUID
-                sport_obj = None
-
-                # 1️⃣ Coba parse sebagai UUID (dari DB)
-                try:
-                    sport_uuid = UUID(sport_value)
-                    sport_obj = Sport.objects.filter(id=sport_uuid).first()
-                except ValueError:
-                    pass  # Bukan UUID, mungkin ID dari JSON
-
-                # 2️⃣ Kalau belum ketemu, cari di JSON berdasarkan ID
-                if not sport_obj:
-                    base_dir = Path(__file__).resolve().parent.parent.parent
-                    sports_path = base_dir / "database" / "sports.json"
-                    try:
-                        with open(sports_path, "r", encoding="utf-8") as f:
-                            sports_json = json.load(f)
-                            sport_name = None
-                            for s in sports_json:
-                                if str(s["id"]) == str(sport_value):
-                                    sport_name = s["name"]
-                                    break
-                            if sport_name:
-                                # Cari di DB berdasarkan nama
-                                sport_obj = Sport.objects.filter(name__iexact=sport_name).first()
-                                if not sport_obj:
-                                    # Buat baru otomatis
-                                    sport_obj = Sport.objects.create(
-                                        name=sport_name,
-                                        category=s.get("category", "Umum"),
-                                        difficulty=s.get("difficulty", "Menengah"),
-                                        description=s.get("description", "Generated otomatis dari JSON."),
-                                        history=s.get("history", "Tidak tersedia."),
-                                    )
-                    except Exception as e:
-                        print(f"⚠️ Gagal membaca sports.json: {e}")
-
-                gear.sport = sport_obj
-            else:
-                gear.sport = sport_value
-
-            # Simpan owner dan gear
-            gear.owner = request.user
-            gear.save()
-
-            messages.success(request, f"✅ Gear '{gear.name}' berhasil ditambahkan di kategori {gear.sport.name}!")
-            return redirect("gearguide:show_all_gears")
-        else:
-            messages.error(request, "⚠️ Gagal menambahkan gear. Periksa kembali input kamu.")
-    else:
-        form = GearForm()
-
-    return render(request, "gearguide/add_gear.html", {"form": form})
-
-
-
-# ======================= DELETE GEAR =======================
-@login_required(login_url='login')
-@require_http_methods(["POST"])
-def delete_gear(request, gear_id):
-    gear = get_object_or_404(Gear, id=gear_id)
-    if hasattr(gear, "owner") and gear.owner != request.user:
-        messages.error(request, "🚫 Kamu tidak punya izin untuk menghapus gear ini.")
-        return redirect("gearguide:show_all_gears")
-
-    name = gear.name
-    gear.delete()
-    messages.success(request, f"🗑️ Gear '{name}' berhasil dihapus.")
-    return redirect("gearguide:show_all_gears")
-
-
-# ======================= AJAX HELPERS =======================
-def _gear_to_json(gear: Gear):
+def _gear_to_json(gear):
+    """Convert Gear model ke dict buat AJAX"""
     return {
         "id": str(gear.id),
         "sport_id": str(gear.sport.id) if gear.sport else None,
@@ -345,7 +42,7 @@ def _gear_to_json(gear: Gear):
         "function": gear.function or "",
         "description": gear.description or "",
         "level": gear.level,
-        "level_display": gear.get_level_display(),
+        "level_display": gear.get_level_display() if hasattr(gear, "get_level_display") else gear.level,
         "price_range": gear.price_range or "",
         "recommended_brands": gear.recommended_brands or [],
         "materials": gear.materials or [],
@@ -353,145 +50,191 @@ def _gear_to_json(gear: Gear):
         "ecommerce_link": gear.ecommerce_link or "",
         "tags": gear.tags or [],
         "image": gear.image or "",
+        "owner": gear.owner.username if gear.owner else None,
     }
 
 
-# ======================= AJAX GET =======================
+# ==============================================================
+# MAIN VIEWS
+# ==============================================================
+
+def show_all_gears(request):
+    gears = Gear.objects.select_related("sport").all()
+    all_sports = Sport.objects.all().order_by("name")
+
+    # filter sport
+    selected_sport = request.GET.get("sport", "").strip().lower()
+    if selected_sport:
+        gears = [g for g in gears if g.sport and g.sport.name.lower() == selected_sport]
+
+    # filter level
+    selected_level = request.GET.get("level", "").strip().lower()
+    if selected_level:
+        gears = [g for g in gears if g.level.lower() == selected_level]
+
+    # filter: your gears
+    view_filter = request.GET.get("view", "all")
+    if view_filter == "your" and request.user.is_authenticated:
+        gears = [g for g in gears if g.owner and g.owner.username == request.user.username]
+
+    context = {
+        "gears": gears,
+        "all_sports": all_sports,
+        "view_filter": view_filter,
+        "title": "Gear Guide"
+    }
+    return render(request, "gearguide/gearguide.html", context)
+
+
+def show_gear_detail(request, gear_id):
+    """Tampilkan detail gear (langsung dari DB)"""
+    try:
+        gear = get_object_or_404(Gear, id=gear_id)
+        _log_activity(request, gear.name)
+        return render(request, "gearguide/card_details.html", {
+            "gear": gear,
+            "is_from_db": True
+        })
+    except Exception:
+        raise Http404("Gear tidak ditemukan.")
+
+
+# ==============================================================
+# CRUD FUNCTIONS
+# ==============================================================
+
+@login_required(login_url="/accounts/login/")
+def add_gear(request):
+    """Tambah gear baru (user-generated)"""
+    sports = Sport.objects.all()
+
+    if request.method == "POST":
+        try:
+            name = request.POST.get("name")
+            description = request.POST.get("description")
+            sport_input = request.POST.get("sport")
+            sport = None
+            if sport_input:
+                sport = Sport.objects.filter(id=sport_input).first() or \
+                        Sport.objects.filter(name__iexact=sport_input).first()
+
+            new_gear = Gear.objects.create(
+                sport=sport,
+                name=name,
+                description=description,
+                function=request.POST.get("function"),
+                image=request.POST.get("image"),
+                price_range=request.POST.get("price_range"),
+                ecommerce_link=request.POST.get("ecommerce_link"),
+                level=request.POST.get("level") or "beginner",
+                recommended_brands=[b.strip() for b in request.POST.get("recommended_brands", "").split(",") if b.strip()],
+                materials=[m.strip() for m in request.POST.get("materials", "").split(",") if m.strip()],
+                care_tips=request.POST.get("care_tips"),
+                tags=[t.strip() for t in request.POST.get("tags", "").split(",") if t.strip()],
+                owner=request.user
+            )
+
+            ActivityLog.objects.create(
+                user=request.user,
+                action_type="CREATE",
+                description=f"User '{request.user.username}' menambahkan gear '{new_gear.name}'"
+            )
+            messages.success(request, f"✅ Gear '{new_gear.name}' berhasil ditambahkan!")
+            return redirect("gearguide:show_all_gears")
+
+        except Exception as e:
+            traceback.print_exc()
+            messages.error(request, f"❌ Gagal menambahkan gear: {e}")
+
+    return render(request, "gear_app/gear_form.html", {"sports": sports, "edit_mode": False})
+
+
+@login_required
+def edit_gear(request, gear_id):
+    """Edit gear (hanya admin atau pemilik)"""
+    gear = get_object_or_404(Gear, id=gear_id)
+
+    if not (request.user.is_staff or request.user.is_superuser or gear.owner == request.user):
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"ok": False, "message": "❌ Hanya admin atau pemilik gear yang dapat mengedit gear ini."}, status=403)
+        return HttpResponseForbidden("❌ Kamu tidak punya izin untuk mengedit gear ini.")
+
+    if request.method == "POST":
+        try:
+            sport_id = request.POST.get("sport")
+            sport = Sport.objects.filter(id=sport_id).first() if sport_id else None
+
+            gear.name = request.POST.get("name")
+            gear.description = request.POST.get("description")
+            gear.function = request.POST.get("function")
+            gear.sport = sport
+            gear.image = request.POST.get("image")
+            gear.price_range = request.POST.get("price_range")
+            gear.ecommerce_link = request.POST.get("ecommerce_link")
+            gear.level = request.POST.get("level")
+            gear.recommended_brands = [b.strip() for b in request.POST.get("recommended_brands", "").split(",") if b.strip()]
+            gear.materials = [m.strip() for m in request.POST.get("materials", "").split(",") if m.strip()]
+            gear.care_tips = request.POST.get("care_tips")
+            gear.tags = [t.strip() for t in request.POST.get("tags", "").split(",") if t.strip()]
+            gear.save()
+
+            ActivityLog.objects.create(
+                user=request.user,
+                action_type="UPDATE",
+                description=f"User '{request.user.username}' mengedit gear '{gear.name}'"
+            )
+            return JsonResponse({"ok": True, "message": "✅ Gear berhasil diperbarui!"})
+
+        except Exception as e:
+            return JsonResponse({"ok": False, "message": f"❌ Gagal memperbarui gear: {e}"}, status=400)
+
+    return JsonResponse({"ok": False, "message": "❌ Metode tidak valid."}, status=405)
+
+
+@login_required
+@csrf_exempt
+def delete_gear(request, gear_id):
+    """Hapus gear (hanya admin/superuser)"""
+    gear = get_object_or_404(Gear, id=gear_id)
+
+    if not (request.user.is_staff or request.user.is_superuser):
+        return JsonResponse({"ok": False, "message": "❌ Hanya admin yang dapat menghapus gear."}, status=403)
+
+    if request.method == "POST":
+        gear_name = gear.name
+        gear.delete()
+
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type="DELETE",
+            description=f"Admin '{request.user.username}' menghapus gear '{gear_name}'"
+        )
+
+        return JsonResponse({"ok": True, "message": f"🗑️ Gear '{gear_name}' berhasil dihapus!"})
+
+    return JsonResponse({"ok": False, "message": "❌ Metode tidak valid."}, status=405)
+
+
+# ==============================================================
+# AJAX / JSON API
+# ==============================================================
+
 @require_http_methods(["GET"])
 def get_gear_json(request, gear_id):
-    from uuid import UUID
-    from pathlib import Path
-    import json
-
-    # 1️⃣ Ambil dari DB dulu
+    """Endpoint buat ambil data gear via AJAX"""
     try:
-        try:
-            gear = get_object_or_404(Gear, id=UUID(gear_id))
-        except ValueError:
-            gear = get_object_or_404(Gear, id=gear_id)
+        gear = Gear.objects.filter(id=gear_id).first()
+        if not gear:
+            return JsonResponse({"ok": False, "error": "Gear tidak ditemukan."}, status=404)
 
-        data = {
-            "id": str(gear.id),
-            "name": gear.name,
-            "function": gear.function,
-            "description": gear.description,
-            "level": gear.level,
-            "price_range": gear.price_range,
-            "recommended_brands": gear.recommended_brands or [],
-            "materials": gear.materials or [],
-            "care_tips": gear.care_tips,
-            "buy_link": gear.buy_link,
-            "tags": gear.tags or [],
-            "image": gear.image.url if gear.image else "",
-            "is_from_db": True,
-        }
+        data = _gear_to_json(gear)
+        data.update({
+            "recommended_brands_text": ", ".join(data["recommended_brands"]),
+            "materials_text": ", ".join(data["materials"]),
+            "tags_text": ", ".join(data["tags"]),
+        })
         return JsonResponse({"ok": True, "data": data}, status=200)
 
-    except Exception:
-        # 2️⃣ Fallback ke JSON file (kalau belum ada di DB)
-        base_dir = Path(__file__).resolve().parent.parent.parent
-        data_path = base_dir / 'database' / 'gears.json'
-        if data_path.exists():
-            with open(data_path, 'r', encoding='utf-8') as f:
-                gears = json.load(f)
-                gear = next((g for g in gears if str(g["id"]) == str(gear_id)), None)
-                if gear:
-                    return JsonResponse({"ok": True, "data": gear}, status=200)
-        return JsonResponse({"ok": False, "error": "Gear tidak ditemukan."}, status=404)
-
-
-
-
-
-
-# ======================= AJAX EDIT =======================
-@login_required(login_url='login')
-@require_http_methods(["POST"])
-def edit_gear_ajax(request, gear_id):
-    from uuid import UUID
-    
-    try:
-        uuid_id = UUID(gear_id)
-        gear = get_object_or_404(Gear, id=uuid_id)
-        
-        if hasattr(gear, "owner") and gear.owner != request.user:
-            return JsonResponse({
-                "ok": False,
-                "message": "🚫 Kamu tidak punya izin untuk mengedit gear ini.",
-                "errors": {"general": ["Kamu tidak punya izin untuk mengedit gear ini."]}
-            }, status=403)
-    except ValueError:
-        return JsonResponse({
-            "ok": False,
-            "message": "❌ Gear dari JSON tidak bisa diedit.",
-            "errors": {"general": ["Hanya gear yang dibuat user yang bisa diedit."]}
-        }, status=400)
     except Exception as e:
-        return JsonResponse({
-            "ok": False,
-            "message": "❌ Gear tidak ditemukan.",
-            "errors": {"general": [f"Gear tidak ditemukan: {str(e)}"]}
-        }, status=404)
-
-    form = GearForm(request.POST, instance=gear)
-    if form.is_valid():
-        try:
-            gear = form.save(commit=False)
-            
-            # Handle sport conversion (sama kayak di add_gear)
-            sport_value = form.cleaned_data.get("sport")
-            if isinstance(sport_value, str):
-                sport_obj = None
-                try:
-                    sport_uuid = UUID(sport_value)
-                    sport_obj = Sport.objects.filter(id=sport_uuid).first()
-                except ValueError:
-                    pass
-
-                if not sport_obj:
-                    base_dir = Path(__file__).resolve().parent.parent.parent
-                    sports_path = base_dir / "database" / "sports.json"
-                    try:
-                        with open(sports_path, "r", encoding="utf-8") as f:
-                            sports_json = json.load(f)
-                            sport_name = None
-                            for s in sports_json:
-                                if str(s["id"]) == str(sport_value):
-                                    sport_name = s["name"]
-                                    break
-                            if sport_name:
-                                sport_obj = Sport.objects.filter(name__iexact=sport_name).first()
-                                if not sport_obj:
-                                    sport_obj = Sport.objects.create(
-                                        name=sport_name,
-                                        category=s.get("category", "Umum"),
-                                        difficulty=s.get("difficulty", "Menengah"),
-                                        description=s.get("description", "Generated otomatis dari JSON."),
-                                        history=s.get("history", "Tidak tersedia."),
-                                    )
-                    except Exception as e:
-                        print(f"⚠️ Gagal membaca sports.json: {e}")
-
-                gear.sport = sport_obj
-            
-            gear.save()
-            updated = _gear_to_json(gear)
-            return JsonResponse({
-                "ok": True, 
-                "message": f"✏️ Gear '{gear.name}' berhasil diperbarui!",
-                "data": updated
-            }, status=200)
-        except Exception as e:
-            return JsonResponse({
-                "ok": False,
-                "message": "❌ Gagal menyimpan gear.",
-                "errors": {"general": [f"Gagal menyimpan: {str(e)}"]}
-            }, status=500)
-
-    errors_dict = {field: [str(err) for err in errs] for field, errs in form.errors.items()}
-    return JsonResponse({
-        "ok": False, 
-        "message": "⚠️ Periksa kembali input kamu.",
-        "errors": errors_dict
-    }, status=400)
-
+        traceback.print_exc()
+        return JsonResponse({"ok": False, "error": str(e)}, status=500)

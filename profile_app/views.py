@@ -30,7 +30,8 @@ def pengaturan_akun(request):
         new_password = request.POST.get('password')
         olahraga_favorit = request.POST.get('olahraga_favorit')
         preferensi = request.POST.get('preferensi')
-        foto = request.FILES.get('foto_profil')
+        # foto = request.FILES.get('foto_profil')
+        foto_url = request.POST.get('foto_profil')
 
         # --- Update User ---
         if email and email != user.email:
@@ -48,8 +49,8 @@ def pengaturan_akun(request):
         # --- Update Profile ---
         profile.olahraga_favorit = olahraga_favorit
         profile.preferensi = preferensi
-        if foto:
-            profile.foto_profil = foto
+        if foto_url:
+            profile.foto_profil = foto_url
         profile.save()
 
         return redirect('profile_app:profile_page')

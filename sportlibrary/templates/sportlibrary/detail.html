@@ -30,30 +30,6 @@
     .stagger-1 { animation-delay: 0.1s; } .stagger-2 { animation-delay: 0.2s; } .stagger-3 { animation-delay: 0.3s; } .stagger-4 { animation-delay: 0.4s; } .stagger-5 { animation-delay: 0.5s; } .stagger-6 { animation-delay: 0.6s; }
   </style>
   
-  {# --- Add JS Variables (ONLY if user is logged in) --- #}
-  {% if request.user.is_authenticated %}
-  <script>
-      // Make sure sport.id from JSON is treated as a number if needed
-      window.SPORT_ID = parseInt("{{ sport.id }}", 10); 
-      window.UPDATE_PROGRESS_URL = "{% url 'sportlibrary:update_progress' sport.id %}";
-      // Function to get CSRF token (needed if NOT using @csrf_exempt on view)
-      function getCookie(name) {
-          let cookieValue = null;
-          if (document.cookie && document.cookie !== '') {
-              const cookies = document.cookie.split(';');
-              for (let i = 0; i < cookies.length; i++) {
-                  const cookie = cookies[i].trim();
-                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                      break;
-                  }
-              }
-          }
-          return cookieValue;
-      }
-      window.CSRF_TOKEN = getCookie('csrftoken'); 
-  </script>
-  {% endif %}
 {% endblock %}
 
 

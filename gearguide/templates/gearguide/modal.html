@@ -1,16 +1,13 @@
-<!-- ================================ -->
-<!-- MODAL EDIT GEAR (Final Version FIXED) -->
-<!-- ================================ -->
 <style>
 #editModal {
   backdrop-filter: none;
 }
-#editModal .fixed.inset-0.bg-black\/50 {
+#editModal .modal-overlay {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   background: rgba(0, 0, 0, 0.55) !important;
 }
-#editModal .bg-white {
+#editModal .modal-container {
   animation: modalSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
 }
@@ -18,44 +15,110 @@
   from {opacity: 0; transform: translateY(30px) scale(0.95);}
   to {opacity: 1; transform: translateY(0) scale(1);}
 }
-#editModal .border-b {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+/* 💙 HEADER BARU: gradient biru elegan + tombol X center align */
+#editModal .modal-header {
+  background: linear-gradient(135deg, #1e3a8a 0%, #992626 100%);
   border-bottom: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-#editModal .border-b h3 {color: white !important; font-size: 26px;}
-#editModal .border-b button {background: rgba(255,255,255,0.15); border-radius:10px; width:40px; height:40px; color:white;}
-#editModal .border-b button:hover {background:rgba(255,255,255,0.25); transform:rotate(90deg);}
-#editGearForm {max-height:calc(90vh - 180px); overflow-y:auto;}
-#editGearForm::-webkit-scrollbar {width:8px;}
-#editGearForm::-webkit-scrollbar-thumb {background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); border-radius:10px;}
-#editGearForm input, #editGearForm textarea, #editGearForm select {
-  border:2px solid #e2e8f0; border-radius:12px; padding:13px 16px;
-  font-size:15px; transition:all 0.2s ease; background:white;
+#editModal .modal-header h3 {
+  color: white !important; 
+  font-size: 26px;
+  font-weight: 700;
 }
-#editGearForm input:focus, #editGearForm textarea:focus, #editGearForm select:focus {
-  outline:none; border-color:#667eea; box-shadow:0 0 0 4px rgba(102,126,234,0.1);
+#editModal .modal-header button {
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  width: 42px;
+  height: 42px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
 }
+#editModal .modal-header button:hover {
+  background: rgba(255,255,255,0.25);
+  transform: rotate(90deg);
+}
+
+/* 💙 FORM */
+#editGearForm {
+  max-height: calc(90vh - 180px);
+  overflow-y: auto;
+}
+#editGearForm::-webkit-scrollbar {
+  width: 8px;
+}
+#editGearForm::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,#1e3a8a 0%,#992626 100%);
+  border-radius: 10px;
+}
+#editGearForm input, 
+#editGearForm textarea, 
+#editGearForm select {
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  background: white;
+}
+#editGearForm input:focus, 
+#editGearForm textarea:focus, 
+#editGearForm select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.1);
+}
+
+/* 💙 BUTTON */
 #editGearForm button[type="submit"] {
-  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-  color:white; padding:13px 28px; border-radius:12px; font-weight:600;
-  box-shadow:0 4px 12px rgba(102,126,234,0.3);
+  background: linear-gradient(135deg, #1e3a8a 0%, #992626 100%);
+  color: white;
+  padding: 13px 28px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+  transition: all 0.2s ease;
 }
-#editGearForm button[type="submit"]:hover {
-  box-shadow:0 6px 20px rgba(102,126,234,0.4); transform:translateY(-2px);
+#editGearForm button[type="submit"]:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(59,130,246,0.4);
+  transform: translateY(-2px);
+}
+#editGearForm button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 💙 ERROR BOX (ubah merah → biru elegan) */
+#edit-error {
+  background: #eff6ff;
+  border-left: 4px solid #3b82f6;
+}
+#edit-error svg {
+  color: #2563eb;
+}
+#edit-error p {
+  color: #1e3a8a !important;
 }
 </style>
 
 <div id="editModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
   <div class="flex items-center justify-center min-h-screen px-4">
     <!-- Overlay -->
-    <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeEditModal()"></div>
+    <div class="modal-overlay fixed inset-0 transition-opacity" onclick="closeEditModal()"></div>
     
     <!-- Modal Box -->
-    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-auto my-8 z-10">
-      <!-- Header -->
-      <div class="flex items-center justify-between p-6 border-b">
+    <div class="modal-container relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-auto my-8 z-10">
+      
+      <!-- 💙 Header -->
+      <div class="modal-header p-6">
         <h3 class="text-2xl font-bold">✏️ Edit Gear</h3>
-        <button onclick="closeEditModal()">
+        <button type="button" onclick="closeEditModal()" title="Tutup">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -65,21 +128,23 @@
       <!-- Form -->
       <form id="editGearForm" class="p-6 space-y-4">
         {% csrf_token %}
-        <input type="hidden" id="edit-gear-id">
+        <input type="hidden" id="edit-gear-id" name="id">
 
         <div>
-          <label class="block text-sm font-semibold">Nama Gear *</label>
-          <input id="edit-name" type="text" required class="w-full">
+          <label class="block text-sm font-semibold mb-2">Nama Gear *</label>
+          <input id="edit-name" name="name" type="text" required 
+                 class="w-full" placeholder="Contoh: Sepatu Lari Nike">
         </div>
 
         <div>
-          <label class="block text-sm font-semibold">Deskripsi</label>
-          <textarea id="edit-description" rows="3" class="w-full"></textarea>
+          <label class="block text-sm font-semibold mb-2">Deskripsi</label>
+          <textarea id="edit-description" name="description" rows="3" 
+                    class="w-full" placeholder="Jelaskan tentang gear ini..."></textarea>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold">Kategori Olahraga *</label>
-          <select id="edit-sport" required class="w-full">
+          <label class="block text-sm font-semibold mb-2">Kategori Olahraga *</label>
+          <select id="edit-sport" name="sport" required class="w-full">
             <option value="">Pilih Kategori</option>
             {% for s in all_sports %}
             <option value="{{ s.id }}">{{ s.name }}</option>
@@ -88,65 +153,83 @@
         </div>
 
         <div>
-          <label class="block text-sm font-semibold">Level *</label>
-          <select id="edit-level" required class="w-full">
-            <option value="beginner">🌱 Pemula</option>
-            <option value="intermediate">⚡ Menengah</option>
-            <option value="advanced">🏆 Lanjutan</option>
+          <label class="block text-sm font-semibold mb-2">Level *</label>
+            <select id="edit-level">
+              <option value="beginner">Pemula</option>
+              <option value="intermediate">Menengah</option>
+              <option value="advanced">Profesional</option>
           </select>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold">Harga</label>
-          <input id="edit-price" type="text" placeholder="Rp 500.000 - Rp 1.000.000" class="w-full">
+          <label class="block text-sm font-semibold mb-2">Harga</label>
+          <input id="edit-price" name="price_range" type="text" 
+                 class="w-full" placeholder="Rp 500.000 - Rp 1.000.000">
         </div>
 
         <div>
-          <label class="block text-sm font-semibold">Fungsi</label>
-          <input id="edit-function" type="text" class="w-full">
+          <label class="block text-sm font-semibold mb-2">Fungsi</label>
+          <input id="edit-function" name="function" type="text" 
+                 class="w-full" placeholder="Untuk lari jarak jauh">
         </div>
 
         <div>
-          <label class="block text-sm font-semibold">Brand Rekomendasi</label>
-          <input id="edit-brands" type="text" placeholder="Nike, Adidas, Puma" class="w-full">
+          <label class="block text-sm font-semibold mb-2">Brand Rekomendasi</label>
+          <input id="edit-brands" name="recommended_brands" type="text" 
+                 class="w-full" placeholder="Nike, Adidas, Puma">
+          <p class="text-xs text-gray-500 mt-1">Pisahkan dengan koma</p>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold">Material</label>
-          <input id="edit-materials" type="text" placeholder="Kulit, Mesh, Rubber" class="w-full">
+          <label class="block text-sm font-semibold mb-2">Material</label>
+          <input id="edit-materials" name="materials" type="text" 
+                 class="w-full" placeholder="Kulit, Mesh, Rubber">
+          <p class="text-xs text-gray-500 mt-1">Pisahkan dengan koma</p>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold">Link Beli</label>
-          <input id="edit-buy" type="url" placeholder="https://tokopedia.com/..." class="w-full">
+          <label class="block text-sm font-semibold mb-2">Link Beli</label>
+          <input id="edit-buy" name="ecommerce_link" type="url" 
+                 class="w-full" placeholder="https://tokopedia.com/...">
         </div>
 
         <div>
-          <label class="block text-sm font-semibold">URL Gambar</label>
-          <input id="edit-image" type="url" placeholder="https://example.com/image.jpg" class="w-full">
+          <label class="block text-sm font-semibold mb-2">URL Gambar</label>
+          <input id="edit-image" name="image" type="url" 
+                 class="w-full" placeholder="https://example.com/image.jpg">
         </div>
 
         <div>
-          <label class="block text-sm font-semibold">Tips Perawatan</label>
-          <textarea id="edit-care" rows="2" class="w-full"></textarea>
+          <label class="block text-sm font-semibold mb-2">Tips Perawatan</label>
+          <textarea id="edit-care" name="care_tips" rows="2" 
+                    class="w-full" placeholder="Bersihkan setelah digunakan..."></textarea>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold">Tags</label>
-          <input id="edit-tags" type="text" placeholder="premium, outdoor, waterproof" class="w-full">
+          <label class="block text-sm font-semibold mb-2">Tags</label>
+          <input id="edit-tags" name="tags" type="text" 
+                 class="w-full" placeholder="premium, outdoor, waterproof">
+          <p class="text-xs text-gray-500 mt-1">Pisahkan dengan koma</p>
         </div>
 
-        <!-- Error Message -->
-        <div id="edit-error" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p class="text-sm text-red-600 font-medium"></p>
+        <!-- 💙 Error Message -->
+        <div id="edit-error" class="hidden mt-4 p-4 rounded-lg">
+          <div class="flex items-start">
+            <svg class="w-5 h-5 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+            <p class="text-sm font-medium"></p>
+          </div>
         </div>
 
         <!-- Buttons -->
-        <div class="mt-6 flex justify-end gap-3">
-          <button type="button" onclick="closeEditModal()" class="px-6 py-2.5 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50">
+        <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <button type="button" onclick="closeEditModal()" 
+                  class="px-6 py-2.5 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
             Batal
           </button>
-          <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 shadow-md">
+          <button type="submit" 
+                  class="px-6 py-2.5 rounded-lg font-semibold shadow-md transition-all">
             💾 Simpan Perubahan
           </button>
         </div>
@@ -154,51 +237,3 @@
     </div>
   </div>
 </div>
-
-<script>
-async function openEditModal(gearId) {
-  console.log("🧩 openEditModal gearId =", gearId);
-
-  const modal = document.querySelector('#editModal');
-  if (!modal) {
-    console.error("❌ #editModal not found in DOM!");
-    return;
-  }
-
-  try {
-    const res = await fetch(`/gearguide/get-gear-json/${gearId}/`);
-    const data = await res.json();
-    console.log("📦 Fetched data:", data);
-
-    if (data.ok && data.data) {
-      const g = data.data;
-      document.querySelector('#edit-gear-id').value = g.id || "";
-      document.querySelector('#edit-name').value = g.name || "";
-      document.querySelector('#edit-description').value = g.description || "";
-      document.querySelector('#edit-sport').value = g.sport_id || "";
-      document.querySelector('#edit-level').value = g.level || "";
-      document.querySelector('#edit-price').value = g.price_range || "";
-      document.querySelector('#edit-function').value = g.function || "";
-      document.querySelector('#edit-brands').value = (g.recommended_brands || []).join(", ");
-      document.querySelector('#edit-materials').value = (g.materials || []).join(", ");
-      document.querySelector('#edit-buy').value = g.buy_link || "";
-      document.querySelector('#edit-image').value = g.image || "";
-      document.querySelector('#edit-care').value = g.care_tips || "";
-      document.querySelector('#edit-tags').value = (g.tags || []).join(", ");
-    } else {
-      console.warn("⚠️ No valid data received, opening modal anyway for manual edit.");
-    }
-
-    modal.classList.remove('hidden');
-    console.log("✅ Modal opened successfully.");
-  } catch (err) {
-    console.error("❌ Error fetching gear data:", err);
-    modal.classList.remove('hidden'); // tetap buka modal biar gak stuck
-  }
-}
-
-function closeEditModal() {
-  const modal = document.querySelector('#editModal');
-  if (modal) modal.classList.add('hidden');
-}
-</script>
