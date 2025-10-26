@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-kfq8bf45j2_@pwen@&kdmh9g@3)z6wlni4-fhg6e8p^8jx4bb&
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ainur-fadhil-sportpedia.pbp.cs.ui.ac.id"]
 
