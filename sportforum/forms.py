@@ -9,7 +9,7 @@ class ForumPostForm(forms.ModelForm):
     
     class Meta:
         model = ForumPost
-        fields = ['sport', 'title', 'content', 'tags']
+        fields = ['sport', 'title', 'content']
 
 
 class ReplyForm(forms.Form):
