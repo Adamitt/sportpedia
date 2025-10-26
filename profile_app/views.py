@@ -5,6 +5,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
 from .models import UserProfile
 from profile_app.models import ActivityLog
+from django.views.decorators.http import require_POST
 
 @login_required(login_url='/accounts/login/')
 def profile_page(request):
@@ -63,3 +64,20 @@ def profile_view(request):
         'user': request.user,
     }
     return render(request, 'profile_page/profile.html', context)
+
+@login_required
+@require_POST
+def clear_activity_history(request):
+    """Menghapus semua ActivityLog untuk user yang sedang login."""
+    try:
+        logs_deleted, _ = ActivityLog.objects.filter(user=request.user).delete()
+        
+        if logs_deleted > 0:
+            messages.success(request, f'🧹 Semua riwayat aktivitas ({logs_deleted} item) berhasil dihapus.')
+        else:
+            messages.info(request, 'Tidak ada riwayat aktivitas untuk dihapus.')
+            
+    except Exception as e:
+       messages.error(request, f'❌ Gagal menghapus riwayat aktivitas: {e}')
+
+    return redirect('profile_app:profile_page')
