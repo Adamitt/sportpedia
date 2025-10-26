@@ -1,8 +1,9 @@
 import json
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from videos.models import Video
+from videos.models import Video, VideoRating
 from sportlibrary.models import Sport
+from django.utils.dateparse import parse_date
 
 class Command(BaseCommand):
     help = 'Import videos dari videos.json ke database'
@@ -113,15 +114,38 @@ class Command(BaseCommand):
                 
                 # Buat video baru
                 video = Video.objects.create(
+                    id=video_data.get('id'), # Asumsi ID dari JSON adalah Integer
                     title=video_data.get('title', 'Untitled'),
                     description=video_data.get('description', ''),
                     sport=sport,
                     difficulty=difficulty,
                     video_url=video_url,
+                    thumbnail_url=thumbnail_url, # <-- TAMBAHKAN
+                    instructor=video_data.get('instructor', 'Admin'), # <-- TAMBAHKAN
+                    tags=video_data.get('tags', []), # <-- TAMBAHKAN
                     duration=video_data.get('duration', '00:00'),
                     uploader=uploader,
                     views_count=video_data.get('views', 0)
                 )
+
+                # Coba atur upload_date jika ada
+                upload_date_str = video_data.get('upload_date')
+                if upload_date_str:
+                    video.created_at = parse_date(upload_date_str)
+                    video.save(update_fields=['created_at'])
+
+                # Buat entri VideoRating (jika ada)
+                json_rating = video_data.get('rating')
+                if json_rating:
+                    try:
+                        VideoRating.objects.create(
+                            video=video,
+                            user=uploader, # Asumsikan rating awal dari uploader/admin
+                            rating=int(json_rating) # Bulatkan ke integer
+                        )
+                    except Exception as e:
+                        self.stdout.write(self.style.WARNING(f'⚠️  Gagal menambah rating untuk {video.title}: {e}'))
+                # --- AKHIR PERBAIKAN ---
                 
                 imported_count += 1
                 self.stdout.write(

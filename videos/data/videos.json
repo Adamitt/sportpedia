@@ -223,13 +223,14 @@
     "instructor": "Coach Aldi",
     "description": "Postur tubuh, ayunan tangan, dan pernapasan yang benar untuk lari jarak pendek.",
     "rating": 4.8,
-    "views": 11000,
+    "views": 11001,
     "upload_date": "2025-02-22",
     "tags": [
       "running",
       "form",
       "outdoor"
-    ]
+    ],
+    "sport_name": "Renang"
   },
   {
     "id": 13,

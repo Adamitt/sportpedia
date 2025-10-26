@@ -3,8 +3,23 @@
 
 {% block title %}Video Gallery - SportPedia{% endblock %}
 
+{% block head %}
+{{ block.super }}
+<style>
+/* CSS Anda untuk hero, filter, dan card bisa ditaruh di sini jika belum ada di base.css */
+.form-select {
+    background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23000%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e');
+    background-repeat: no-repeat;
+    background-position: right 1.2rem center;
+    background-size: 1em;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- Hero Section -->
 <div class="max-w-[1400px] mx-auto px-8 py-8">
     <div class="relative bg-cover bg-center rounded-3xl overflow-hidden shadow-xl" style="background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1400&q=80'); height: 380px;">
         <div class="absolute inset-0 flex flex-col items-center justify-center text-white px-8">
@@ -12,19 +27,16 @@
                 Learn visually with step-by-step<br>
                 sports tutorials for every level.
             </h1>
-            <a href="#video-section" class="border-3 border-white text-white px-12 py-3.5 rounded-full text-lg font-semibold hover:bg-white hover:text-gray-900 transition-all duration-300">
+            <a href="#video-section" class="border-2 border-white text-white px-12 py-3.5 rounded-full text-lg font-semibold hover:bg-white hover:text-gray-900 transition-all duration-300">
                 GET STARTED
             </a>
         </div>
     </div>
 </div>
 
-<!-- Video Gallery Section -->
 <div id="video-section" class="bg-gray-50 py-16">
     <div class="max-w-[1400px] mx-auto px-8">
-        <!-- Section Title -->
         <div class="text-center mb-12">
-            <!-- Play Button in Circle Icon -->
             <div class="inline-flex items-center justify-center mb-6">
                 <svg class="w-16 h-16" fill="none" stroke="#1C3264" viewBox="0 0 24 24" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -38,8 +50,8 @@
         {% if user.is_authenticated and user.is_staff %}
         <div class="text-center mb-10">
           <a href="{% url 'videos:video_create' %}"
-            class="inline-flex items-center gap-2 px-6 py-3 rounded-full text-white font-semibold hover:opacity-90 transition"
-            style="background-color: #1E3A5F;">
+             class="inline-flex items-center gap-2 px-6 py-3 rounded-full text-white font-semibold hover:opacity-90 transition"
+             style="background-color: #1E3A5F;">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
             </svg>
@@ -48,7 +60,6 @@
         </div>
         {% endif %}
         
-        <!-- Search Bar -->
         <div class="max-w-3xl mx-auto mb-10">
             <form method="GET" action="{% url 'videos:video_gallery' %}">
                 <div class="relative">
@@ -59,175 +70,100 @@
                         placeholder="Search for videos, sports, or instructors..." 
                         class="w-full px-6 py-4 pl-14 border-2 border-gray-300 rounded-full text-lg focus:outline-none focus:border-blue-600 transition-colors shadow-sm"
                     >
-                    <!-- Search Icon -->
-                    <svg class="absolute left-5 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="M21 21l-4.35-4.35"></path>
-                    </svg>
+                    <svg class="absolute left-5 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"> <circle cx="11" cy="11" r="8"></circle> <path d="M21 21l-4.35-4.35"></path> </svg>
                     {% if search_query %}
                     <a href="{% url 'videos:video_gallery' %}" class="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path> </svg>
                     </a>
                     {% endif %}
                 </div>
             </form>
         </div>
 
-        <!-- Filters -->
         <div class="mb-12">
             <form method="GET" action="{% url 'videos:video_gallery' %}" class="flex flex-wrap items-center gap-4">
-                <!-- Hidden search input to preserve search query -->
                 {% if search_query %}
                 <input type="hidden" name="search" value="{{ search_query }}">
                 {% endif %}
 
-                <!-- Filter Dropdown -->
-                <button type="button" class="flex items-center gap-2.5 px-7 py-3.5 bg-white border-2 border-gray-800 rounded-full font-semibold text-gray-800 hover:bg-gray-50 transition-colors text-base">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                    </svg>
-                    <span>Filter</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </button>
-
-                <!-- All Sports Dropdown -->
-                <select name="sport" class="px-7 py-3.5 bg-white border-2 border-gray-800 rounded-full font-semibold text-gray-800 focus:outline-none focus:border-gray-900 transition-colors appearance-none pr-12 cursor-pointer text-base" style="background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23000%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 1.2rem center; background-size: 1em;">
+                <select name="sport" class="px-7 py-3.5 bg-white border-2 border-gray-800 rounded-full font-semibold text-gray-800 focus:outline-none focus:border-gray-900 transition-colors cursor-pointer text-base form-select">
                     <option value="">All Sports</option>
                     {% for sport in sports %}
-                    <option value="{{ sport.id }}" {% if request.GET.sport == sport.id|stringformat:"s" %}selected{% endif %}>{{ sport.name }}</option>
+                    <option value="{{ sport.id }}" {% if selected_sport == sport.id|stringformat:"s" %}selected{% endif %}>{{ sport.name }}</option>
                     {% endfor %}
                 </select>
 
-                <!-- Difficulty Level Dropdown -->
-                <select name="difficulty" class="px-7 py-3.5 bg-white border-2 border-gray-800 rounded-full font-semibold text-gray-800 focus:outline-none focus:border-gray-900 transition-colors appearance-none pr-12 cursor-pointer text-base" style="background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23000%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 1.2rem center; background-size: 1em;">
+                <select name="difficulty" class="px-7 py-3.5 bg-white border-2 border-gray-800 rounded-full font-semibold text-gray-800 focus:outline-none focus:border-gray-900 transition-colors cursor-pointer text-base form-select">
                     <option value="">Difficulty Level</option>
-                    <option value="beginner" {% if request.GET.difficulty == 'beginner' %}selected{% endif %}>Beginner</option>
-                    <option value="intermediate" {% if request.GET.difficulty == 'intermediate' %}selected{% endif %}>Intermediate</option>
-                    <option value="advanced" {% if request.GET.difficulty == 'advanced' %}selected{% endif %}>Advanced</option>
+                    <option value="beginner" {% if selected_difficulty == 'beginner' %}selected{% endif %}>Beginner</option>
+                    <option value="intermediate" {% if selected_difficulty == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                    <option value="advanced" {% if selected_difficulty == 'advanced' %}selected{% endif %}>Advanced</option>
                 </select>
 
-                <!-- Apply Filters Button -->
+                <select name="sort" class="px-7 py-3.5 bg-white border-2 border-gray-800 rounded-full font-semibold text-gray-800 focus:outline-none focus:border-gray-900 transition-colors cursor-pointer text-base form-select">
+                    <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>Most Popular</option>
+                    <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Highest Rating</option>
+                    <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
+                    <option value="shortest" {% if sort_by == 'shortest' %}selected{% endif %}>Shortest Duration</option>
+                </select>
+
                 <button type="submit" class="px-9 py-3.5 text-white rounded-full font-semibold hover:opacity-90 transition-opacity text-base" style="background-color: #1C3264;">
                     Apply Filters
                 </button>
-
-                <!-- Right Side: Video Count & View Toggle -->
+                
                 <div class="ml-auto flex items-center gap-5">
                     <span class="text-gray-800 font-semibold text-base">{{ videos|length }} videos</span>
-                    
-                    <div class="flex items-center gap-2">
-                        <!-- Grid Icon (Active) -->
-                        <button type="button" class="p-2.5 text-white rounded-lg" style="background-color: #1C3264;">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                <rect x="3" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="14" width="7" height="7"></rect>
-                                <rect x="3" y="14" width="7" height="7"></rect>
-                            </svg>
-                        </button>
-                        <!-- List Icon (Inactive) -->
-                        <button type="button" class="p-2.5 bg-white border-2 border-gray-800 text-gray-800 rounded-lg hover:bg-gray-50 transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                <line x1="8" y1="6" x2="21" y2="6"></line>
-                                <line x1="8" y1="12" x2="21" y2="12"></line>
-                                <line x1="8" y1="18" x2="21" y2="18"></line>
-                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                            </svg>
-                        </button>
                     </div>
-                </div>
             </form>
         </div>
 
-        <!-- Search Results Info -->
-        {% if search_query %}
-        <div class="mb-6 flex items-center gap-3">
-            <p class="text-gray-700">
-                Search results for: <span class="font-bold">"{{ search_query }}"</span>
-            </p>
-            <a href="{% url 'videos:video_gallery' %}" class="text-sm hover:underline font-semibold" style="color: #1C3264;">
-                Clear search
-            </a>
-        </div>
-        {% endif %}
-
-        <!-- Video Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for video in videos %}
             <div class="h-full">
                 <a href="{% url 'videos:video_detail' video.id %}" class="group block h-full">
                     <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
-                        <!-- Thumbnail -->
                         <div class="relative aspect-video bg-gray-900 overflow-hidden">
-                            {% if video.thumbnail %}
-                            <!-- YouTube thumbnail dengan fallback ke Unsplash jika error -->
-                            <img src="{{ video.thumbnail }}" 
-                                 alt="{{ video.title }}" 
-                                 class="w-full h-full object-cover"
-                                 onerror="this.onerror=null; this.src='https://source.unsplash.com/featured/800x450/?{% if video.tags %}{{ video.tags.0 }}{% else %}{{ video.sport_name|lower }},sport{% endif %}';">
-                            {% elif video.tags %}
-                            <!-- Unsplash image based on first tag -->
-                            <img src="https://source.unsplash.com/featured/800x450/?{{ video.tags.0 }}" alt="{{ video.title }}" class="w-full h-full object-cover">
+                            {% if video.thumbnail_url %}
+                            <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}" class="w-full h-full object-cover">
+                            {% elif video.thumbnail %}
+                            <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="w-full h-full object-cover">
                             {% else %}
-                            <!-- Fallback: Sport name as keyword -->
-                            <img src="https://source.unsplash.com/featured/800x450/?{{ video.sport_name|lower }},sport" alt="{{ video.title }}" class="w-full h-full object-cover">
+                            <img src="https://source.unsplash.com/featured/800x450/?{{ video.sport.name|lower }},sport" alt="{{ video.title }}" class="w-full h-full object-cover">
                             {% endif %}
                             
-                            <!-- Duration Badge -->
                             <div class="absolute bottom-3 right-3 text-white text-sm font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5" style="background-color: rgba(28, 50, 100, 0.95);">
-                                <!-- Clock Icon -->
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <polyline points="12 6 12 12 16 14"></polyline>
-                                </svg>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"> <circle cx="12" cy="12" r="10"></circle> <polyline points="12 6 12 12 16 14"></polyline> </svg>
                                 {{ video.duration }}
                             </div>
                         </div>
 
-                        <!-- Video Info -->
                         <div class="p-6 flex-1 flex flex-col">
-                            <!-- Title -->
                             <h3 class="font-bold text-gray-900 text-xl mb-4 leading-snug h-14 overflow-hidden">
                                 {{ video.title }}
                             </h3>
                             
-                            <!-- Badges -->
                             <div class="flex flex-wrap gap-2 mb-4">
                                 <span class="px-4 py-1.5 text-white text-sm font-bold rounded-full" style="background-color: #1C3264;">
-                                    {{ video.sport_name|default:"Sport" }}
+                                    {{ video.sport.name|default:"Sport" }}
                                 </span>
-                                {% if video.difficulty == 'Pemula' %}
+                                {% if video.difficulty == 'beginner' %}
                                 <span class="px-4 py-1.5 text-gray-900 text-sm font-bold rounded-full" style="background-color: #FFDD78;">Beginner</span>
-                                {% elif video.difficulty == 'Menengah' %}
+                                {% elif video.difficulty == 'intermediate' %}
                                 <span class="px-4 py-1.5 text-gray-900 text-sm font-bold rounded-full" style="background-color: #FFDD78;">Intermediate</span>
                                 {% else %}
                                 <span class="px-4 py-1.5 text-gray-900 text-sm font-bold rounded-full" style="background-color: #FFDD78;">Advanced</span>
                                 {% endif %}
                             </div>
                             
-                            <!-- Stats -->
                             <div class="flex items-center justify-between text-sm text-gray-700 mt-auto">
-                                <!-- Views -->
                                 <div class="flex items-center gap-1.5">
-                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                    <span class="font-semibold">{{ video.views }}</span>
+                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"> <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path> <circle cx="12" cy="12" r="3"></circle> </svg>
+                                    <span class="font-semibold">{{ video.views_count }}</span>
                                 </div>
                                 
-                                <!-- Rating -->
                                 <div class="flex items-center gap-1.5">
-                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" style="color: #FFDD78;">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                                    </svg>
-                                    <span class="font-semibold text-gray-900">{{ video.rating|floatformat:1 }}</span>
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" style="color: #FFDD78;"> <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path> </svg>
+                                    <span class="font-semibold text-gray-900">{{ video.avg_rating|floatformat:1|default:"0.0" }}</span>
                                 </div>
                             </div>
                         </div>
@@ -235,16 +171,8 @@
                 </a>
             </div>
             {% empty %}
-            <!-- No Videos Found -->
             <div class="col-span-full text-center py-20">
-                <svg class="mx-auto h-24 w-24 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                    <rect x="2" y="6" width="20" height="14" rx="2" ry="2"></rect>
-                    <path d="M2 10h20"></path>
-                    <path d="M7 2l-2 4"></path>
-                    <path d="M12 2l-2 4"></path>
-                    <path d="M17 2l-2 4"></path>
-                    <polygon points="10 13 15 10.5 10 8 10 13" fill="currentColor"></polygon>
-                </svg>
+                <svg class="mx-auto h-24 w-24 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"> <rect x="2" y="6" width="20" height="14" rx="2" ry="2"></rect> <path d="M2 10h20"></path> <path d="M7 2l-2 4"></path> <path d="M12 2l-2 4"></path> <path d="M17 2l-2 4"></path> <polygon points="10 13 15 10.5 10 8 10 13" fill="currentColor"></polygon> </svg>
                 <h3 class="text-2xl font-bold text-gray-700 mb-2">No videos found</h3>
                 <p class="text-gray-500 mb-6">
                     {% if search_query %}
