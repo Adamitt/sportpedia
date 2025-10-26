@@ -167,25 +167,26 @@ def edit_post(request, id):
     if request.method == 'POST':
         form = ForumPostForm(request.POST, instance=post)
         if form.is_valid():
-            updated_post = form.save()
-            
-            # Handle tags
-            if form.cleaned_data.get('tags'):
-                # Clear existing tags
-                updated_post.tags.clear()
-                
-                # Add new tags
-                tags = [t.strip() for t in form.cleaned_data['tags'].split(',') if t.strip()]
+            updated_post = form.save(commit=False)
+            updated_post.save()
+            # Handle tags manually
+            tags_input = request.POST.get('tags', '')
+            updated_post.tags.clear()
+            if tags_input:
+                tags = [t.strip() for t in tags_input.split(',') if t.strip()]
                 for tag_name in tags:
                     tag, created = Tag.objects.get_or_create(name=tag_name)
                     updated_post.tags.add(tag)
-            else:
-                # Clear all tags if field is empty
-                updated_post.tags.clear()
-            
             return HttpResponseRedirect(reverse('sportforum:post_detail', args=[id]))
     else:
-        form = ForumPostForm(instance=post, initial={'tags': initial_tags})
+        form = ForumPostForm(instance=post)
+        # Pass initial tags for template rendering
+        context = {
+            'form': form,
+            'post': post,
+            'initial_tags': initial_tags,
+        }
+        return render(request, "sportforum/edit_post.html", context)
 
     context = {
         'form': form,
