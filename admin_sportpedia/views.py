@@ -22,9 +22,11 @@ def dashboard(request):
     """Halaman utama dashboard admin"""
     total_gears = Gear.objects.count()
     total_sports = Sport.objects.count()
+    total_users_count = User.objects.count()
 
     return render(request, 'dashboard/dashboard.html', {
         'total_gears': total_gears,
+        'total_users': total_users_count,
         'total_sports': total_sports,
     })
 
@@ -368,23 +370,3 @@ def get_admin_data(request, admin_id):
     except Exception as e:
          # Log error jika perlu: print(f"Error in get_admin_data: {e}")
          return JsonResponse({'error': 'Internal server error'}, status=500)
-
-@user_passes_test(admin_only, login_url='/accounts/login/')
-@require_POST
-def delete_admin(request, admin_id):
-    """Menangani POST delete (non-AJAX, me-reload halaman)."""
-    target_admin = get_object_or_404(User, pk=admin_id)
-    target_username = target_admin.username
-    if target_admin == request.user:
-        messages.error(request, '❌ Anda tidak dapat menghapus akun Anda sendiri.')
-        return redirect('admin_sportpedia:manage_admin')
-    try:
-        target_admin.delete()
-        ActivityLog.objects.create(
-            user=request.user, action_type='ADMIN_DELETE',
-            description=f"Admin menghapus admin: {target_username}"
-        )
-        messages.success(request, f'🗑️ Admin "{target_username}" berhasil dihapus!')
-    except Exception as e:
-        messages.error(request, f'❌ Gagal menghapus admin: {e}')
-    return redirect('admin_sportpedia:manage_admin')
