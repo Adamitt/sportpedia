@@ -147,13 +147,15 @@
     "instructor": "Coach Dimas",
     "description": "Cara mengatur pernapasan dan gerakan tangan dalam gaya bebas.",
     "rating": 4.9,
-    "views": 15700,
+    "views": 15702,
     "upload_date": "2025-01-15",
     "tags": [
       "swimming",
       "freestyle",
       "water"
-    ]
+    ],
+    "sport_name": "Swimming",
+    "likes": 10
   },
   {
     "id": 9,
@@ -739,13 +741,14 @@
     "instructor": "Coach Yudha",
     "description": "Langkah progresif untuk meningkatkan kekuatan bahu dan keseimbangan tubuh.",
     "rating": 4.9,
-    "views": 9700,
+    "views": 9701,
     "upload_date": "2025-03-08",
     "tags": [
       "calisthenics",
       "planche",
       "strength"
-    ]
+    ],
+    "sport_name": "Calisthenics"
   },
   {
     "id": 40,
