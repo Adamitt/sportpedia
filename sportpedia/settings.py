@@ -166,7 +166,7 @@ STATIC_URL = 'static/'
 # Folder tempat Django nyari file static kamu (contohnya images, css, js)
 STATICFILES_DIRS = [
     BASE_DIR / "static",        # static global di root project
-    BASE_DIR / "main" / "static",  # static di app main
+    # BASE_DIR / "main" / "static",  # static di app main
 ]
 
 # Folder tempat Django ngumpulin semua file static pas deploy
