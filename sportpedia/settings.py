@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     'admin_sportpedia',
     'metrics',
     'videos',
-    'widget_tweaks',
     'sportforum',
 ]
 
