@@ -42,11 +42,24 @@ class Command(BaseCommand):
         with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
+        level_map = {
+            'Pemula': 'beginner',
+            'Menengah': 'intermediate',
+            'Lanjutan': 'advanced',
+            # Tambahkan value huruf kecil jika ada data yang tidak konsisten
+            'pemula': 'beginner', 
+            'menengah': 'intermediate',
+            'lanjutan': 'advanced',
+        }
+
         created, skipped = 0, 0
         for gear_data in data:
             try:
                 sport_id = gear_data.get("sport_id")
                 sport_name = SPORT_MAP.get(sport_id, "Tidak diketahui")
+
+                level_raw = gear_data.get("level", "Pemula") # Ambil "Pemula"
+                level_db = level_map.get(level_raw, 'beginner')
 
                 # Cari sport by name (buat kalau udah ada di DB)
                 sport_obj = Sport.objects.filter(name__iexact=sport_name).first()
@@ -56,7 +69,8 @@ class Command(BaseCommand):
                         defaults={
                             "category": "Umum",
                             "difficulty": "beginner",
-                            "description": "Auto-created from gear sync"
+                            "description": "Auto-created from gear sync",
+                            "level": level_db,
                         }
                     )
 

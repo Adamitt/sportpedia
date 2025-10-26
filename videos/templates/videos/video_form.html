@@ -1,239 +1,62 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if video %}Edit Video{% else %}Add New Video{% endif %} - SPORTPEDIA{% endblock %}
+{% block title %}{% if video %}Edit Video{% else %}Add Video{% endif %} - SPORTPEDIA{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-8 py-12">
-    <!-- Back Button -->
-    <a href="{% url 'videos:video_gallery' %}" class="mb-6 font-semibold hover:opacity-80 flex items-center gap-2 transition-opacity text-lg inline-flex" style="color: #1E3A5F;">
-        ← Back to Gallery
-    </a>
+<div class="max-w-3xl mx-auto bg-white p-8 sm:p-10 rounded-3xl shadow-xl mt-12 mb-16 border border-gray-200">
+  <h2 class="text-3xl font-bold mb-8 text-[#1E3A5F]">
+    {% if video %}✏️ Edit Video{% else %}🎥 Add New Video{% endif %}
+  </h2>
+  
+  <form method="POST" class="space-y-6">
+    {% csrf_token %}
 
-    <!-- Form Card -->
-    <div class="bg-white rounded-3xl p-8 border-2 shadow-lg" style="border-color: #fce7f3;">
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold mb-2" style="color: #1E3A5F;">
-                {% if video %}
-                    <i data-lucide="edit" class="h-8 w-8 inline mr-2"></i>
-                    Edit Video
-                {% else %}
-                    <i data-lucide="plus-circle" class="h-8 w-8 inline mr-2"></i>
-                    Add New Video
-                {% endif %}
-            </h1>
-            <p class="text-gray-600">Fill in the details below to {% if video %}update{% else %}create{% endif %} a video tutorial</p>
+    {# Tampilkan error non-field jika ada #}
+    {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
         </div>
-
-        <form method="POST" class="space-y-6">
-            {% csrf_token %}
-
-            <!-- Title -->
-            <div>
-                <label for="title" class="block text-sm font-semibold mb-2" style="color: #1E3A5F;">
-                    Video Title <span class="text-red-600">*</span>
-                </label>
-                <input 
-                    type="text" 
-                    id="title" 
-                    name="title" 
-                    value="{{ video.title|default:'' }}"
-                    required
-                    class="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] transition-all"
-                    placeholder="e.g., Teknik Dasar Servis Bulu Tangkis"
-                >
-            </div>
-
-            <!-- Description -->
-            <div>
-                <label for="description" class="block text-sm font-semibold mb-2" style="color: #1E3A5F;">
-                    Description <span class="text-red-600">*</span>
-                </label>
-                <textarea 
-                    id="description" 
-                    name="description" 
-                    rows="4"
-                    required
-                    class="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] resize-none transition-all"
-                    placeholder="Describe what viewers will learn from this video..."
-                >{{ video.description|default:'' }}</textarea>
-            </div>
-
-            <!-- Sport ID & Difficulty (Row) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="sport_id" class="block text-sm font-semibold mb-2" style="color: #1E3A5F;">
-                        Sport ID <span class="text-red-600">*</span>
-                    </label>
-                    <input 
-                        type="number" 
-                        id="sport_id" 
-                        name="sport_id" 
-                        value="{{ video.sport_id|default:'1' }}"
-                        min="1"
-                        required
-                        class="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] transition-all"
-                        placeholder="1"
-                    >
-                    <p class="text-xs text-gray-500 mt-1">Enter the sport category ID</p>
-                </div>
-
-                <div>
-                    <label for="difficulty" class="block text-sm font-semibold mb-2" style="color: #1E3A5F;">
-                        Difficulty Level <span class="text-red-600">*</span>
-                    </label>
-                    <select 
-                        id="difficulty" 
-                        name="difficulty" 
-                        required
-                        class="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] transition-all"
-                    >
-                        <option value="Pemula" {% if video.difficulty == 'Pemula' %}selected{% endif %}>Pemula (Beginner)</option>
-                        <option value="Menengah" {% if video.difficulty == 'Menengah' %}selected{% endif %}>Menengah (Intermediate)</option>
-                        <option value="Lanjutan" {% if video.difficulty == 'Lanjutan' %}selected{% endif %}>Lanjutan (Advanced)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Duration & Instructor (Row) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="duration" class="block text-sm font-semibold mb-2" style="color: #1E3A5F;">
-                        Duration <span class="text-red-600">*</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="duration" 
-                        name="duration" 
-                        value="{{ video.duration|default:'' }}"
-                        required
-                        pattern="[0-9]{2}:[0-9]{2}"
-                        class="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] transition-all"
-                        placeholder="05:30"
-                    >
-                    <p class="text-xs text-gray-500 mt-1">Format: MM:SS (e.g., 05:30)</p>
-                </div>
-
-                <div>
-                    <label for="instructor" class="block text-sm font-semibold mb-2" style="color: #1E3A5F;">
-                        Instructor Name <span class="text-red-600">*</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="instructor" 
-                        name="instructor" 
-                        value="{{ video.instructor|default:'' }}"
-                        required
-                        class="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] transition-all"
-                        placeholder="Coach John"
-                    >
-                </div>
-            </div>
-
-            <!-- Video URL -->
-            <div>
-                <label for="url" class="block text-sm font-semibold mb-2" style="color: #1E3A5F;">
-                    Video URL <span class="text-red-600">*</span>
-                </label>
-                <input 
-                    type="url" 
-                    id="url" 
-                    name="url" 
-                    value="{{ video.url|default:'' }}"
-                    required
-                    class="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] transition-all"
-                    placeholder="https://www.youtube.com/watch?v=..."
-                >
-                <p class="text-xs text-gray-500 mt-1">YouTube, Vimeo, or any video hosting URL</p>
-            </div>
-
-            <!-- Thumbnail URL -->
-            <div>
-                <label for="thumbnail" class="block text-sm font-semibold mb-2" style="color: #1E3A5F;">
-                    Thumbnail URL
-                </label>
-                <input 
-                    type="url" 
-                    id="thumbnail" 
-                    name="thumbnail" 
-                    value="{{ video.thumbnail|default:'' }}"
-                    class="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] transition-all"
-                    placeholder="https://img.youtube.com/vi/VIDEO_ID/0.jpg"
-                >
-                <p class="text-xs text-gray-500 mt-1">Optional: YouTube thumbnail or custom image URL</p>
-            </div>
-
-            <!-- Tags -->
-            <div>
-                <label for="tags" class="block text-sm font-semibold mb-2" style="color: #1E3A5F;">
-                    Tags
-                </label>
-                <input 
-                    type="text" 
-                    id="tags" 
-                    name="tags" 
-                    value="{% if video.tags %}{{ video.tags|join:',' }}{% endif %}"
-                    class="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] transition-all"
-                    placeholder="badminton, technique, beginner"
-                >
-                <p class="text-xs text-gray-500 mt-1">Separate tags with commas</p>
-            </div>
-
-            <!-- Submit Buttons -->
-            <div class="flex items-center gap-4 pt-6 border-t-2 border-gray-100">
-                <button 
-                    type="submit" 
-                    class="px-8 py-4 text-white rounded-full font-bold text-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2"
-                    style="background-color: #1E3A5F;"
-                >
-                    <i data-lucide="save" class="h-5 w-5"></i>
-                    {% if video %}Update Video{% else %}Create Video{% endif %}
-                </button>
-                
-                <a 
-                    href="{% url 'videos:video_gallery' %}" 
-                    class="px-8 py-4 border-2 rounded-full font-bold text-lg hover:bg-gray-50 transition-all flex items-center gap-2"
-                    style="border-color: #1E3A5F; color: #1E3A5F;"
-                >
-                    <i data-lucide="x" class="h-5 w-5"></i>
-                    Cancel
-                </a>
-            </div>
-        </form>
-    </div>
-
-    <!-- Preview Section (Optional Enhancement) -->
-    {% if video %}
-    <div class="mt-8 bg-gray-50 rounded-3xl p-8 border-2 border-gray-200">
-        <h3 class="text-xl font-bold mb-4" style="color: #1E3A5F;">Current Video Preview</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <p class="text-sm text-gray-600 mb-1">Thumbnail:</p>
-                {% if video.thumbnail %}
-                <img src="{{ video.thumbnail }}" alt="{{ video.title }}" class="w-full h-40 object-cover rounded-xl">
-                {% else %}
-                <div class="w-full h-40 bg-gray-200 rounded-xl flex items-center justify-center">
-                    <span class="text-4xl">🎾</span>
-                </div>
-                {% endif %}
-            </div>
-            <div class="space-y-2">
-                <p class="text-sm text-gray-600">Current Stats:</p>
-                <div class="flex items-center gap-2 text-sm">
-                    <i data-lucide="eye" class="h-4 w-4"></i>
-                    <span>{{ video.views }} views</span>
-                </div>
-                <div class="flex items-center gap-2 text-sm">
-                    <i data-lucide="star" class="h-4 w-4 text-[#F4D160] fill-[#F4D160]"></i>
-                    <span>{{ video.rating }} rating</span>
-                </div>
-                <div class="flex items-center gap-2 text-sm">
-                    <i data-lucide="calendar" class="h-4 w-4"></i>
-                    <span>Uploaded: {{ video.upload_date }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
     {% endif %}
+
+    {# Loop melalui setiap field di form #}
+    {% for field in form %}
+      <div>
+        <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+          {{ field.label }}
+          {% if field.field.required %}
+            <span class="text-red-600">*</span>
+          {% endif %}
+        </label>
+        
+        {{ field }} {# Ini akan merender widget DENGAN kelas Tailwind dari forms.py #}
+        
+        {% if field.help_text %}
+          <p class="mt-2 text-xs text-gray-500">{{ field.help_text|safe }}</p>
+        {% endif %}
+        
+        {% if field.errors %}
+          <div class="mt-2 text-sm text-red-600">
+            {% for error in field.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    {# Tombol Submit #}
+    <div class="pt-6 border-t border-gray-200 flex items-center gap-4">
+      <button type="submit" class="bg-[#1E3A5F] text-white px-6 py-3 rounded-full font-semibold hover:opacity-90 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+        {% if video %}Update Video{% else %}Save Video{% endif %}
+      </button>
+      <a href="{% if video %}{% url 'videos:video_detail' video.id %}{% else %}{% url 'videos:video_gallery' %}{% endif %}" 
+         class="text-gray-600 font-semibold hover:underline">
+         Cancel
+      </a>
+    </div>
+  </form>
 </div>
 {% endblock %}
