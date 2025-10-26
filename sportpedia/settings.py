@@ -18,8 +18,11 @@ load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -31,7 +34,7 @@ PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "chevinka-queen-sportpedia.pbp.cs.ui.ac.id"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ainur-fadhil-sportpedia.pbp.cs.ui.ac.id"]
 
 
 # Application definition
@@ -43,10 +46,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main',
+    'landingpage',
     'gearguide',
     'sportlibrary',
+    'profile_app',
+    'accounts',
+    'admin_sportpedia',
+    'metrics',
+    'videos',
+    'widget_tweaks',
+    'sportforum',
 ]
+
+LOGIN_URL = '/login/'  # biar decorator login_required tahu harus redirect ke sini
+LOGIN_REDIRECT_URL = '/'  # ke mana user dibawa setelah login\
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -56,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'landingpage.middleware.PageHitMiddleware' ##
 ]
 
 ROOT_URLCONF = 'sportpedia.urls'
@@ -63,7 +78,7 @@ ROOT_URLCONF = 'sportpedia.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'sportpedia' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,6 +89,13 @@ TEMPLATES = [
         },
     },
 ]
+
+TRACKED_VIEWS = {
+    'sportlibrary:sport_detail',   # contoh: halaman detail olahraga (sejarah padel dsb.)
+    'gearguide:detail',            # contoh: halaman detail perlengkapan
+    'videos:detail',               # contoh: halaman detail video
+    'forum:thread_detail',         # contoh: detail thread forum
+}
 
 WSGI_APPLICATION = 'sportpedia.wsgi.application'
 
@@ -130,7 +152,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Jakarta'
 
 USE_I18N = True
 
@@ -142,7 +164,23 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Folder tempat Django nyari file static kamu (contohnya images, css, js)
+STATICFILES_DIRS = [
+    BASE_DIR / "static",        # static global di root project
+    BASE_DIR / "main" / "static",  # static di app main
+]
+
+# Folder tempat Django ngumpulin semua file static pas deploy
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Redirect to home page after login
+LOGIN_REDIRECT_URL = '/'
+
+# LOGIN_URL = '/accounts/login/'
+# LOGIN_REDIRECT_URL = '/videos/'
+# LOGOUT_REDIRECT_URL = '/videos/'

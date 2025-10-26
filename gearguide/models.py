@@ -1,22 +1,60 @@
 from django.db import models
 from sportlibrary.models import Sport
-import uuid
+from django.conf import settings  # ⬅️ TAMBAHKAN INI
+# import uuid  # (opsional: hapus kalau tak dipakai)
+# from django.contrib.auth.models import User  # (opsional: tidak dipakai)
 
 class Gear(models.Model):
-    sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name="gears")
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.AutoField(primary_key=True)
+    sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name="gear_items")
+
     name = models.CharField(max_length=100)
+    function = models.TextField(blank=True, null=True)
     description = models.TextField()
-    required = models.BooleanField(default=True)  
-    image = models.URLField(blank=True, null=True)  # link gambar alat (opsional)
-    price_range = models.CharField(max_length=50, blank=True, null=True)  # contoh: "Rp300.000 – Rp800.000"
-    ecommerce_link = models.URLField(blank=True, null=True)  # link rekomendasi e-commerce
-    difficulty_level = models.CharField(max_length=50, choices=[
-        ('beginner', 'Pemula'),
-        ('intermediate', 'Menengah'),
-        ('advanced', 'Lanjutan')
-    ], default='beginner')
-    tips = models.TextField(blank=True, null=True)  # tips tambahan untuk pemakaian alat
+    required = models.BooleanField(default=True)
+
+    image = models.URLField(blank=True, null=True)
+    price_range = models.CharField(max_length=50, blank=True, null=True)
+    ecommerce_link = models.URLField(blank=True, null=True)
+
+    level = models.CharField(
+        max_length=50,
+        choices=[
+            ('beginner', 'Pemula'),
+            ('intermediate', 'Menengah'),
+            ('advanced', 'Lanjutan'),
+        ],
+        default='beginner'
+    )
+
+    recommended_brands = models.JSONField(blank=True, null=True, default=list)
+    materials = models.JSONField(blank=True, null=True, default=list)
+    care_tips = models.TextField(blank=True, null=True)
+    tags = models.JSONField(blank=True, null=True, default=list)
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name='gears'
+    )
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Gear'
+        verbose_name_plural = 'Gears'
 
     def __str__(self):
         return f"{self.name} - {self.sport.name}"
+
+    def to_dict(self):
+        return {
+            "id": str(self.id),
+            "sport": self.sport.name,
+            "name": self.name,
+            "description": self.description,
+            "price_range": self.price_range,
+            "level": self.get_level_display(),
+            "brands": self.recommended_brands or [],
+            "tags": self.tags or [],
+            "buy_link": self.ecommerce_link,
+            "image": self.image,
+        }

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profil Pengguna — Sportpedia{% endblock %}
+
+{% block content %}
+<section class="bg-gradient-to-b from-gray-50 via-white to-white py-16">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+    <!-- Header Profil -->
+    <div class="flex flex-col items-center text-center">
+      {% if profile.foto_profil %}
+        <img src="{{ profile.foto_profil }}" alt="Foto Profil"
+             class="w-32 h-32 rounded-full object-cover shadow-md border-4 border-white">
+      {% else %}
+        <img src="https://via.placeholder.com/120" alt="Foto Default"
+             class="w-32 h-32 rounded-full object-cover shadow-md border-4 border-white">
+      {% endif %}
+      <h2 class="mt-4 text-3xl font-extrabold text-gray-900">{{ user.username }}</h2>
+      <p class="text-gray-500">{{ user.email }}</p>
+    </div>
+
+    <!-- Info Dasar -->
+    <div class="mt-10 bg-white rounded-2xl shadow-md p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">🧭 Informasi Dasar</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <p><span class="font-medium text-gray-700">Olahraga Favorit:</span>
+           <span class="text-gray-600">{{ profile.olahraga_favorit|default:"Belum diatur" }}</span></p>
+        <p><span class="font-medium text-gray-700">Preferensi:</span>
+           <span class="text-gray-600">{{ profile.preferensi|default:"Belum ada preferensi" }}</span></p>
+      </div>
+
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href="{% url 'profile_app:pengaturan_akun' %}"
+           class="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:opacity-90 transition">
+           ⚙️ Pengaturan Akun
+        </a>
+        <a href="{% url 'accounts:logout' %}"
+           class="px-5 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition">
+           🚪 Logout
+        </a>
+      </div>
+    </div>
+
+    <!-- Progress Tracker -->
+    <div class="mt-10 bg-white rounded-2xl shadow-md p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">📊 Progress Tracker</h3>
+
+    {% if progress %}
+        <div class="space-y-5">
+        {% for p in progress %}
+            <div class="p-4 bg-gray-50 rounded-xl">
+            <div class="flex justify-between items-center mb-2">
+                <h4 class="font-semibold text-gray-800">{{ p.sport.name }}</h4>
+                <span class="text-sm text-gray-600 font-medium">
+                {% if p.completed %}✅ 100%{% else %}{{ p.percent }}%{% endif %}
+                </span>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div class="h-3 bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-500"
+                    style="width: {{ p.percent }}%;">
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-500 mt-1">
+                {{ p.time_spent|floatformat:0 }} / 240 detik
+            </p>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-gray-500 italic">Belum ada progress yang tercatat.</p>
+    {% endif %}
+    </div>
+
+
+
+    <!-- Riwayat Aktivitas -->
+    <div class="mt-10 bg-white rounded-2xl shadow-md p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">🕓 Riwayat Aktivitas Terbaru</h3> {# Title updated slightly #}
+      
+      {% if aktivitas %}
+        <div class="space-y-3">
+          {% for act in aktivitas %}
+            {# --- Card Styling --- #}
+            <div class="bg-gray-50 p-3 rounded-xl border-l-4 border-indigo-200 transition hover:shadow-sm"> 
+              {# Display the description from the ActivityLog model #}
+              <p class="text-gray-700 text-sm font-medium">{{ act.description }}</p> 
+              {# Optional: Display action type subtly #}
+              {# <p class="text-xs text-indigo-500 font-semibold">{{ act.get_action_type_display }}</p> #}
+              <p class="text-xs text-gray-500 mt-1">{{ act.timestamp|date:"d M Y, H:i" }}</p>
+            </div>
+            {# --- End Card --- #}
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-gray-500 italic">Belum ada aktivitas yang tercatat.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

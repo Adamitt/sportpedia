@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  {% if edit_mode %}Edit Olahraga{% else %}Tambah Olahraga Baru{% endif %} - Sportpedia Admin
+{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 py-10 md:py-12">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-8">
+      <a href="{% url 'admin_sportpedia:manage_library' %}" 
+         class="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors shadow-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Kembali
+      </a>
+      
+      <h1 class="text-3xl md:text-4xl font-extrabold" style="color: #1C3264;">
+        {% if edit_mode %}
+          ✏️ Edit Olahraga
+        {% else %}
+          ➕ Tambah Olahraga Baru
+        {% endif %}
+      </h1>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 p-8">
+      <form method="POST" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Basic Information -->
+        <div class="border-b border-gray-200 pb-6">
+          <h2 class="text-xl font-bold mb-4" style="color: #1C3264;">📋 Informasi Dasar</h2>
+          
+          <!-- Name -->
+          <div class="mb-4">
+            <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
+              Nama Olahraga <span class="text-red-500">*</span>
+            </label>
+            <input type="text" 
+                   id="name" 
+                   name="name" 
+                   value="{{ sport.name|default:'' }}"
+                   required
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                   placeholder="Contoh: Sepak Bola">
+          </div>
+
+          <!-- Category & Difficulty Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- Category -->
+            <div>
+              <label for="category" class="block text-sm font-semibold text-gray-700 mb-2">
+                Kategori <span class="text-red-500">*</span>
+              </label>
+              <select id="category" 
+                      name="category" 
+                      required
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                <option value="">-- Pilih Kategori --</option>
+                <option value="Indoor" {% if sport.category == "Indoor" %}selected{% endif %}>Indoor</option>
+                <option value="Outdoor" {% if sport.category == "Outdoor" %}selected{% endif %}>Outdoor</option>
+              </select>
+            </div>
+
+            <!-- Difficulty -->
+            <div>
+              <label for="difficulty" class="block text-sm font-semibold text-gray-700 mb-2">
+                Tingkat Kesulitan <span class="text-red-500">*</span>
+              </label>
+              <select id="difficulty" 
+                      name="difficulty" 
+                      required
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                <option value="">-- Pilih Tingkat --</option>
+                <option value="Pemula" {% if sport.difficulty == "Pemula" %}selected{% endif %}>⭐ Pemula</option>
+                <option value="Menengah" {% if sport.difficulty == "Menengah" %}selected{% endif %}>⭐⭐ Menengah</option>
+                <option value="Lanjutan" {% if sport.difficulty == "Lanjutan" %}selected{% endif %}>⭐⭐⭐ Lanjutan</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-4">
+            <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
+              Deskripsi <span class="text-red-500">*</span>
+            </label>
+            <textarea id="description" 
+                      name="description" 
+                      rows="4"
+                      required
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      placeholder="Deskripsi singkat tentang olahraga ini...">{{ sport.description|default:'' }}</textarea>
+          </div>
+
+          <!-- History -->
+          <div>
+            <label for="history" class="block text-sm font-semibold text-gray-700 mb-2">
+              Sejarah <span class="text-red-500">*</span>
+            </label>
+            <textarea id="history" 
+                      name="history" 
+                      rows="5"
+                      required
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      placeholder="Sejarah dan asal-usul olahraga ini...">{{ sport.history|default:'' }}</textarea>
+          </div>
+        </div>
+
+        <!-- Detailed Information -->
+        <div class="border-b border-gray-200 pb-6">
+          <h2 class="text-xl font-bold mb-4" style="color: #1C3264;">📝 Informasi Detail</h2>
+          
+          <!-- Rules -->
+          <div class="mb-4">
+            <label for="rules" class="block text-sm font-semibold text-gray-700 mb-2">
+              Aturan Dasar
+            </label>
+            <textarea id="rules" 
+                      name="rules" 
+                      rows="4"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      placeholder="Pisahkan dengan koma (,) contoh: Aturan 1, Aturan 2, Aturan 3">{{ rules_str|default:'' }}</textarea>
+            <p class="text-xs text-gray-500 mt-1">💡 Pisahkan setiap aturan dengan koma</p>
+          </div>
+
+          <!-- Techniques -->
+          <div class="mb-4">
+            <label for="techniques" class="block text-sm font-semibold text-gray-700 mb-2">
+              Teknik Fundamental
+            </label>
+            <textarea id="techniques" 
+                      name="techniques" 
+                      rows="4"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      placeholder="Pisahkan dengan koma (,) contoh: Teknik 1, Teknik 2, Teknik 3">{{ techniques_str|default:'' }}</textarea>
+            <p class="text-xs text-gray-500 mt-1">💡 Pisahkan setiap teknik dengan koma</p>
+          </div>
+
+          <!-- Benefits -->
+          <div>
+            <label for="benefits" class="block text-sm font-semibold text-gray-700 mb-2">
+              Manfaat untuk Kesehatan
+            </label>
+            <textarea id="benefits" 
+                      name="benefits" 
+                      rows="4"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      placeholder="Pisahkan dengan koma (,) contoh: Manfaat 1, Manfaat 2, Manfaat 3">{{ benefits_str|default:'' }}</textarea>
+            <p class="text-xs text-gray-500 mt-1">💡 Pisahkan setiap manfaat dengan koma</p>
+          </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="pb-6">
+          <h2 class="text-xl font-bold mb-4" style="color: #1C3264;">🌍 Informasi Tambahan</h2>
+          
+          <!-- Popular Countries -->
+          <div class="mb-4">
+            <label for="popular_countries" class="block text-sm font-semibold text-gray-700 mb-2">
+              Negara Populer
+            </label>
+            <textarea id="popular_countries" 
+                      name="popular_countries" 
+                      rows="2"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      placeholder="Pisahkan dengan koma (,) contoh: Indonesia, Brasil, Jepang">{{ countries_str|default:'' }}</textarea>
+            <p class="text-xs text-gray-500 mt-1">💡 Pisahkan setiap negara dengan koma</p>
+          </div>
+
+          <!-- Tags -->
+          <div>
+            <label for="tags" class="block text-sm font-semibold text-gray-700 mb-2">
+              Tags / Kata Kunci
+            </label>
+            <textarea id="tags" 
+                      name="tags" 
+                      rows="2"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      placeholder="Pisahkan dengan koma (,) contoh: olahraga, tim, strategi">{{ tags_str|default:'' }}</textarea>
+            <p class="text-xs text-gray-500 mt-1">💡 Pisahkan setiap tag dengan koma</p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
+          <button type="submit"
+                  class="flex-1 inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all shadow-md hover:shadow-lg"
+                  style="background: linear-gradient(135deg, #1C3264 0%, #2d4a8f 100%);">
+            {% if edit_mode %}
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z" />
+              </svg>
+              Simpan Perubahan
+            {% else %}
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+              </svg>
+              Tambah Olahraga
+            {% endif %}
+          </button>
+
+          <a href="{% url 'admin_sportpedia:manage_library' %}"
+             class="flex-1 inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-all shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+            Batal
+          </a>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Help Section -->
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <h3 class="font-semibold text-blue-900 mb-2">💡 Tips Pengisian Form:</h3>
+      <ul class="text-sm text-blue-800 space-y-1">
+        <li>• Field dengan tanda <span class="text-red-500">*</span> wajib diisi</li>
+        <li>• Gunakan koma (,) untuk memisahkan item dalam list (rules, techniques, benefits, dll)</li>
+        <li>• Pastikan kategori dan tingkat kesulitan sesuai dengan karakteristik olahraga</li>
+        <li>• Deskripsi sebaiknya singkat namun informatif (2-3 kalimat)</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

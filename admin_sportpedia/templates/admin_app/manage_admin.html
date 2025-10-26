@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Manage Admins - Sportpedia Admin{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 py-10 md:py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+      <div class="flex items-center gap-4">
+        <a href="{% url 'admin_sportpedia:dashboard' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors shadow-sm">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+          Kembali
+        </a>
+        <h1 class="text-3xl md:text-4xl font-extrabold" style="color: #1C3264;">👥 Kelola Admin</h1>
+      </div>
+
+      {# --- Button to open ADD modal --- #}
+      <button type="button" id="add-admin-btn"
+         class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all shadow-md hover:shadow-lg"
+         style="background: linear-gradient(135deg, #1C3264 0%, #2d4a8f 100%);">
+        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+        Tambah Admin Baru
+      </button>
+    </div>
+
+    <div id="page-feedback" class="mb-5 space-y-3">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="{% if message.tags == 'error' %}bg-red-100 border-l-4 border-red-500 text-red-700{% elif message.tags == 'success' %}bg-green-100 border-l-4 border-green-500 text-green-700{% else %}bg-blue-100 border-l-4 border-blue-500 text-blue-700{% endif %} p-4 rounded-md" role="alert">
+                <p class="font-bold">{{ message.tags|capfirst }}</p>
+                <p>{{ message }}</p>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[640px] text-sm text-left text-gray-700">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-100" style="border-bottom: 2px solid #e5e7eb;">
+            <tr>
+              <th scope="col" class="px-6 py-4 font-semibold">Username</th>
+              <th scope="col" class="px-6 py-4 font-semibold">Email</th>
+              <th scope="col" class="px-6 py-4 font-semibold">Staff</th>
+              <th scope="col" class="px-6 py-4 font-semibold">Superuser</th>
+              <th scope="col" class="px-6 py-4 font-semibold text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-body"> {# Added ID for potential dynamic updates #}
+            {% for admin in admins %}
+            <tr class="bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+              <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ admin.username }}</td>
+              <td class="px-6 py-4">{{ admin.email|default:"-" }}</td>
+              <td class="px-6 py-4 text-center">{% if admin.is_staff %}✅{% else %}❌{% endif %}</td>
+              <td class="px-6 py-4 text-center">{% if admin.is_superuser %}👑{% else %}❌{% endif %}</td>
+              <td class="px-6 py-4 text-center whitespace-nowrap">
+                {# --- Button to open EDIT modal --- #}
+                <button type="button"
+                   class="edit-admin-btn font-medium text-blue-600 hover:text-blue-800 transition-colors mr-3"
+                   data-admin-id="{{ admin.id }}"
+                   data-get-url="{% url 'admin_sportpedia:get_admin_data' admin.id %}"
+                   data-edit-url="{% url 'admin_sportpedia:edit_admin' admin.id %}">
+                   ✏️ Edit
+                </button>
+                {# --- Delete Form (remains standard POST) --- #}
+                <form action="{% url 'admin_sportpedia:delete_admin' admin.id %}" method="post" class="inline-block"
+                      onsubmit="return confirm('Anda yakin ingin menghapus admin \'{{ admin.username|escapejs }}\'? Tindakan ini tidak dapat dibatalkan.');">
+                  {% csrf_token %}
+                  <button type="submit" class="font-medium text-red-600 hover:text-red-800 transition-colors">🗑️ Hapus</button>
+                </form>
+              </td>
+            </tr>
+            {% empty %}
+            <tr class="bg-white"><td colspan="5" class="px-6 py-10 text-center text-gray-500 italic">Tidak ada admin lain yang ditemukan.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ========================================== #}
+{# --- START: Add/Edit Admin Modal --- #}
+{# ========================================== #}
+<div id="admin-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 transition-opacity duration-300 opacity-0">
+  <div id="admin-modal-content" class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto transform scale-95 transition-transform duration-300">
+
+    <div class="flex justify-between items-center p-5 border-b border-gray-200 sticky top-0 bg-white z-10">
+      <h3 id="modal-title" class="text-xl font-semibold text-gray-800">Admin Form</h3>
+      <button type="button" id="close-admin-modal-btn" class="p-1 rounded-full text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+
+    <form id="admin-form" method="POST" action="" novalidate class="p-6 md:p-8 space-y-6">
+      {% csrf_token %}
+      <input type="hidden" name="admin_id" id="admin-id-field"> {# For edit identification #}
+
+      <div id="modal-feedback" class="space-y-3"></div>
+
+      {# --- Fields will be dynamically populated or use a placeholder form --- #}
+      {# --- Example using Add form structure initially --- #}
+      {% with form=add_form %} {# Pass add_form from manage_admin view context #}
+          {% for field in form %}
+            <div>
+              <label for="modal-{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                {{ field.label }}
+                {% if field.field.required %}<span class="text-red-600">*</span>{% endif %}
+              </label>
+              {# Apply classes via widget_tweaks or directly if needed #}
+              {% render_field field id="modal-"|add:field.id_for_label %}
+              {% if field.help_text %}
+                 <p class="mt-1 text-xs text-gray-500">{{ field.help_text|safe }}</p>
+              {% endif %}
+              <div id="error-modal-{{ field.auto_id }}" class="form-field-error hidden">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                <span></span>
+              </div>
+            </div>
+          {% endfor %}
+      {% endwith %}
+
+      <div class="pt-5 border-t border-gray-200 mt-6 flex justify-end gap-3">
+        <button type="button" id="cancel-admin-modal-btn" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors">
+          Batal
+        </button>
+        <button type="submit" id="submit-admin-modal-btn" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white transition-all shadow-md hover:shadow-lg" style="background: linear-gradient(135deg, #1C3264 0%, #2d4a8f 100%);">
+          💾 <span id="modal-submit-text">Submit</span>
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+{# ========================================== #}
+{# --- END: Add/Edit Admin Modal --- #}
+{# ========================================== #}
+
+{% endblock %}
+
+
+{% block head %}
+{{ block.super }}
+{% load widget_tweaks %} {# Load widget_tweaks here #}
+<style>
+  tbody tr:last-child { border-bottom: none; }
+  .form-field-error { margin-top: 0.25rem; font-size: 0.75rem; color: #dc2626; display: flex; align-items: center;}
+  .form-field-error svg { width: 0.875rem; height: 0.875rem; margin-right: 0.25rem; }
+  #modal-feedback div { transition: opacity 0.3s ease; }
+</style>
+{% endblock %}
+
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('admin-modal');
+    const modalContent = document.getElementById('admin-modal-content');
+    const modalTitle = document.getElementById('modal-title');
+    const adminForm = document.getElementById('admin-form');
+    const submitBtn = document.getElementById('submit-admin-modal-btn');
+    const submitBtnText = document.getElementById('modal-submit-text');
+    const adminIdField = document.getElementById('admin-id-field'); // Hidden field for edit
+    const modalFeedbackDiv = document.getElementById('modal-feedback');
+    const addAdminBtn = document.getElementById('add-admin-btn');
+    const closeBtn = document.getElementById('close-admin-modal-btn');
+    const cancelBtn = document.getElementById('cancel-admin-modal-btn');
+    const editAdminBtns = document.querySelectorAll('.edit-admin-btn');
+
+    // --- Modal Control ---
+    function openModal() { modal.classList.remove('hidden'); setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); }, 10); }
+    function closeModal() { modal.classList.add('opacity-0'); modalContent.classList.add('scale-95'); setTimeout(() => { modal.classList.add('hidden'); clearModalFeedback(); adminForm.reset(); }, 300); }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    if (modal) { modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); }); }
+
+    // --- Prepare ADD Modal ---
+    if (addAdminBtn) {
+        addAdminBtn.addEventListener('click', () => {
+            adminForm.action = "{% url 'admin_sportpedia:add_admin' %}";
+            modalTitle.textContent = '➕ Tambah Admin Baru';
+            submitBtnText.textContent = 'Tambah Admin';
+            adminIdField.value = ''; // Clear ID field
+            adminForm.reset(); // Clear form fields
+            // Ensure password field is treated as required for add (if needed, adjust form logic)
+            // You might need JS to add/remove 'required' attribute if form differs significantly
+            openModal();
+        });
+    }
+
+    // --- Prepare EDIT Modal ---
+    editAdminBtns.forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const adminId = btn.dataset.adminId;
+            const getUrl = btn.dataset.getUrl;
+            const editUrl = btn.dataset.editUrl;
+
+            adminForm.action = editUrl;
+            modalTitle.textContent = '✏️ Edit Admin';
+            submitBtnText.textContent = 'Simpan Perubahan';
+            adminIdField.value = adminId; // Set hidden ID for edit view reference if needed
+
+            // Fetch current admin data
+            try {
+                // --- THIS 'FETCH' IS FAILING ---
+                const response = await fetch(getUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'} });
+                if (!response.ok) throw new Error('Failed to fetch admin data'); 
+                // --- IT FAILS AND JUMPS TO CATCH ---
+
+                const data = await response.json();
+                // ... (populates form) ...
+                openModal();
+
+            } catch (error) {
+                // --- WHICH TRIGGERS THIS ALERT ---
+                console.error("Error fetching admin data:", error);
+                alert('Gagal memuat data admin. Silakan coba lagi.'); 
+            }
+        });
+    });
+
+    // --- AJAX Form Submission ---
+    if (adminForm) {
+        adminForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            clearModalFeedback();
+            const formData = new FormData(adminForm);
+            const originalButtonHTML = submitBtn.innerHTML; // Store full HTML
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Menyimpan...`;
+
+            try {
+                const response = await fetch(adminForm.action, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': formData.get('csrfmiddlewaretoken'), 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showModalFeedback(data.message, 'success');
+                    // Reload the page to see changes in the table
+                    setTimeout(() => { window.location.reload(); }, 1500);
+                    // Or implement dynamic table update here if preferred
+                } else {
+                    if (data.errors) { showModalFieldErrors(data.errors); showModalFeedback('Perbaiki error di bawah.', 'error'); }
+                    else if (data.message) { showModalFeedback(data.message, 'error'); }
+                    else { showModalFeedback('Terjadi kesalahan.', 'error'); }
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                showModalFeedback('Terjadi kesalahan jaringan.', 'error');
+            } finally {
+                // Restore button only if not redirecting/reloading soon
+                if (! (response?.ok && data?.success)) {
+                   submitBtn.disabled = false;
+                   submitBtn.innerHTML = originalButtonHTML;
+                }
+            }
+        });
+    }
+
+    // --- Helper Functions for Feedback ---
+    function showModalFeedback(message, type = 'error') {
+        const alertClass = type === 'success' ? 'bg-green-100 border-l-4 border-green-500 text-green-700' : 'bg-red-100 border-l-4 border-red-500 text-red-700';
+        const iconPath = type === 'success' ? 'M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' : 'M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z';
+        modalFeedbackDiv.innerHTML = `<div class="${alertClass} p-4 rounded-md opacity-0" role="alert" style="transition: opacity 0.3s ease;"><div class="flex"><div class="flex-shrink-0"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="${iconPath}" clip-rule="evenodd"/></svg></div><div class="ml-3"><p class="text-sm font-medium">${message}</p></div></div></div>`;
+        setTimeout(() => { const alertBox = modalFeedbackDiv.querySelector('div'); if(alertBox) alertBox.style.opacity = '1'; }, 10);
+    }
+    function showModalFieldErrors(errors) {
+        for (const fieldName in errors) {
+            const errorMsg = errors[fieldName][0];
+            // Adjust field ID prefix based on actual modal rendering
+            const fieldId = `modal-id_${fieldName}`;
+            const errorDiv = document.getElementById(`error-${fieldId}`); // Corrected ID targeting
+            if (errorDiv) { errorDiv.querySelector('span').textContent = errorMsg; errorDiv.classList.remove('hidden'); }
+            const inputField = document.getElementById(fieldId);
+            if (inputField) inputField.classList.add('border-red-500');
+        }
+    }
+    function clearModalFeedback() {
+        modalFeedbackDiv.innerHTML = '';
+        adminForm.querySelectorAll('.form-field-error').forEach(el => { el.classList.add('hidden'); el.querySelector('span').textContent = ''; });
+        adminForm.querySelectorAll('input, textarea').forEach(el => { el.classList.remove('border-red-500'); });
+    }
+
+}); // End DOMContentLoaded
+</script>
+{% endblock %}

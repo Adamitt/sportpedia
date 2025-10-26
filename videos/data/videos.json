@@ -1,0 +1,791 @@
+[
+  {
+    "id": 1,
+    "sport_id": 1,
+    "title": "Cara Memegang Raket dengan Benar (Grip Dasar)",
+    "difficulty": "Pemula",
+    "duration": "04:21",
+    "url": "https://www.youtube.com/watch?v=bS-cOAQ2DCw",
+    "thumbnail": "https://img.youtube.com/vi/bS-cOAQ2DCw/hqdefault.jpg",
+    "instructor": "Coach Rian",
+    "description": "Pelajari perbedaan antara forehand dan backhand grip yang menjadi dasar permainan bulu tangkis.",
+    "rating": 4.8,
+    "views": 13425,
+    "upload_date": "2025-02-10",
+    "tags": [
+      "badminton",
+      "grip",
+      "tutorial",
+      "pemula"
+    ],
+    "sport_name": "Badminton"
+  },
+  {
+    "id": 2,
+    "sport_id": 1,
+    "title": "Footwork Dasar untuk Pemula",
+    "difficulty": "Pemula",
+    "duration": "05:02",
+    "url": "https://www.youtube.com/watch?v=QOt6aH5xxV0",
+    "thumbnail": "https://img.youtube.com/vi/QOt6aH5xxV0/hqdefault.jpg",
+    "instructor": "Coach Lia",
+    "description": "Teknik langkah kaki yang benar agar bisa bergerak cepat di lapangan.",
+    "rating": 4.7,
+    "views": 11200,
+    "upload_date": "2025-02-15",
+    "tags": [
+      "footwork",
+      "agility",
+      "badminton"
+    ]
+  },
+  {
+    "id": 3,
+    "sport_id": 1,
+    "title": "Latihan Smash Dasar dan Timing Tepat",
+    "difficulty": "Menengah",
+    "duration": "06:10",
+    "url": "https://www.youtube.com/watch?v=H7kpZ9inc10",
+    "thumbnail": "https://img.youtube.com/vi/H7kpZ9inc10/hqdefault.jpg",
+    "instructor": "Coach Kevin",
+    "description": "Cara menghasilkan smash kuat dengan kontrol arah dan kecepatan optimal.",
+    "rating": 4.9,
+    "views": 18559,
+    "upload_date": "2025-03-01",
+    "tags": [
+      "smash",
+      "power",
+      "intermediate"
+    ],
+    "sport_name": "Bulu Tangkis",
+    "likes": 4
+  },
+  {
+    "id": 4,
+    "sport_id": 2,
+    "title": "Yoga untuk Pemula: Pernapasan Pranayama",
+    "difficulty": "Pemula",
+    "duration": "07:30",
+    "url": "https://www.youtube.com/watch?v=I77hh5I69gA",
+    "thumbnail": "https://img.youtube.com/vi/I77hh5I69gA/hqdefault.jpg",
+    "instructor": "Ayu Devi",
+    "description": "Latihan pernapasan dalam untuk menenangkan pikiran dan meningkatkan konsentrasi.",
+    "rating": 4.8,
+    "views": 9500,
+    "upload_date": "2025-01-28",
+    "tags": [
+      "yoga",
+      "breathing",
+      "calm"
+    ]
+  },
+  {
+    "id": 5,
+    "sport_id": 2,
+    "title": "Pose Dasar Yoga: Mountain & Warrior",
+    "difficulty": "Pemula",
+    "duration": "06:45",
+    "url": "https://www.youtube.com/watch?v=v7AYKMP6rOE",
+    "thumbnail": "https://img.youtube.com/vi/v7AYKMP6rOE/hqdefault.jpg",
+    "instructor": "Nadya Purnama",
+    "description": "Pelajari pose paling dasar yang melatih keseimbangan dan kekuatan inti tubuh.",
+    "rating": 4.9,
+    "views": 10240,
+    "upload_date": "2025-02-05",
+    "tags": [
+      "yoga",
+      "pose",
+      "balance"
+    ]
+  },
+  {
+    "id": 6,
+    "sport_id": 3,
+    "title": "Bagaimana cara melakukan servis yang sah? - Semua aturan servis tenis meja",
+    "difficulty": "Menengah",
+    "duration": "05:15",
+    "url": "https://www.youtube.com/watch?v=B5HVrxujvdc",
+    "thumbnail": "https://img.youtube.com/vi/B5HVrxujvdc/hqdefault.jpg",
+    "instructor": "Learn Table Tennis",
+    "description": "Panduan melakukan serve atas dan slice untuk kontrol bola lebih baik.",
+    "rating": 4.7,
+    "views": 8700,
+    "upload_date": "2025-01-10",
+    "tags": [
+      "tennis",
+      "serve",
+      "technique"
+    ]
+  },
+  {
+    "id": 7,
+    "sport_id": 3,
+    "title": "Cara Cepat Bisa Backhand Untuk Pemula",
+    "difficulty": "Pemula",
+    "duration": "04:50",
+    "url": "https://www.youtube.com/watch?v=7YlRfZ8THDg",
+    "thumbnail": "https://img.youtube.com/vi/7YlRfZ8THDg/hqdefault.jpg",
+    "instructor": "Yogi Ardiansyah",
+    "description": "Gerakan backhand yang efisien tanpa kehilangan kekuatan pukulan.",
+    "rating": 4.6,
+    "views": 7400,
+    "upload_date": "2025-01-20",
+    "tags": [
+      "tennis",
+      "backhand",
+      "racket"
+    ]
+  },
+  {
+    "id": 8,
+    "sport_id": 4,
+    "title": "Teknik Dasar Gaya Bebas",
+    "difficulty": "Pemula",
+    "duration": "05:40",
+    "url": "https://www.youtube.com/watch?v=5HLW2AI1Ink",
+    "thumbnail": "https://img.youtube.com/vi/5HLW2AI1Ink/hqdefault.jpg",
+    "instructor": "Coach Dimas",
+    "description": "Cara mengatur pernapasan dan gerakan tangan dalam gaya bebas.",
+    "rating": 4.9,
+    "views": 15700,
+    "upload_date": "2025-01-15",
+    "tags": [
+      "swimming",
+      "freestyle",
+      "water"
+    ]
+  },
+  {
+    "id": 9,
+    "sport_id": 4,
+    "title": "Cara mudah belajar renang dasar untuk pemula",
+    "difficulty": "Pemula",
+    "duration": "06:05",
+    "url": "https://www.youtube.com/watch?v=LVy9mwWfXxc",
+    "thumbnail": "https://img.youtube.com/vi/LVy9mwWfXxc/hqdefault.jpg",
+    "instructor": "Fajar Ranger",
+    "description": "Pelajari sinkronisasi tangan dan kaki pada gaya dada.",
+    "rating": 4.8,
+    "views": 8900,
+    "upload_date": "2025-02-10",
+    "tags": [
+      "swim",
+      "breaststroke",
+      "beginner"
+    ]
+  },
+  {
+    "id": 10,
+    "sport_id": 5,
+    "title": "TEKNIK DASAR PANAHAN. Tutorial belajar memanah untuk pemula.",
+    "difficulty": "Pemula",
+    "duration": "05:22",
+    "url": "https://www.youtube.com/watch?v=w_r3tZlVges",
+    "thumbnail": "https://img.youtube.com/vi/w_r3tZlVges/hqdefault.jpg",
+    "instructor": "Smack Archery",
+    "description": "Cara memegang busur dengan stabil dan nyaman sebelum menarik tali.",
+    "rating": 4.8,
+    "views": 6700,
+    "upload_date": "2025-03-01",
+    "tags": [
+      "archery",
+      "grip",
+      "focus"
+    ]
+  },
+  {
+    "id": 11,
+    "sport_id": 5,
+    "title": "Cara membidik/aiming pada busur horsebow dengan teknik thumbdraw",
+    "difficulty": "Menengah",
+    "duration": "06:40",
+    "url": "https://www.youtube.com/watch?v=NkMu9TRj1mo",
+    "thumbnail": "https://img.youtube.com/vi/NkMu9TRj1mo/hqdefault.jpg",
+    "instructor": "Coach Intan",
+    "description": "Langkah-langkah membidik target dan pelepasan panah yang halus.",
+    "rating": 4.9,
+    "views": 9300,
+    "upload_date": "2025-03-10",
+    "tags": [
+      "archery",
+      "aim",
+      "outdoor"
+    ]
+  },
+  {
+    "id": 12,
+    "sport_id": 6,
+    "title": "Teknik Lari yang Efisien",
+    "difficulty": "Pemula",
+    "duration": "04:50",
+    "url": "https://www.youtube.com/watch?v=brFHyOtTwH4",
+    "thumbnail": "https://img.youtube.com/vi/brFHyOtTwH4/hqdefault.jpg",
+    "instructor": "Coach Aldi",
+    "description": "Postur tubuh, ayunan tangan, dan pernapasan yang benar untuk lari jarak pendek.",
+    "rating": 4.8,
+    "views": 11001,
+    "upload_date": "2025-02-22",
+    "tags": [
+      "running",
+      "form",
+      "outdoor"
+    ],
+    "sport_name": "Renang"
+  },
+  {
+    "id": 13,
+    "sport_id": 6,
+    "title": "Cara Menjaga Ritme Napas Saat Lari",
+    "difficulty": "Pemula",
+    "duration": "05:10",
+    "url": "https://www.youtube.com/watch?v=THDtsFprFiE",
+    "thumbnail": "https://img.youtube.com/vi/THDtsFprFiE/hqdefault.jpg",
+    "instructor": "Fahri Ardi",
+    "description": "Latihan mengatur pola napas agar tidak cepat lelah.",
+    "rating": 4.7,
+    "views": 9300,
+    "upload_date": "2025-02-27",
+    "tags": [
+      "running",
+      "breathing",
+      "stamina"
+    ]
+  },
+  {
+    "id": 14,
+    "sport_id": 7,
+    "title": "Pelajari Seni KONTROL YANG SANGAT KETAT!",
+    "difficulty": "Pemula",
+    "duration": "05:35",
+    "url": "https://www.youtube.com/watch?v=9Vc2OY7MiSw",
+    "thumbnail": "https://img.youtube.com/vi/9Vc2OY7MiSw/hqdefault.jpg",
+    "instructor": "2oddlers Football ",
+    "description": "Teknik dasar dribble dan latihan koordinasi tangan-kaki.",
+    "rating": 4.8,
+    "views": 9900,
+    "upload_date": "2025-02-01",
+    "tags": [
+      "basket",
+      "dribble",
+      "control"
+    ]
+  },
+  {
+    "id": 15,
+    "sport_id": 7,
+    "title": "Cara ngeshoot bola yang baik dan benar ala Avan Seputra - Ballerbro Tutorial",
+    "difficulty": "Menengah",
+    "duration": "05:45",
+    "url": "https://www.youtube.com/watch?v=PQkwNNzlC0c",
+    "thumbnail": "https://img.youtube.com/vi/PQkwNNzlC0c/hqdefault.jpg",
+    "instructor": "BALLERBRO IDN",
+    "description": "Pelajari posisi tangan dan arah bola agar tembakan lebih akurat.",
+    "rating": 4.9,
+    "views": 10702,
+    "upload_date": "2025-03-03",
+    "tags": [
+      "shooting",
+      "basket",
+      "focus"
+    ],
+    "sport_name": "Football"
+  },
+  {
+    "id": 16,
+    "sport_id": 8,
+    "title": "Strategi Tiki Taka Futsal Formasi Menyerang | Formasi Futsal Terbaik",
+    "difficulty": "Pemula",
+    "duration": "06:05",
+    "url": "https://www.youtube.com/watch?v=kCBUQu8_sro",
+    "thumbnail": "https://img.youtube.com/vi/kCBUQu8_sro/hqdefault.jpg",
+    "instructor": "Coach Riko",
+    "description": "Cara melakukan passing cepat dan menjaga rotasi pemain selama permainan.",
+    "rating": 4.7,
+    "views": 8600,
+    "upload_date": "2025-01-25",
+    "tags": [
+      "futsal",
+      "teamwork",
+      "passing"
+    ]
+  },
+  {
+    "id": 17,
+    "sport_id": 8,
+    "title": "HOW TO CONTROL THE BALL IN FUTSAL",
+    "difficulty": "Menengah",
+    "duration": "05:50",
+    "url": "https://www.youtube.com/watch?v=NFeqYlMRx8c",
+    "thumbnail": "https://img.youtube.com/vi/NFeqYlMRx8c/hqdefault.jpg",
+    "instructor": "Coach Tama",
+    "description": "Latihan kontrol bola menggunakan sisi kaki dan menjaga tempo permainan.",
+    "rating": 4.8,
+    "views": 9400,
+    "upload_date": "2025-02-03",
+    "tags": [
+      "futsal",
+      "control",
+      "skill"
+    ]
+  },
+  {
+    "id": 18,
+    "sport_id": 9,
+    "title": "Tips Aman Bersepeda di Jalan Raya",
+    "difficulty": "Pemula",
+    "duration": "06:30",
+    "url": "https://www.youtube.com/watch?v=wadbDQk864o",
+    "thumbnail": "https://img.youtube.com/vi/wadbDQk864o/hqdefault.jpg",
+    "instructor": "Sleman TV",
+    "description": "Panduan penting untuk menjaga keselamatan dan posisi ideal saat bersepeda di jalan umum.",
+    "rating": 4.9,
+    "views": 15402,
+    "upload_date": "2025-02-18",
+    "tags": [
+      "cycling",
+      "safety",
+      "tips"
+    ],
+    "sport_name": "Bersepeda"
+  },
+  {
+    "id": 19,
+    "sport_id": 9,
+    "title": "Cara Fungsi Oper Gigi Sepeda Buat Ngebut Dan Tanjakan",
+    "difficulty": "Menengah",
+    "duration": "05:20",
+    "url": "https://www.youtube.com/watch?v=-xIPBHIzjIA",
+    "thumbnail": "https://img.youtube.com/vi/-xIPBHIzjIA/hqdefault.jpg",
+    "instructor": "BANGGANS",
+    "description": "Pelajari kapan harus mengganti gear agar kayuhan tetap efisien.",
+    "rating": 4.8,
+    "views": 10200,
+    "upload_date": "2025-03-08",
+    "tags": [
+      "cycling",
+      "gear",
+      "outdoor"
+    ]
+  },
+  {
+    "id": 20,
+    "sport_id": 10,
+    "title": "cara melakukan service side spin tenis meja terkini khusus pemula",
+    "difficulty": "Pemula",
+    "duration": "04:45",
+    "url": "https://www.youtube.com/watch?v=5ixXfDU6tlQ",
+    "thumbnail": "https://img.youtube.com/vi/5ixXfDU6tlQ/hqdefault.jpg",
+    "instructor": "The PingPong Video",
+    "description": "Latihan servis dasar dengan kontrol arah bola dan putaran.",
+    "rating": 4.7,
+    "views": 6901,
+    "upload_date": "2025-01-30",
+    "tags": [
+      "pingpong",
+      "serve",
+      "indoor"
+    ],
+    "sport_name": "Table Tennis"
+  },
+  {
+    "id": 21,
+    "sport_id": 10,
+    "title": "Refleks Tersandung | RAHASIA Keberhasilan Latihan Kecepatan?!",
+    "difficulty": "Menengah",
+    "duration": "05:55",
+    "url": "https://www.youtube.com/watch?v=hMyGiXCZ9B0",
+    "thumbnail": "https://img.youtube.com/vi/hMyGiXCZ9B0/hqdefault.jpg",
+    "instructor": "Garage Strength",
+    "description": "Tingkatkan refleks dan kecepatan tangan lewat latihan rally 50 bola.",
+    "rating": 4.9,
+    "views": 8700,
+    "upload_date": "2025-02-14",
+    "tags": [
+      "pingpong",
+      "rally",
+      "speed"
+    ]
+  },
+  {
+    "id": 22,
+    "sport_id": 11,
+    "title": "BOLA VOLI | SERVIS BAWAH DAN ATAS",
+    "difficulty": "Pemula",
+    "duration": "05:25",
+    "url": "https://www.youtube.com/watch?v=RfvRMWFcdUs",
+    "thumbnail": "https://img.youtube.com/vi/RfvRMWFcdUs/hqdefault.jpg",
+    "instructor": "BELAJAR INI ITU",
+    "description": "Latihan servis bawah dan atas untuk kontrol bola yang baik.",
+    "rating": 4.8,
+    "views": 7100,
+    "upload_date": "2025-02-22",
+    "tags": [
+      "volley",
+      "serve",
+      "indoor"
+    ]
+  },
+  {
+    "id": 23,
+    "sport_id": 11,
+    "title": "How to SPIKE + BLOCK a Volleyball Tutorial",
+    "difficulty": "Menengah",
+    "duration": "06:20",
+    "url": "https://www.youtube.com/watch?v=x7LKWi4rJsM",
+    "thumbnail": "https://img.youtube.com/vi/x7LKWi4rJsM/hqdefault.jpg",
+    "instructor": "Coach Gina",
+    "description": "Langkah-langkah menghasilkan spike kuat dan cara membaca arah bola untuk blocking.",
+    "rating": 4.9,
+    "views": 9400,
+    "upload_date": "2025-03-01",
+    "tags": [
+      "volley",
+      "spike",
+      "blocking"
+    ]
+  },
+  {
+    "id": 24,
+    "sport_id": 12,
+    "title": "SAFETY PROCEDURE PANJAT TEBING",
+    "difficulty": "Pemula",
+    "duration": "07:00",
+    "url": "https://www.youtube.com/watch?v=LJdiayhdFNg",
+    "thumbnail": "https://img.youtube.com/vi/LJdiayhdFNg/hqdefault.jpg",
+    "instructor": "Mawarga Bandung",
+    "description": "Cara memakai harness dan melakukan pemeriksaan pengaman sebelum memanjat.",
+    "rating": 4.9,
+    "views": 8800,
+    "upload_date": "2025-02-18",
+    "tags": [
+      "climbing",
+      "safety",
+      "outdoor"
+    ]
+  },
+  {
+    "id": 25,
+    "sport_id": 12,
+    "title": "Tutorial Pemakaian Peralatan Belay",
+    "difficulty": "Menengah",
+    "duration": "06:35",
+    "url": "https://www.youtube.com/watch?v=1jKpVtDznWk",
+    "thumbnail": "https://img.youtube.com/vi/1jKpVtDznWk/hqdefault.jpg",
+    "instructor": "RIMPALA FAHUTAN IPB",
+    "description": "Panduan lengkap mengamankan partner dengan teknik belay yang aman.",
+    "rating": 4.8,
+    "views": 7600,
+    "upload_date": "2025-02-20",
+    "tags": [
+      "climbing",
+      "belay",
+      "rope"
+    ]
+  },
+  {
+    "id": 26,
+    "sport_id": 13,
+    "title": "TEKNIK DASAR TENDANGAN MUAY THAI",
+    "difficulty": "Pemula",
+    "duration": "05:25",
+    "url": "https://www.youtube.com/watch?v=Q9LZytMGP0s",
+    "thumbnail": "https://img.youtube.com/vi/Q9LZytMGP0s/hqdefault.jpg",
+    "instructor": "Hook Fight Gear",
+    "description": "Pelajari teknik tendangan dasar seperti teep dan roundhouse dengan posisi tubuh seimbang.",
+    "rating": 4.8,
+    "views": 8200,
+    "upload_date": "2025-02-18",
+    "tags": [
+      "muaythai",
+      "kick",
+      "combat"
+    ]
+  },
+  {
+    "id": 27,
+    "sport_id": 13,
+    "title": "Different Muay Thai Knees",
+    "difficulty": "Menengah",
+    "duration": "06:10",
+    "url": "https://www.youtube.com/watch?v=mLKj_aYZRks",
+    "thumbnail": "https://img.youtube.com/vi/mLKj_aYZRks/hqdefault.jpg",
+    "instructor": "Coach Petch",
+    "description": "Teknik clinch yang efektif dan kombinasi serangan lutut untuk kontrol jarak dekat.",
+    "rating": 4.9,
+    "views": 9600,
+    "upload_date": "2025-03-01",
+    "tags": [
+      "muaythai",
+      "knee",
+      "defense"
+    ]
+  },
+  {
+    "id": 28,
+    "sport_id": 14,
+    "title": "How to Hold and Grip the Golf Club",
+    "difficulty": "Pemula",
+    "duration": "05:40",
+    "url": "https://www.youtube.com/watch?v=hhnhHgvOaB0",
+    "thumbnail": "https://img.youtube.com/vi/hhnhHgvOaB0/hqdefault.jpg",
+    "instructor": "Rick Shiels Golf",
+    "description": "Langkah-langkah melakukan ayunan penuh dengan grip yang benar.",
+    "rating": 4.8,
+    "views": 7000,
+    "upload_date": "2025-02-22",
+    "tags": [
+      "golf",
+      "swing",
+      "grip"
+    ]
+  },
+  {
+    "id": 29,
+    "sport_id": 14,
+    "title": "Teknik Putting untuk Skor Rendah",
+    "difficulty": "Menengah",
+    "duration": "06:30",
+    "url": "https://www.youtube.com/watch?v=GO49hVlNf-8",
+    "thumbnail": "https://img.youtube.com/vi/GO49hVlNf-8/hqdefault.jpg",
+    "instructor": "Coach Riko",
+    "description": "Latihan fokus dan kekuatan pukulan ringan saat putting di green.",
+    "rating": 4.9,
+    "views": 9500,
+    "upload_date": "2025-03-05",
+    "tags": [
+      "golf",
+      "putting",
+      "focus"
+    ]
+  },
+  {
+    "id": 30,
+    "sport_id": 15,
+    "title": "Cara Melesat di Papan Selancar | Teknik Lepas Landas untuk Pemula",
+    "difficulty": "Pemula",
+    "duration": "07:10",
+    "url": "https://www.youtube.com/watch?v=KCLWvAcPcPk",
+    "thumbnail": "https://img.youtube.com/vi/KCLWvAcPcPk/hqdefault.jpg",
+    "instructor": "Barefoot Surf",
+    "description": "Teknik berpindah dari posisi berbaring ke berdiri di atas papan dengan seimbang.",
+    "rating": 4.9,
+    "views": 11200,
+    "upload_date": "2025-02-09",
+    "tags": [
+      "surf",
+      "popup",
+      "balance"
+    ]
+  },
+  {
+    "id": 31,
+    "sport_id": 15,
+    "title": "Watch THIS To Read ANY Wave With 1 Glance",
+    "difficulty": "Menengah",
+    "duration": "06:45",
+    "url": "https://www.youtube.com/watch?v=l6iz_hMM3q4",
+    "thumbnail": "https://img.youtube.com/vi/l6iz_hMM3q4/hqdefault.jpg",
+    "instructor": "Hydro Mind",
+    "description": "Pelajari cara menentukan timing dan posisi terbaik sebelum mengambil ombak.",
+    "rating": 4.8,
+    "views": 8800,
+    "upload_date": "2025-03-02",
+    "tags": [
+      "surf",
+      "wave",
+      "timing"
+    ]
+  },
+  {
+    "id": 32,
+    "sport_id": 16,
+    "title": "TEKNIK TENDANGAN DALAM PENCAK SILAT",
+    "difficulty": "Pemula",
+    "duration": "05:55",
+    "url": "https://www.youtube.com/watch?v=yo5ZVvBEE7s",
+    "thumbnail": "https://img.youtube.com/vi/yo5ZVvBEE7s/hqdefault.jpg",
+    "instructor": "Guru Jaya",
+    "description": "Pelajari kuda-kuda dasar dan pukulan lurus untuk membangun keseimbangan tubuh.",
+    "rating": 4.9,
+    "views": 10101,
+    "upload_date": "2025-01-28",
+    "tags": [
+      "silat",
+      "stance",
+      "tradisi"
+    ],
+    "sport_name": "Pencak Silat"
+  },
+  {
+    "id": 33,
+    "sport_id": 16,
+    "title": "Tangkisan, Hindaran, Elakan ll Pencak Silat",
+    "difficulty": "Menengah",
+    "duration": "06:20",
+    "url": "https://www.youtube.com/watch?v=oQ_lqze55GE",
+    "thumbnail": "https://img.youtube.com/vi/oQ_lqze55GE/hqdefault.jpg",
+    "instructor": "pandora channel",
+    "description": "Latihan refleks dan gerakan menghindar dari serangan lawan.",
+    "rating": 4.8,
+    "views": 9700,
+    "upload_date": "2025-02-20",
+    "tags": [
+      "silat",
+      "defense",
+      "refleks"
+    ]
+  },
+  {
+    "id": 34,
+    "sport_id": 17,
+    "title": "Teknik Pitching Dasar Baseball",
+    "difficulty": "Pemula",
+    "duration": "05:40",
+    "url": "https://www.youtube.com/watch?v=QN6P2q-9AJg",
+    "thumbnail": "https://img.youtube.com/vi/QN6P2q-9AJg/hqdefault.jpg",
+    "instructor": "ngurah oka",
+    "description": "Langkah-langkah dasar melempar bola dengan kontrol dan akurasi.",
+    "rating": 4.7,
+    "views": 8900,
+    "upload_date": "2025-02-12",
+    "tags": [
+      "baseball",
+      "pitch",
+      "outdoor"
+    ]
+  },
+  {
+    "id": 35,
+    "sport_id": 17,
+    "title": "How To Hit A Baseball",
+    "difficulty": "Pemula",
+    "duration": "06:15",
+    "url": "https://www.youtube.com/watch?v=YY9tErIBVQw",
+    "thumbnail": "https://img.youtube.com/vi/YY9tErIBVQw/hqdefault.jpg",
+    "instructor": "Coach Rafi",
+    "description": "Teknik ayunan tangan yang tepat untuk pukulan bola cepat.",
+    "rating": 4.9,
+    "views": 9400,
+    "upload_date": "2025-03-06",
+    "tags": [
+      "baseball",
+      "bat",
+      "swing"
+    ]
+  },
+  {
+    "id": 36,
+    "sport_id": 18,
+    "title": "Ollie: Trik Dasar Skateboard",
+    "difficulty": "Pemula",
+    "duration": "05:10",
+    "url": "https://www.youtube.com/watch?v=QkeOAcj8Y5k",
+    "thumbnail": "https://img.youtube.com/vi/QkeOAcj8Y5k/hqdefault.jpg",
+    "instructor": "Coach Derry",
+    "description": "Panduan langkah demi langkah untuk mempelajari trik ollie pertama kamu.",
+    "rating": 4.9,
+    "views": 12801,
+    "upload_date": "2025-02-14",
+    "tags": [
+      "skate",
+      "trick",
+      "beginner"
+    ],
+    "sport_name": "Skateboarding"
+  },
+  {
+    "id": 37,
+    "sport_id": 18,
+    "title": "Latihan Balance dan Drop-In",
+    "difficulty": "Menengah",
+    "duration": "06:00",
+    "url": "https://www.youtube.com/watch?v=VasSLuFO4wY",
+    "thumbnail": "https://img.youtube.com/vi/VasSLuFO4wY/hqdefault.jpg",
+    "instructor": "Coach Rio",
+    "description": "Cara menjaga keseimbangan saat turun di half-pipe dengan aman.",
+    "rating": 4.8,
+    "views": 9800,
+    "upload_date": "2025-02-22",
+    "tags": [
+      "skate",
+      "balance",
+      "urban"
+    ]
+  },
+  {
+    "id": 38,
+    "sport_id": 19,
+    "title": "Latihan Pull-Up untuk Pemula",
+    "difficulty": "Pemula",
+    "duration": "04:50",
+    "url": "https://www.youtube.com/watch?v=eGo4IYlbE5g",
+    "thumbnail": "https://img.youtube.com/vi/eGo4IYlbE5g/hqdefault.jpg",
+    "instructor": "Coach Alvi",
+    "description": "Cara memulai latihan pull-up dengan bantuan resistance band.",
+    "rating": 4.8,
+    "views": 10400,
+    "upload_date": "2025-03-01",
+    "tags": [
+      "calisthenics",
+      "pullup",
+      "bodyweight"
+    ]
+  },
+  {
+    "id": 39,
+    "sport_id": 19,
+    "title": "Progression Planche dan Handstand",
+    "difficulty": "Menengah",
+    "duration": "06:25",
+    "url": "https://www.youtube.com/watch?v=mRznU6pzez0",
+    "thumbnail": "https://img.youtube.com/vi/mRznU6pzez0/hqdefault.jpg",
+    "instructor": "Coach Yudha",
+    "description": "Langkah progresif untuk meningkatkan kekuatan bahu dan keseimbangan tubuh.",
+    "rating": 4.9,
+    "views": 9700,
+    "upload_date": "2025-03-08",
+    "tags": [
+      "calisthenics",
+      "planche",
+      "strength"
+    ]
+  },
+  {
+    "id": 40,
+    "sport_id": 20,
+    "title": "Pelajari 100+ Teknik Panjat Tebing Hanya dengan 4 Konsep Gerakan",
+    "difficulty": "Pemula",
+    "duration": "05:35",
+    "url": "https://www.youtube.com/watch?v=a8DTOztiuLM",
+    "thumbnail": "https://img.youtube.com/vi/a8DTOztiuLM/hqdefault.jpg",
+    "instructor": "Lattice Training",
+    "description": "Latihan posisi kaki agar efisien saat memanjat dinding dalam ruangan.",
+    "rating": 4.9,
+    "views": 8200,
+    "upload_date": "2025-02-28",
+    "tags": [
+      "climb",
+      "indoor",
+      "footwork"
+    ]
+  },
+  {
+    "id": 41,
+    "sport_id": 20,
+    "title": "Pelajari 100+ Teknik Panjat Tebing Hanya dengan 4 Konsep Gerakan",
+    "difficulty": "Menengah",
+    "duration": "06:40",
+    "url": "https://www.youtube.com/watch?v=a8DTOztiuLM",
+    "thumbnail": "https://img.youtube.com/vi/a8DTOztiuLM/hqdefault.jpg",
+    "instructor": "Lattice Training",
+    "description": "Gerakan eksplosif dan jangkauan optimal untuk jalur panjat yang menantang.",
+    "rating": 4.9,
+    "views": 9100,
+    "upload_date": "2025-03-10",
+    "tags": [
+      "climb",
+      "reach",
+      "technique"
+    ]
+  }
+]
