@@ -161,11 +161,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Folder tempat Django nyari file static kamu (contohnya images, css, js)
 STATICFILES_DIRS = [
-    BASE_DIR / "static",        # static global di root project
+    BASE_DIR / "static"        # static global di root project
     # BASE_DIR / "main" / "static",  # static di app main
 ]
 
