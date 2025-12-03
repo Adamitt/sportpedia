@@ -14,18 +14,11 @@ from sportlibrary.models import Sport
 from profile_app.models import ActivityLog
 from .models import Gear
 
-
-# ==============================================================
-# HELPER FUNCTIONS
-# ==============================================================
-
 def admin_only(user):
-    """Cek user admin/superuser"""
     return user.is_staff or user.is_superuser
 
 
 def _log_activity(request, gear_name):
-    """Log aktivitas user"""
     if request.user.is_authenticated:
         ActivityLog.objects.create(
             user=request.user,
@@ -35,7 +28,6 @@ def _log_activity(request, gear_name):
 
 
 def _gear_to_json(gear):
-    """Convert Gear model ke dict buat AJAX"""
     return {
         "id": str(gear.id),
         "sport_id": str(gear.sport.id) if gear.sport else None,
@@ -54,11 +46,6 @@ def _gear_to_json(gear):
         "image": gear.image or "",
         "owner": gear.owner.username if gear.owner else None,
     }
-
-
-# ==============================================================
-# MAIN VIEWS
-# ==============================================================
 
 def show_all_gears(request):
     gears = Gear.objects.select_related("sport").all()
@@ -93,15 +80,14 @@ def show_gear_detail(request, gear_id):
     try:
         gear = get_object_or_404(Gear, id=gear_id)
         _log_activity(request, gear.name)
-                # Naikkan counter untuk What's Hot
         bump_view(
             key=f"gear:{gear.id}",
             title=gear.name,
             url=reverse('gearguide:card_details', kwargs={'gear_id': gear.id}),
-            category="Gear",   # pilih salah satu dan konsisten, di home kita include keduanya
+            category="Gear",   
             image=(gear.image.url if getattr(gear, "image", None) and hasattr(gear.image, "url") else (gear.image or "")),
             request=request,
-            dedupe_seconds=60,  # turunin dulu buat test
+            dedupe_seconds=60, 
         )
 
         return render(request, "gearguide/card_details.html", {
@@ -110,12 +96,7 @@ def show_gear_detail(request, gear_id):
         })
     except Exception:
         raise Http404("Gear tidak ditemukan.")
-
-
-# ==============================================================
-# CRUD FUNCTIONS
-# ==============================================================
-
+    
 @login_required(login_url="/accounts/login/")
 def add_gear(request):
     """Tambah gear baru (user-generated)"""
@@ -227,11 +208,6 @@ def delete_gear(request, gear_id):
 
     return JsonResponse({"ok": False, "message": "❌ Metode tidak valid."}, status=405)
 
-
-# ==============================================================
-# AJAX / JSON API
-# ==============================================================
-
 @require_http_methods(["GET"])
 def get_gear_json(request, gear_id):
     """Endpoint buat ambil data gear via AJAX"""
@@ -251,3 +227,28 @@ def get_gear_json(request, gear_id):
     except Exception as e:
         traceback.print_exc()
         return JsonResponse({"ok": False, "error": str(e)}, status=500)
+    
+@require_http_methods(["GET"])
+def get_all_gears_json(request):
+    try:
+        gears = Gear.objects.select_related("sport").all()
+        selected_sport = request.GET.get("sport", "").strip().lower()
+        if selected_sport:
+            gears = [g for g in gears if g.sport and g.sport.name.lower() == selected_sport]
+
+        selected_level = request.GET.get("level", "").strip().lower()
+        if selected_level:
+            gears = [g for g in gears if g.level.lower() == selected_level]
+
+        view_filter = request.GET.get("view", "")
+        if view_filter == "your" and request.user.is_authenticated:
+            gears = [g for g in gears if g.owner == request.user]
+
+        data = [_gear_to_json(g) for g in gears]
+
+        return JsonResponse({"ok": True, "count": len(data), "data": data}, status=200)
+
+    except Exception as e:
+        traceback.print_exc()
+        return JsonResponse({"ok": False, "error": str(e)}, status=500)
+
