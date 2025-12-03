@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import redirect, render
 from sportforum.models import ForumPost, Reply, Tag
 from django.http import HttpResponseRedirect, JsonResponse, Http404
@@ -10,6 +11,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from sportforum.forms import ReplyForm, ForumPostForm
 from datetime import datetime
 from django.utils import timezone
+from django.utils.html import strip_tags
 import uuid
 from django.contrib import messages
 
@@ -285,3 +287,46 @@ def show_json_by_id(request, id):
     except ForumPost.DoesNotExist:
         return JsonResponse({'detail': 'Not found'}, status=404)
 
+@csrf_exempt
+def create_forum_flutter(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": "error"}, status=401)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+
+    title = strip_tags(data.get("title", "")).strip()
+    content = strip_tags(data.get("content", "")).strip()
+    sport = (data.get("sportSlug") or data.get("sport") or "").strip()
+    tags_payload = data.get("tags", [])
+
+    if not title or not content or not sport:
+        return JsonResponse({"status": "error", "message": "Missing required fields"}, status=400)
+
+    valid_sports = {choice[0] for choice in ForumPost.SPORT_CHOICES}
+    if sport not in valid_sports:
+        return JsonResponse({"status": "error", "message": "Invalid sport value"}, status=400)
+
+    author = request.user if request.user.is_authenticated else None
+    new_forum = ForumPost(
+        title=title,
+        content=content,
+        sport=sport,
+        author=author,
+    )
+    new_forum.save()
+
+    if isinstance(tags_payload, str):
+        candidate_tags = [tag.strip() for tag in tags_payload.split(',')]
+    elif isinstance(tags_payload, list):
+        candidate_tags = [str(tag).strip() for tag in tags_payload]
+    else:
+        candidate_tags = []
+
+    for tag_name in {tag for tag in candidate_tags if tag}:
+        tag_obj, _ = Tag.objects.get_or_create(name=tag_name)
+        new_forum.tags.add(tag_obj)
+
+    return JsonResponse({"status": "success", "post_id": str(new_forum.id)}, status=201)

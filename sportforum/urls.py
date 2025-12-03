@@ -12,5 +12,6 @@ urlpatterns = [
     path("post/<str:id>/delete", views.delete_post, name="delete_post"),
     path("post/json/<str:id>/", views.show_json_by_id, name="show_json_by_id"),
     path("json/", views.show_json, name="show_json"),
-    
+    path("create-forum-flutter/", views.create_forum_flutter, name="create_forum_flutter"),
+
 ]
