@@ -34,8 +34,17 @@ PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ainur-fadhil-sportpedia.pbp.cs.ui.ac.id"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ainur-fadhil-sportpedia.pbp.cs.ui.ac.id", "10.0.2.2"]
 
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
+# Cookie settings for development (HTTP)
+# Set to True for production (HTTPS)
+CSRF_COOKIE_SECURE = False  # True hanya untuk HTTPS
+SESSION_COOKIE_SECURE = False  # True hanya untuk HTTPS
+CSRF_COOKIE_SAMESITE = 'Lax'  # 'None' hanya untuk cross-site + HTTPS
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 # Application definition
 
@@ -46,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'landingpage',
     'gearguide',
     'sportlibrary',
@@ -64,12 +74,13 @@ LOGIN_REDIRECT_URL = '/'  # ke mana user dibawa setelah login\
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'landingpage.middleware.PageHitMiddleware' ##
+    'landingpage.middleware.PageHitMiddleware',
 ]
 
 ROOT_URLCONF = 'sportpedia.urls'
