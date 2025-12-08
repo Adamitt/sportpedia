@@ -23,4 +23,11 @@ urlpatterns = [
     path('dashboard/admins/add/', views.add_admin, name='add_admin'),
     path('dashboard/admins/edit/<int:admin_id>/', views.edit_admin, name='edit_admin'),
     path('api/admin-data/<int:admin_id>/', views.get_admin_data, name='get_admin_data'),
+    
+    # API untuk Flutter
+    path('api/dashboard/', views.api_admin_dashboard, name='api_admin_dashboard'),
+    path('api/admins/', views.api_get_admins, name='api_get_admins'),
+    path('api/admins/add/', views.api_add_admin, name='api_add_admin'),
+    path('api/admins/edit/<int:admin_id>/', views.api_edit_admin, name='api_edit_admin'),
+    path('api/admins/delete/<int:admin_id>/', views.api_delete_admin, name='api_delete_admin'),
 ]
