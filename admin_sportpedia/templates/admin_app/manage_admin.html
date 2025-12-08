@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manage Administrators - Sportpedia Admin{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 py-10 md:py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+      <div class="flex items-center gap-4">
+        <a href="{% url 'admin_sportpedia:dashboard' %}"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Kembali
+        </a>
+        <h1 class="text-3xl md:text-4xl font-extrabold" style="color: #1C3264;">
+          👥 Kelola Administrator
+        </h1>
+      </div>
+
+      <button type="button" id="add-admin-btn"
+        class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all shadow-md hover:shadow-lg"
+        style="background: linear-gradient(135deg, #1C3264 0%, #2d4a8f 100%);">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Tambah Admin Baru
+      </button>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[768px] text-sm text-left text-gray-700">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-100" style="border-bottom: 2px solid #e5e7eb;">
+            <tr>
+              <th scope="col" class="px-6 py-4 font-semibold">Username</th>
+              <th scope="col" class="px-6 py-4 font-semibold">Email</th>
+              <th scope="col" class="px-6 py-4 font-semibold">Status</th>
+              <th scope="col" class="px-6 py-4 font-semibold text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for admin_user in admins %}
+            <tr class="bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+              <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                {{ admin_user.username }}
+                {% if admin_user.get_full_name %}
+                  <span class="block text-xs text-gray-500">{{ admin_user.get_full_name }}</span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4">
+                {{ admin_user.email|default:"-" }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                {% if admin_user.is_superuser %}
+                <span class="px-3 py-1 text-xs font-bold text-white rounded-full"
+                  style="background-color: #1C3264;">Super Admin</span>
+                {% elif admin_user.is_staff %}
+                <span class="px-3 py-1 text-xs font-medium text-gray-800 bg-gray-200 rounded-full">Staff</span>
+                {% else %}
+                <span class="px-3 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full">Non-Staff</span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4 text-center whitespace-nowrap">
+                
+                <button type="button"
+                  class="edit-admin-btn font-medium text-blue-600 hover:text-blue-800 transition-colors mr-3"
+                  data-id="{{ admin_user.id }}" 
+                  data-url="{% url 'admin_sportpedia:get_admin_data' admin_user.id %}">
+                  ✏️ Edit
+                </button>
+
+                {% if request.user.id != admin_user.id %}
+                <form action="{% url 'admin_sportpedia:delete_admin' admin_user.id %}" method="post"
+                  class="inline-block"
+                  onsubmit="return confirm('Anda yakin ingin menghapus admin \'{{ admin_user.username|escapejs }}\'? Tindakan ini tidak dapat dibatalkan.');">
+                  {% csrf_token %}
+                  <button type="submit" class="font-medium text-red-600 hover:text-red-800 transition-colors">
+                    🗑️ Hapus
+                  </button>
+                </form>
+                {% else %}
+                <span class="font-medium text-gray-400 cursor-not-allowed"
+                  title="Anda tidak dapat menghapus akun Anda sendiri">
+                  🗑️ Hapus
+                </span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr class="bg-white">
+              <td colspan="4" class="px-6 py-10 text-center text-gray-500 italic">
+                Belum ada admin lain yang ditambahkan.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="add-admin-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div id="modal-backdrop-add" class="fixed inset-0 bg-gray-900 bg-opacity-75 backdrop-blur-sm transition-opacity"></div>
+
+  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+    <div class="flex min-h-full items-center justify-center p-4 text-center">
+      
+      <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+        <form id="add-admin-form" action="{% url 'admin_sportpedia:add_admin' %}" method="POST" novalidate>
+          {% csrf_token %}
+          <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-700" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
+                <h3 class="text-lg font-semibold leading-6 text-gray-900" id="modal-title">Tambah Admin Baru</h3>
+                <div id="add-form-errors" class="text-sm text-red-600 mt-2"></div>
+                <div class="mt-4 space-y-4">
+                  
+                  {% for field in add_form %}
+                  <div>
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                      {{ field.label }}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                      <p class="mt-1 text-xs text-gray-500">{{ field.help_text|safe }}</p>
+                    {% endif %}
+                    <div id="add-error-{{ field.name }}" class="text-sm text-red-600 mt-1"></div>
+                  </div>
+                  {% endfor %}
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+            <button type="submit" id="add-submit-btn" class="inline-flex w-full justify-center rounded-md bg-blue-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 sm:ml-3 sm:w-auto">
+              Simpan
+            </button>
+            <button type="button" data-close-modal="add-admin-modal" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+              Batal
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="edit-admin-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div id="modal-backdrop-edit" class="fixed inset-0 bg-gray-900 bg-opacity-75 backdrop-blur-sm transition-opacity"></div>
+  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+    <div class="flex min-h-full items-center justify-center p-4 text-center">
+      <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+        
+        <form id="edit-admin-form" action="" method="POST" novalidate>
+          {% csrf_token %}
+          <input type="hidden" id="edit-admin-id" name="admin_id">
+          
+          <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-700" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                  <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
+                <h3 class="text-lg font-semibold leading-6 text-gray-900" id="modal-title">Edit Admin</h3>
+                <div id="edit-form-errors" class="text-sm text-red-600 mt-2"></div>
+                <div class="mt-4 space-y-4">
+                  
+                  <div>
+                    <label for="edit-username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" id="edit-username" name="username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <div id="edit-error-username" class="text-sm text-red-600 mt-1"></div>
+                  </div>
+                  
+                  <div>
+                    <label for="edit-email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="edit-email" name="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <div id="edit-error-email" class="text-sm text-red-600 mt-1"></div>
+                  </div>
+
+                  <div class_="">
+                    <p class="text-sm font-medium text-gray-700">Peran</p>
+                    <div class="mt-2 space-y-2">
+                      <div class="flex items-center gap-2">
+                        <input id="edit-is_staff" name="is_staff" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <label for="edit-is_staff" class="text-sm text-gray-900">Staff</label>
+                      </div>
+                       <div class="flex items-center gap-2">
+                        <input id="edit-is_superuser" name="is_superuser" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <label for="edit-is_superuser" class="text-sm text-gray-900">Super Admin</label>
+                      </div>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+            <button type="submit" id="edit-submit-btn" class="inline-flex w-full justify-center rounded-md bg-blue-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 sm:ml-3 sm:w-auto">
+              Simpan Perubahan
+            </button>
+            <button type="button" data-close-modal="edit-admin-modal" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+              Batal
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    
+    const addModal = document.getElementById('add-admin-modal');
+    const editModal = document.getElementById('edit-admin-modal');
+
+    // --- Logika untuk styling form 'add_form' ---
+    function styleAddFormFields() {
+      const textInputClasses = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm";
+      const checkboxClasses = "h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500";
+      
+      const formInputs = addModal.querySelectorAll('input[type="text"], input[type="password"], input[type="email"], select');
+      formInputs.forEach(input => {
+        input.className = textInputClasses;
+      });
+      
+      const formCheckboxes = addModal.querySelectorAll('input[type="checkbox"]');
+      formCheckboxes.forEach(input => {
+        input.className = checkboxClasses;
+        if (input.parentElement.tagName !== 'LABEL' && input.parentElement.tagName !== 'DIV') {
+            const label = input.nextElementSibling;
+            if (label && label.tagName === 'LABEL') {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex items-center gap-2';
+                input.before(wrapper);
+                wrapper.appendChild(input);
+                wrapper.appendChild(label);
+            }
+        }
+      });
+    }
+    styleAddFormFields();
+    // ----------------------------------------------------
+
+
+    // --- Fungsi Helper Modal ---
+    function openModal(modal) {
+      modal.classList.remove('hidden');
+    }
+    function closeModal(modal) {
+      modal.classList.add('hidden');
+      clearFormErrors('add');
+      clearFormErrors('edit');
+    }
+
+    // --- Event Listener Tombol Buka Modal ---
+    document.getElementById('add-admin-btn').addEventListener('click', () => {
+      openModal(addModal);
+    });
+
+    // --- Event Listener Tombol Tutup Modal ---
+    document.querySelectorAll('[data-close-modal]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const modalToClose = document.getElementById(btn.dataset.closeModal);
+        closeModal(modalToClose);
+      });
+    });
+    document.getElementById('modal-backdrop-add').addEventListener('click', () => closeModal(addModal));
+    document.getElementById('modal-backdrop-edit').addEventListener('click', () => closeModal(editModal));
+
+
+    // --- Helper untuk clear error ---
+    function clearFormErrors(formTypePrefix) {
+      const errorDiv = document.getElementById(`${formTypePrefix}-form-errors`);
+      if (errorDiv) errorDiv.textContent = '';
+      
+      const fieldErrorDivs = document.querySelectorAll(`[id^="${formTypePrefix}-error-"]`);
+      fieldErrorDivs.forEach(div => div.textContent = '');
+    }
+
+    // --- Helper untuk tampilkan error ---
+    function displayFormErrors(formTypePrefix, errors) {
+      clearFormErrors(formTypePrefix);
+      if (typeof errors === 'object' && errors !== null) {
+        for (const [field, messages] of Object.entries(errors)) {
+          const errorDiv = document.getElementById(`${formTypePrefix}-error-${field}`);
+          if (errorDiv) {
+            errorDiv.textContent = messages.join(' ');
+          } else if (field === '__all__') {
+            const generalErrorDiv = document.getElementById(`${formTypePrefix}-form-errors`);
+            if (generalErrorDiv) generalErrorDiv.textContent = messages.join(' ');
+          }
+        }
+      }
+    }
+
+    // --- [AJAX] Submit Form Tambah Admin ---
+    const addForm = document.getElementById('add-admin-form');
+    addForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      clearFormErrors('add');
+      
+      const formData = new FormData(addForm);
+      const submitBtn = document.getElementById('add-submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Menyimpan...';
+
+      fetch(addForm.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+          location.reload();
+        } else {
+          if (data.errors) {
+            displayFormErrors('add', data.errors);
+          } else {
+            document.getElementById('add-form-errors').textContent = data.message || 'Terjadi kesalahan.';
+          }
+        }
+      })
+      .catch(err => {
+        document.getElementById('add-form-errors').textContent = 'Terjadi error jaringan.';
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Simpan';
+      });
+    });
+
+
+    // --- [AJAX] Buka & Isi Modal Edit Admin ---
+    document.querySelectorAll('.edit-admin-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const adminId = this.dataset.id;
+        const getDataUrl = this.dataset.url;
+        
+        fetch(getDataUrl, {
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Gagal mengambil data admin.');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+            throw new Error(data.error);
+          }
+          
+          const editForm = document.getElementById('edit-admin-form');
+          document.getElementById('edit-admin-id').value = data.id;
+          document.getElementById('edit-username').value = data.username;
+          document.getElementById('edit-email').value = data.email;
+          document.getElementById('edit-is_staff').checked = data.is_staff;
+          document.getElementById('edit-is_superuser').checked = data.is_superuser;
+
+          const editUrl = `{% url 'admin_sportpedia:edit_admin' 0 %}`.replace('0', data.id);
+          editForm.action = editUrl;
+
+          openModal(editModal);
+        })
+        .catch(err => {
+          alert(err.message);
+        });
+      });
+    });
+
+
+    // --- [AJAX] Submit Form Edit Admin ---
+    const editForm = document.getElementById('edit-admin-form');
+    editForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      clearFormErrors('edit');
+
+      const formData = new FormData(editForm);
+      const submitBtn = document.getElementById('edit-submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Menyimpan...';
+
+      fetch(editForm.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+          location.reload();
+        } else {
+          if (data.errors) {
+            displayFormErrors('edit', data.errors);
+          } else {
+            document.getElementById('edit-form-errors').textContent = data.message || 'Terjadi kesalahan.';
+          }
+        }
+      })
+      .catch(err => {
+        document.getElementById('edit-form-errors').textContent = 'Terjadi error jaringan.';
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Simpan Perubahan';
+      });
+    });
+
+  });
+</script>
+
+{% endblock %}
+
+
+{% block head %}
+{{ block.super }}
+<style>
+  tbody tr:last-child {
+    border-bottom: none; 
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,253 @@
+<script>
+(function() {
+  'use strict';
+
+  function getCSRFToken() {
+    let token = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    
+    if (!token) {
+      const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+      token = cookieValue;
+    }
+    
+    console.log('🔑 CSRF Token:', token ? 'Found' : 'NOT FOUND');
+    return token || '';
+  }
+
+  // ==============================================================
+  // 🧩 OPEN MODAL — fetch data dan isi field edit
+  // ==============================================================
+  window.openEditModal = async function(gearId) {
+    console.log("🧩 Opening edit modal for gear:", gearId);
+
+    const modal = document.getElementById('editModal');
+    const errMsg = document.getElementById('edit-error');
+    
+    if (!modal) {
+      console.error("❌ #editModal not found!");
+      return;
+    }
+
+    try {
+      const url = `/gearguide/get-gear-json/${gearId}/`;
+      console.log('📡 Fetching from:', url);
+      
+      const res = await fetch(url, {
+        headers: { 
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        }
+      });
+
+      console.log('📦 Response status:', res.status);
+      console.log('📦 Response headers:', [...res.headers.entries()]);
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('❌ Response not OK:', text.slice(0, 500));
+        throw new Error(`HTTP ${res.status}`);
+      }
+      
+      const data = await res.json();
+      console.log("✅ Fetched data:", data);
+
+      if (!data.ok || !data.data) {
+        throw new Error(data.error || "Data tidak valid");
+      }
+
+      // Populate form
+      const g = data.data;
+      document.getElementById('edit-gear-id').value = g.id || '';
+      document.getElementById('edit-name').value = g.name || '';
+      document.getElementById('edit-description').value = g.description || '';
+      document.getElementById('edit-sport').value = g.sport_id || '';
+
+      // 🧭 MAPPING untuk isi dropdown Level
+      const levelMap = {
+        'Pemula': 'beginner',
+        'Menengah': 'intermediate',
+        'Profesional': 'advanced',
+        'beginner': 'beginner',
+        'intermediate': 'intermediate',
+        'advanced': 'advanced'
+      };
+      document.getElementById('edit-level').value = levelMap[g.level?.trim()] || 'beginner';
+
+      document.getElementById('edit-price').value = g.price_range || '';
+      document.getElementById('edit-function').value = g.function || '';
+      
+      // Handle array fields
+      const brands = g.recommended_brands_text || (Array.isArray(g.recommended_brands) ? g.recommended_brands.join(', ') : '');
+      const materials = g.materials_text || (Array.isArray(g.materials) ? g.materials.join(', ') : '');
+      const tags = g.tags_text || (Array.isArray(g.tags) ? g.tags.join(', ') : '');
+      
+      document.getElementById('edit-brands').value = brands;
+      document.getElementById('edit-materials').value = materials;
+      document.getElementById('edit-tags').value = tags;
+      
+      document.getElementById('edit-buy').value = g.ecommerce_link || g.buy_link || '';
+      document.getElementById('edit-image').value = g.image || '';
+      document.getElementById('edit-care').value = g.care_tips || '';
+
+      // Hide error & show modal
+      if (errMsg) errMsg.classList.add('hidden');
+      modal.classList.remove('hidden');
+      console.log("✅ Modal opened successfully");
+
+    } catch (err) {
+      console.error("❌ Error fetching gear:", err);
+      if (errMsg) {
+        errMsg.querySelector('p').textContent = err.message || 'Gagal memuat data';
+        errMsg.classList.remove('hidden');
+      }
+      // Still open modal for manual correction
+      modal.classList.remove('hidden');
+    }
+  };
+
+  // ==============================================================
+  // ❌ CLOSE MODAL
+  // ==============================================================
+  window.closeEditModal = function() {
+    const modal = document.getElementById('editModal');
+    const form = document.getElementById('editGearForm');
+    const errMsg = document.getElementById('edit-error');
+    
+    if (modal) modal.classList.add('hidden');
+    if (form) form.reset();
+    if (errMsg) errMsg.classList.add('hidden');
+  };
+
+  // ==============================================================
+  // 💾 HANDLE SUBMIT FORM
+  // ==============================================================
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editGearForm');
+    const errMsg = document.getElementById('edit-error');
+
+    if (!form) {
+      console.error('❌ Form #editGearForm tidak ditemukan!');
+      return;
+    }
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      console.log('📝 Submitting form...');
+
+      const gearId = document.getElementById('edit-gear-id').value;
+      const formData = new FormData(form);
+
+      // 🔁 MAPPING KEBALIKAN (user → backend)
+      const levelMapReverse = {
+        'Pemula': 'beginner',
+        'Menengah': 'intermediate',
+        'Profesional': 'advanced'
+      };
+
+      const currentLevel = formData.get('level');
+      const mappedLevel = levelMapReverse[currentLevel] || currentLevel;
+      formData.set('level', mappedLevel);
+
+      const csrftoken = getCSRFToken();
+
+      console.log('🔑 Using CSRF token:', csrftoken ? 'Yes' : 'NO!');
+      console.log('📤 Form data:', [...formData.entries()]);
+
+      // Show loading state
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '⏳ Menyimpan...';
+
+      try {
+        const url = `/gearguide/edit-gear-ajax/${gearId}/`;
+        console.log('📡 Posting to:', url);
+        
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          },
+          body: formData
+        });
+
+        console.log('📦 Response status:', res.status);
+        console.log('📦 Response content-type:', res.headers.get('content-type'));
+
+        const contentType = res.headers.get('content-type');
+        
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await res.text();
+          console.error("🚨 NON-JSON RESPONSE:", text.slice(0, 1000));
+          
+          if (text.includes('login') || text.includes('csrf')) {
+            throw new Error('Session expired. Silakan refresh halaman dan login kembali.');
+          }
+          
+          throw new Error('Server tidak mengembalikan JSON. Cek console untuk detail.');
+        }
+
+        const data = await res.json();
+        console.log('✅ Server response:', data);
+
+        if (data.ok) {
+          console.log('✅ Update berhasil!');
+          
+          if (errMsg) {
+            errMsg.classList.remove('hidden');
+            errMsg.className = 'mt-4 p-4 bg-green-50 border-l-4 border-green-500 rounded-lg';
+            errMsg.querySelector('p').textContent = '✅ ' + (data.message || 'Berhasil diperbarui!');
+            errMsg.querySelector('p').className = 'text-sm text-green-700 font-medium';
+          }
+          
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          const errText = data.errors 
+            ? Object.values(data.errors).flat()[0]
+            : data.message || 'Gagal menyimpan perubahan';
+          
+          if (errMsg) {
+            errMsg.className = 'mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg';
+            errMsg.querySelector('p').textContent = errText;
+            errMsg.querySelector('p').className = 'text-sm text-red-700 font-medium';
+            errMsg.classList.remove('hidden');
+          }
+          
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+
+      } catch (err) {
+        console.error('❌ Fetch error:', err);
+        if (errMsg) {
+          errMsg.className = 'mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg';
+          errMsg.querySelector('p').textContent = err.message || 'Terjadi kesalahan jaringan';
+          errMsg.querySelector('p').className = 'text-sm text-red-700 font-medium';
+          errMsg.classList.remove('hidden');
+        }
+        
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    });
+
+    // Close modal on overlay click
+    const modal = document.getElementById('editModal');
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          closeEditModal();
+        }
+      });
+    }
+  });
+
+})();
+</script>

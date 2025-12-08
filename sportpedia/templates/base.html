@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SportPedia{% endblock %}</title>
+    {% load static %}
+    <!-- Tailwind (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="{% static 'images/logo1.png' %}" type="image/png">
+    <!-- Font (optional: Poppins) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/global.css' %}">
+
+    {% block head %}{% endblock %}
+  </head>
+
+  <body class="antialiased text-gray-900 font-[Poppins] bg-white">
+    <!-- ============== NAVBAR ============== -->
+    {% include 'navbar.html' %}
+
+    <!-- ============== PAGE CONTENT ============== -->
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- ============== FOOTER GLOBAL (optional) ============== -->
+    {% block footer %}{% endblock %}
+
+    <!-- ============== GLOBAL & PAGE SCRIPTS ============== -->
+    {% block scripts %}{% endblock %}
+    <!-- TOAST STACK -->
+<div id="toast-stack" class="fixed right-4 top-4 z-[1000] space-y-3 pointer-events-none"></div>
+
+  </body>
+</html>

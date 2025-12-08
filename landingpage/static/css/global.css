@@ -1,0 +1,53 @@
+body {
+  margin: 0;
+  line-height: normal;
+  font-family: 'Poppins', sans-serif;
+  color: #111827;
+}
+
+/* --- Chip untuk filter testimoni --- */
+.t-chip {
+  border-radius: 9999px;
+  border: 1.5px solid #17356B;
+  color: #17356B;
+  padding: 6px 16px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+.t-chip:hover {
+  background: #17356B;
+  color: white;
+}
+.t-chip.active {
+  background: #17356B;
+  color: white;
+}
+
+/* --- Kartu testimoni & whatshot --- */
+.t-card {
+  border-radius: 28px;
+  background: rgba(255,243,243,0.50);
+  border: 1.033px solid rgba(154,106,106,0.54);
+  box-shadow: -3.1px 4.133px 4.133px rgba(0,0,0,0.25);
+  transition: all 0.3s ease;
+}
+.t-card:hover {
+  transform: translateY(-3px);
+  box-shadow: -3.1px 6px 6px rgba(0,0,0,0.3);
+}
+
+/* --- Placeholder gambar --- */
+.t-thumb {
+  border-radius: 18px;
+  width: 100%;
+  height: 150px;
+  background: #f3f4f6;
+  object-fit: cover;
+  margin-bottom: 0.75rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
