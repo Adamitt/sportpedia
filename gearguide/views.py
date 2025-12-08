@@ -9,7 +9,7 @@ from uuid import UUID
 import traceback
 from django.urls import reverse
 from metrics.utils import bump_view
-
+from django.views.decorators.http import require_POST
 from sportlibrary.models import Sport
 from profile_app.models import ActivityLog
 from .models import Gear
@@ -228,27 +228,75 @@ def get_gear_json(request, gear_id):
         traceback.print_exc()
         return JsonResponse({"ok": False, "error": str(e)}, status=500)
     
-@require_http_methods(["GET"])
+
 def get_all_gears_json(request):
+    gears = Gear.objects.select_related('sport').all()
+
+    data = []
+    for g in gears:
+        data.append({
+            "id": str(g.id),
+            "sport_id": str(g.sport.id) if g.sport else None,
+            "sport_name": g.sport.name if g.sport else None,
+            "name": g.name,
+            "function": g.function,
+            "description": g.description,
+            "level": g.level,  # 'beginner' / 'intermediate' / 'advanced'
+            "level_display": g.get_level_display(),  # 'Pemula', 'Menengah', 'Lanjutan'
+            "price_range": g.price_range,
+            "recommended_brands": g.recommended_brands or [],
+            "materials": g.materials or [],
+            "care_tips": g.care_tips,
+            "ecommerce_link": g.ecommerce_link,
+            "tags": g.tags or [],
+            "image": g.image,
+            "owner": g.owner.username if g.owner else None,
+        })
+
+    response = {
+        "ok": True,
+        "count": len(data),
+        "data": data,
+    }
+    return JsonResponse(response)
+    
+
+@csrf_exempt
+@require_POST
+@login_required(login_url="/accounts/login/")
+def add_gear_flutter(request):
     try:
-        gears = Gear.objects.select_related("sport").all()
-        selected_sport = request.GET.get("sport", "").strip().lower()
-        if selected_sport:
-            gears = [g for g in gears if g.sport and g.sport.name.lower() == selected_sport]
+        data = json.loads(request.body.decode("utf-8"))
 
-        selected_level = request.GET.get("level", "").strip().lower()
-        if selected_level:
-            gears = [g for g in gears if g.level.lower() == selected_level]
+        sport = None
+        sport_input = data.get("sport")
+        if sport_input:
+            sport = Sport.objects.filter(id=sport_input).first() or \
+                    Sport.objects.filter(name__iexact=sport_input).first()
 
-        view_filter = request.GET.get("view", "")
-        if view_filter == "your" and request.user.is_authenticated:
-            gears = [g for g in gears if g.owner == request.user]
+        new_gear = Gear.objects.create(
+            sport=sport,
+            name=data.get("name"),
+            description=data.get("description"),
+            function=data.get("function"),
+            image=data.get("image"),
+            price_range=data.get("price_range"),
+            ecommerce_link=data.get("ecommerce_link"),
+            level=data.get("level") or "beginner",
+            recommended_brands=[b.strip() for b in data.get("recommended_brands", []) if b.strip()],
+            materials=[m.strip() for m in data.get("materials", []) if m.strip()],
+            care_tips=data.get("care_tips"),
+            tags=[t.strip() for t in data.get("tags", []) if t.strip()],
+            owner=request.user,
+        )
 
-        data = [_gear_to_json(g) for g in gears]
-
-        return JsonResponse({"ok": True, "count": len(data), "data": data}, status=200)
+        return JsonResponse({
+            "ok": True,
+            "message": "Gear berhasil dibuat dari Flutter",
+            "data": _gear_to_json(new_gear),
+        }, status=201)
 
     except Exception as e:
         traceback.print_exc()
-        return JsonResponse({"ok": False, "error": str(e)}, status=500)
+        return JsonResponse({"ok": False, "error": str(e)}, status=400)
 

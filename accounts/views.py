@@ -9,6 +9,51 @@ import json
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 USERS_PATH = BASE_DIR / 'database' / 'users.json'
 
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
+
+@csrf_exempt
+def flutter_login(request):
+    if request.method != 'POST':
+        return JsonResponse(
+            {'status': False, 'message': 'Invalid method'},
+            status=405
+        )
+
+    try:
+        # Kalau pbp_django_auth kirim form-encoded,
+        # request.POST yang dipakai; kalau JSON, pakai body:
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            data = request.POST
+
+        username = data.get('username', '')
+        password = data.get('password', '')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return JsonResponse({
+                'status': True,
+                'message': 'Login berhasil',
+                'username': user.username,
+                'is_staff': user.is_staff,
+                'is_superuser': user.is_superuser,
+            })
+        else:
+            return JsonResponse({
+                'status': False,
+                'message': 'Username atau password salah.',
+            }, status=401)
+    except Exception as e:
+        return JsonResponse({
+            'status': False,
+            'message': f'Terjadi error pada server: {e}',
+        }, status=500)
+
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
