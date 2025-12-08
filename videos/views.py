@@ -136,11 +136,13 @@ def video_detail(request, video_id):
 def video_create(request):
     """Membuat video baru di DATABASE"""
     if request.method == "POST":
-        form = VideoForm(request.POST, request.FILES) # Tambahkan request.FILES
+        # --- PERBAIKAN: HAPUS request.FILES ---
+        form = VideoForm(request.POST) 
         if form.is_valid():
             video = form.save(commit=False)
-            video.uploader = request.user # Set uploader
+            video.uploader = request.user
             video.save()
+            form.save_m2m() # Wajib untuk M2M, tapi aman untuk form ini
             messages.success(request, "Video berhasil ditambahkan! 🎥")
             return redirect('videos:video_detail', video_id=video.id)
     else:
@@ -156,9 +158,11 @@ def video_update(request, video_id):
     """Mengupdate video di DATABASE"""
     video = get_object_or_404(Video, pk=video_id)
     if request.method == "POST":
-        form = VideoForm(request.POST, request.FILES, instance=video) # Tambahkan request.FILES
+        # --- PERBAIKAN: HAPUS request.FILES ---
+        form = VideoForm(request.POST, instance=video) 
         if form.is_valid():
             form.save()
+            form.save_m2m()
             messages.success(request, "Video berhasil diperbarui! ✏️")
             return redirect('videos:video_detail', video_id=video.id)
     else:

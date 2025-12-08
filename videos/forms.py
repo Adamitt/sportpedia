@@ -1,9 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
 import re
-from .models import Video, Sport # Import Sport dari .models (asumsi) atau sportlibrary.models
+from .models import Video, Sport
 
-# --- Ini adalah Form yang sudah disesuaikan dengan Model Anda ---
 class VideoForm(forms.ModelForm):
     """
     Form untuk Video model yang menggunakan URL (bukan upload file).
@@ -28,8 +27,8 @@ class VideoForm(forms.ModelForm):
             'sport', 
             'difficulty', 
             'video_url', 
-            'thumbnail_url', # <-- Gunakan thumbnail_url
-            'instructor',    # <-- Tambahkan instructor
+            'thumbnail_url', # <-- Gunakan ini
+            'instructor',    # <-- Gunakan ini
             'duration',
             'tags_string',   # <-- Gunakan field CharField kustom
         ]
@@ -81,85 +80,69 @@ class VideoForm(forms.ModelForm):
         
         help_texts = {
             'thumbnail_url': 'Akan diisi otomatis dari URL YouTube jika dibiarkan kosong.',
-            'duration': 'Durasi video dalam format MM:SS (contoh: 05:30 untuk 5 menit 30 detik)'
+            'duration': 'Durasi video dalam format MM:SS (contoh: 05:30)',
+            'video_url': 'Wajib diisi. Pastikan link YouTube valid.'
         }
     
     def __init__(self, *args, **kwargs):
         """Isi 'tags_string' saat mengedit (load instance)"""
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
-            # Ubah list tags dari model menjadi string yang dipisahkan koma untuk ditampilkan di form
             if self.instance.tags:
                 self.fields['tags_string'].initial = ', '.join(self.instance.tags)
 
     def clean_title(self):
-        # ... (Validasi title Anda sudah benar) ...
         title = self.cleaned_data.get('title')
         if not title or len(title.strip()) < 5:
              raise ValidationError('Judul harus minimal 5 karakter.')
-        # ... (Cek duplikat juga sudah benar) ...
         return title.strip()
     
     def clean_description(self):
-        # ... (Validasi deskripsi Anda sudah benar) ...
         description = self.cleaned_data.get('description')
         if not description or len(description.strip()) < 20:
              raise ValidationError('Deskripsi harus minimal 20 karakter.')
         return description.strip()
     
     def clean_duration(self):
-        # ... (Validasi durasi Anda sudah benar) ...
         duration = self.cleaned_data.get('duration')
         if not duration: raise ValidationError('Durasi tidak boleh kosong.')
         pattern = r'^\d{1,2}:\d{2}$'
         if not re.match(pattern, duration): raise ValidationError('Format durasi harus MM:SS (contoh: 05:30)')
-        # ... (sisa validasi durasi) ...
         return duration
     
     def clean_video_url(self):
-        # ... (Validasi URL YouTube Anda sudah benar) ...
         video_url = self.cleaned_data.get('video_url')
-        if not video_url: # URL sekarang wajib
+        if not video_url:
              raise ValidationError('URL Video tidak boleh kosong.')
-        # ... (sisa validasi YouTube) ...
+        
+        # Validasi YouTube (dari form Anda sebelumnya)
+        youtube_patterns = [r'youtube\.com/watch\?v=', r'youtu\.be/', r'youtube\.com/embed/']
+        is_youtube = any(re.search(pattern, video_url) for pattern in youtube_patterns)
+        if not is_youtube:
+            raise ValidationError('URL harus dari YouTube (youtube.com atau youtu.be)')
         return video_url
     
     def clean(self):
-        """Validasi silang dan auto-generate thumbnail"""
+        """Auto-generate thumbnail"""
         cleaned_data = super().clean()
         video_url = cleaned_data.get('video_url')
         thumbnail_url = cleaned_data.get('thumbnail_url')
         
-        # Hapus validasi 'video_file' karena field itu sudah tidak ada
-        # if not video_url and not video_file: ... (INI DIHAPUS)
-
-        # Auto-generate thumbnail jika URL YouTube diisi dan thumbnail kosong
         if video_url and not thumbnail_url:
             video_id = None
-            if 'v=' in video_url:
-                video_id = video_url.split('v=')[-1].split('&')[0]
-            elif 'youtu.be/' in video_url:
-                video_id = video_url.split('youtu.be/')[-1].split('?')[0]
+            if 'v=' in video_url: video_id = video_url.split('v=')[-1].split('&')[0]
+            elif 'youtu.be/' in video_url: video_id = video_url.split('youtu.be/')[-1].split('?')[0]
             
             if video_id and len(video_id) == 11:
                 cleaned_data['thumbnail_url'] = f'https://img.youtube.com/vi/{video_id}/hqdefault.jpg'
-            
         return cleaned_data
 
     def save(self, commit=True):
         """Simpan tags_string ke field 'tags' (JSONField)"""
         instance = super().save(commit=False)
-        
-        # Konversi "tag1, tag2" menjadi ["tag1", "tag2"]
         tags_str = self.cleaned_data.get('tags_string', '')
         instance.tags = [tag.strip() for tag in tags_str.split(',') if tag.strip()]
         
         if commit:
             instance.save()
         return instance
-
-
-# --- Form Filter (Ini sudah OK, tidak perlu diubah) ---
-class VideoFilterForm(forms.Form):
-    # ... (kode VideoFilterForm Anda) ...
-    pass

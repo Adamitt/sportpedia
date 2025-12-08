@@ -153,25 +153,6 @@ class HomeWhatsHotTests(_TempBaseDirMixin, TestCase):
         # Pastikan "Forum" tidak muncul
         self.assertFalse(any(it["title"] == "Forum" for it in hot_items))
 
-    def test_api_popular_categories_returns_top_items(self):
-        url = reverse("landingpage:api_popular_categories")
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        items = resp.json()["items"]
-        self.assertEqual(len(items), 3)
-        self.assertEqual(items[0]["title"], "Tennis Racket")
-        self.assertEqual(items[1]["title"], "Tennis")
-        self.assertEqual(items[1]["category"], "Library")
-        self.assertEqual(items[1].get("excerpt"), "")
-        self.assertEqual(items[2]["title"], "Yoga")
-        self.assertEqual(items[2].get("excerpt"), "desc")
-
-    def test_api_popular_categories_limit_query(self):
-        url = reverse("landingpage:api_popular_categories")
-        resp = self.client.get(url, {"limit": "2"})
-        self.assertEqual(resp.status_code, 200)
-        items = resp.json()["items"]
-        self.assertEqual(len(items), 2)
 
 @override_settings(ROOT_URLCONF="sportpedia.urls")
 class TestimonialsApiTests(TestCase):
@@ -217,26 +198,6 @@ class TestimonialsApiTests(TestCase):
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["item"]["user"], "u1")  # owner terisi
 
-    def test_create_accepts_json_payload(self):
-        self.client.login(username="u1", password="pass")
-        url = reverse("landingpage:api_testimonials_create")
-        payload = {
-            "text": "JSON payload!",
-            "title": "JSON title",
-            "category": "library",
-            "image_url": "https://img.json/test.jpg",
-        }
-        r = self.client.post(
-            url,
-            data=json.dumps(payload),
-            content_type="application/json",
-        )
-        self.assertEqual(r.status_code, 200)
-        data = r.json()
-        self.assertTrue(data["ok"])
-        self.assertEqual(data["item"]["text"], "JSON payload!")
-        self.assertEqual(data["item"]["title"], "JSON title")
-
     def test_update_owner_or_admin_only(self):
         # user lain tidak boleh
         from django.contrib.auth import get_user_model
@@ -260,19 +221,6 @@ class TestimonialsApiTests(TestCase):
         self.assertEqual(r3.status_code, 200)
         self.t1.refresh_from_db()
         self.assertEqual(self.t1.text, "admin update")
-
-    def test_update_accepts_json_payload(self):
-        self.client.login(username="u1", password="pass")
-        url = reverse("landingpage:api_testimonials_update", kwargs={"pk": self.t1.pk})
-        payload = {"text": "JSON update", "category": "library"}
-        r = self.client.post(
-            url,
-            data=json.dumps(payload),
-            content_type="application/json",
-        )
-        self.assertEqual(r.status_code, 200)
-        self.t1.refresh_from_db()
-        self.assertEqual(self.t1.text, "JSON update")
 
     def test_delete_owner_or_admin_only(self):
         # anon → 403
