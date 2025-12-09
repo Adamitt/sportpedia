@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.conf import settings
 from profile_app.models import UserProfile
 from .forms import RegisterForm, LoginForm
@@ -40,12 +40,23 @@ def flutter_login(request):
 
         if user is not None:
             login(request, user)
+            
+            # Ensure session is created
+            if not request.session.session_key:
+                request.session.create()
+            
+            # Debug logging
+            print(f"[DEBUG] flutter_login - User: {user.username}, Authenticated: {request.user.is_authenticated}")
+            print(f"[DEBUG] flutter_login - Session key: {request.session.session_key}")
+            print(f"[DEBUG] flutter_login - Cookies in request: {dict(request.COOKIES)}")
+            
             return JsonResponse({
                 'status': True,
                 'message': 'Login berhasil',
                 'username': user.username,
                 'is_staff': user.is_staff,
                 'is_superuser': user.is_superuser,
+                'session_key': request.session.session_key,  # Include session key for Flutter Web
             })
         else:
             return JsonResponse({
@@ -202,6 +213,22 @@ def api_login(request):
         "status": False,
         "message": "Invalid request method."
     }, status=400)
+
+
+@require_GET
+def api_user_info(request):
+    """GET /accounts/api/user-info/ - Get current user info"""
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'authenticated': False,
+        }, status=401)
+    
+    return JsonResponse({
+        'authenticated': True,
+        'username': request.user.username,
+        'is_staff': request.user.is_staff,
+        'is_superuser': request.user.is_superuser,
+    })
 
 
 @require_POST

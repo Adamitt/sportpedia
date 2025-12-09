@@ -345,6 +345,8 @@ def add_comment(request, video_id):
     })
 
 @require_POST
+@csrf_exempt
+@require_POST
 def helpful_comment(request, comment_id):
     """Menambah 'helpful' ke komentar di DATABASE"""
     try:
@@ -493,6 +495,8 @@ def api_video_list(request):
             'duration': video.duration or '',
             'rating': float(video.avg_rating) if video.avg_rating else 0.0,
             'views': video.views_count or 0,
+            'instructor': video.instructor or '',
+            'tags': video.tags or [],
         })
     
     return JsonResponse(videos_data, safe=False)
@@ -533,7 +537,7 @@ def api_video_detail(request, video_id):
 
 @require_GET
 def api_video_comments(request, video_id):
-    """GET /videos/api/{id}/comments/ - List komentar video"""
+    """GET /videos/api/{id}/comments/ - List komentar video dengan replies"""
     try:
         video = get_object_or_404(Video, pk=video_id)
     except Video.DoesNotExist:
@@ -541,19 +545,38 @@ def api_video_comments(request, video_id):
             'error': 'Video tidak ditemukan'
         }, status=404)
     
-    comments = Comment.objects.filter(video=video).select_related('user').order_by('-created_at')
+    # Hanya ambil top-level comments (yang tidak punya parent)
+    top_comments = Comment.objects.filter(
+        video=video,
+        parent__isnull=True
+    ).select_related('user').prefetch_related('replies__user').order_by('-created_at')
     
-    # Convert ke format JSON sesuai Flutter
-    comments_data = []
-    for comment in comments:
-        comments_data.append({
+    def serialize_comment(comment):
+        """Helper function untuk serialize comment dengan replies"""
+        replies_data = []
+        for reply in comment.replies.all().order_by('created_at'):
+            replies_data.append({
+                'id': reply.id,
+                'user': reply.user.username if reply.user else 'Anonymous',
+                'text': reply.text,
+                'rating': reply.rating,
+                'helpful_count': reply.helpful_count or 0,
+                'created_at': reply.created_at.strftime('%Y-%m-%d %H:%M:%S') if reply.created_at else '',
+                'parent_id': reply.parent.id if reply.parent else None,
+            })
+        
+        return {
             'id': comment.id,
             'user': comment.user.username if comment.user else 'Anonymous',
             'text': comment.text,
             'rating': comment.rating,
             'helpful_count': comment.helpful_count or 0,
             'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S') if comment.created_at else '',
-        })
+            'replies': replies_data,
+        }
+    
+    # Convert ke format JSON sesuai Flutter
+    comments_data = [serialize_comment(comment) for comment in top_comments]
     
     return JsonResponse(comments_data, safe=False)
 
@@ -632,7 +655,71 @@ def api_video_add_comment(request, video_id):
             'rating': new_comment.rating,
             'helpful_count': new_comment.helpful_count or 0,
             'created_at': new_comment.created_at.strftime('%Y-%m-%d %H:%M:%S') if new_comment.created_at else '',
+            'replies': [],  # New comment has no replies yet
         }, status=201)
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Gagal menambah komentar: {str(e)}'
+        }, status=500)
+
+
+@csrf_exempt
+@require_POST
+def api_comment_reply(request, comment_id):
+    """POST /videos/api/comment/{comment_id}/reply/ - Reply to a comment"""
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'error': 'Anda harus login terlebih dahulu'
+        }, status=401)
+    
+    try:
+        parent_comment = get_object_or_404(Comment, pk=comment_id)
+    except Comment.DoesNotExist:
+        return JsonResponse({
+            'error': 'Komentar tidak ditemukan'
+        }, status=404)
+    
+    try:
+        data = json.loads(request.body)
+        text = data.get('text', '').strip()
+        
+        if not text:
+            return JsonResponse({
+                'error': 'Text reply harus diisi'
+            }, status=400)
+        
+        # Buat reply (komentar dengan parent)
+        new_reply = Comment.objects.create(
+            video=parent_comment.video,
+            user=request.user,
+            text=text,
+            parent=parent_comment,
+            rating=None  # Replies don't have ratings
+        )
+        
+        # Return dalam format JSON sesuai Flutter
+        return JsonResponse({
+            'id': new_reply.id,
+            'user': new_reply.user.username,
+            'text': new_reply.text,
+            'rating': None,
+            'helpful_count': new_reply.helpful_count or 0,
+            'created_at': new_reply.created_at.strftime('%Y-%m-%d %H:%M:%S') if new_reply.created_at else '',
+            'parent_id': parent_comment.id,
+        }, status=201)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Gagal menambah reply: {str(e)}'
+        }, status=500)
         
     except json.JSONDecodeError:
         return JsonResponse({
@@ -786,9 +873,21 @@ def api_video_create(request):
 @require_POST
 def api_video_update(request, video_id):
     """POST /videos/api/{id}/update/ - Update video (Admin only)"""
+    # Debug logging
+    print(f'[DEBUG] api_video_update - User: {request.user}, Authenticated: {request.user.is_authenticated}, Staff: {request.user.is_staff if request.user.is_authenticated else False}')
+    print(f'[DEBUG] api_video_update - Session key: {request.session.session_key if hasattr(request, "session") else "No session"}')
+    print(f'[DEBUG] api_video_update - Cookies: {dict(request.COOKIES)}')
+    print(f'[DEBUG] api_video_update - Headers: {dict(request.headers)}')
+    
     if not request.user.is_authenticated:
         return JsonResponse({
-            'error': 'Anda harus login terlebih dahulu'
+            'error': 'Anda harus login terlebih dahulu',
+            'debug': {
+                'user': str(request.user),
+                'is_authenticated': request.user.is_authenticated,
+                'session_key': request.session.session_key if hasattr(request, 'session') else None,
+                'cookies': dict(request.COOKIES),
+            }
         }, status=401)
     
     if not request.user.is_staff:
@@ -862,6 +961,23 @@ def api_video_update(request, video_id):
         return JsonResponse({
             'error': f'Terjadi kesalahan: {str(e)}'
         }, status=500)
+
+
+@require_GET
+def api_sports_list(request):
+    """GET /videos/api/sports/ - Get list of all sports"""
+    from sportlibrary.models import Sport
+    
+    sports = Sport.objects.all().order_by('name')
+    sports_data = [
+        {
+            'id': sport.id,
+            'name': sport.name,
+        }
+        for sport in sports
+    ]
+    
+    return JsonResponse(sports_data, safe=False)
 
 
 @csrf_exempt

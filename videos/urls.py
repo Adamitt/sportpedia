@@ -29,9 +29,13 @@ urlpatterns = [
     # List video 
     path('api/', views.api_video_list, name='api_video_list'),
     
+    # Sports list
+    path('api/sports/', views.api_sports_list, name='api_sports_list'),
+    
     # Komentar video 
     path('api/<int:video_id>/comments/', views.api_video_comments, name='api_video_comments'),
     path('api/<int:video_id>/comment/', views.api_video_add_comment, name='api_video_add_comment'),
+    path('api/comment/<int:comment_id>/reply/', views.api_comment_reply, name='api_comment_reply'),
     
     # Rating video
     path('api/<int:video_id>/rate/', views.api_video_rate, name='api_video_rate'),
