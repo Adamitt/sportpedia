@@ -39,7 +39,8 @@ class RegisterForm(forms.ModelForm):
         if password1 and password2 and password1 != password2:
             raise ValidationError("Password tidak cocok.")
 
-        validate_password(password1)  # validasi bawaan Django
+        # Disable password validation untuk development
+        # validate_password(password1)  # Comment untuk development
         return cleaned_data
 
     def save(self, commit=True):

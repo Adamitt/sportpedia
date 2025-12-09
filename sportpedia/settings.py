@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',  # Untuk CORS support (Flutter web)
     'landingpage',
     'gearguide',
     'sportlibrary',
@@ -63,6 +64,7 @@ LOGIN_REDIRECT_URL = '/'  # ke mana user dibawa setelah login\
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # CORS middleware harus di atas CommonMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -130,20 +132,26 @@ else:
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+# Disable password validation untuk development (HANYA DEVELOPMENT!)
+# Di production, enable kembali untuk keamanan
+if not PRODUCTION:
+    AUTH_PASSWORD_VALIDATORS = []  # Disable untuk development
+else:
+    # Production: enable password validation
+    AUTH_PASSWORD_VALIDATORS = [
+        {
+            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        },
+    ]
 
 
 # Internationalization
@@ -175,6 +183,13 @@ CSRF_TRUSTED_ORIGINS = [
     'https://ainur-fadhil-sportpedia.pbp.cs.ui.ac.id'
 ]
 
+# CORS settings untuk Flutter web
+# IMPORTANT: Jika menggunakan CORS_ALLOW_ALL_ORIGINS = True, 
+# jangan set CORS_ALLOWED_ORIGINS (akan conflict)
+CORS_ALLOW_ALL_ORIGINS = True  # Untuk development, allow semua origin
+CORS_ALLOW_CREDENTIALS = True  # Allow cookies untuk session (PENTING!)
+# CORS_ALLOWED_ORIGINS tidak perlu jika CORS_ALLOW_ALL_ORIGINS = True
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -182,6 +197,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Redirect to home page after login
 LOGIN_REDIRECT_URL = '/'
+
+# Session cookie settings untuk Flutter Web
+# Untuk Flutter Web (cross-origin), perlu 'None' dengan Secure=False untuk development
+SESSION_COOKIE_SAMESITE = 'None'  # Allow cross-site cookies (required for Flutter Web)
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access (security)
+CSRF_COOKIE_SAMESITE = 'None'  # Allow cross-site CSRF cookies
+CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
 
 # LOGIN_URL = '/accounts/login/'
 # LOGIN_REDIRECT_URL = '/videos/'
