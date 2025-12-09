@@ -185,4 +185,6 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
+    storage = messages.get_messages(request)
+    storage.used = True
     return redirect('accounts:login')

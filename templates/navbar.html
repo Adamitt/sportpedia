@@ -1,11 +1,10 @@
 {% load static %}
-<<<<<<< HEAD
 <nav class="bg-white shadow-md sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-6 lg:px-12">
 
     <!-- 🔹 Row Atas: Logo + Search Bar + Auth Buttons -->
     <div class="flex items-center justify-between py-4 border-b border-gray-100">
-      
+
       <!-- Logo -->
       <a href="/" class="flex items-center gap-3 group">
         <img src="{% static 'images/logo1.png' %}" alt="SportPedia Logo" class="w-14 h-14 object-contain transition-transform duration-300 group-hover:scale-105">
@@ -13,6 +12,13 @@
           SPORT<span class="text-red-700 group-hover:text-red-600">PEDIA</span>
         </h1>
       </a>
+            <!-- Navigation Menu -->
+            <div class="hidden md:flex items-center gap-8">
+                <a href="/sportlibrary/" class="text-gray-700 hover:text-[#1E3A5F] font-medium transition-colors">Sports Library</a>
+                <a href="/community/" class="text-gray-700 hover:text-[#1E3A5F] font-medium transition-colors">Community</a>
+                <a href="/gearguide/" class="text-gray-700 hover:text-[#1E3A5F] font-medium transition-colors">Gear Guide</a>
+                <a href="{% url 'videos:video_gallery' %}" class="font-medium transition-colors {% if request.resolver_match.url_name == 'gallery' %}text-[#1E3A5F]{% else %}text-gray-700 hover:text-[#1E3A5F]{% endif %}">Video Gallery</a>
+            </div>
 
       <!-- Search Bar -->
       <div class="hidden md:flex flex-grow max-w-2xl mx-8">

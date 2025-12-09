@@ -3,20 +3,24 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('landingpage.urls')),
     path('gearguide/', include('gearguide.urls')),
     path('sportlibrary/', include('sportlibrary.urls')),
-    path('', include('admin_sportpedia.urls')),
     path('profile/', include('profile_app.urls')),
     path('accounts/', include('accounts.urls')),
     path('admin_sportpedia/', include('admin_sportpedia.urls')),
-    path('sportlibrary/', include('sportlibrary.urls')),
+    # path('sportlibrary/', include('sportlibrary.urls')),
     path('library/', include('sportlibrary.urls', namespace='library')),
     path('videos/', include('videos.urls')),
-
+    # path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('forum/', include('sportforum.urls')),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

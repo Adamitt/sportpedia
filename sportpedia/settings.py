@@ -34,8 +34,17 @@ PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ainur-fadhil-sportpedia.pbp.cs.ui.ac.id"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ainur-fadhil-sportpedia.pbp.cs.ui.ac.id", "10.0.2.2"]
 
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
+# Cookie settings for development (HTTP)
+# Set to True for production (HTTPS)
+CSRF_COOKIE_SECURE = False  # True hanya untuk HTTPS
+SESSION_COOKIE_SECURE = False  # True hanya untuk HTTPS
+CSRF_COOKIE_SAMESITE = 'Lax'  # 'None' hanya untuk cross-site + HTTPS
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 # Application definition
 
@@ -46,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'landingpage',
     'gearguide',
     'sportlibrary',
@@ -54,6 +64,7 @@ INSTALLED_APPS = [
     'admin_sportpedia',
     'metrics',
     'videos',
+    'sportforum',
 ]
 
 LOGIN_URL = '/login/'  # biar decorator login_required tahu harus redirect ke sini
@@ -63,12 +74,13 @@ LOGIN_REDIRECT_URL = '/'  # ke mana user dibawa setelah login\
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'landingpage.middleware.PageHitMiddleware' ##
+    'landingpage.middleware.PageHitMiddleware',
 ]
 
 ROOT_URLCONF = 'sportpedia.urls'
@@ -150,7 +162,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Jakarta'
 
 USE_I18N = True
 
@@ -160,16 +172,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Folder tempat Django nyari file static kamu (contohnya images, css, js)
 STATICFILES_DIRS = [
-    BASE_DIR / "static",        # static global di root project
-    BASE_DIR / "main" / "static",  # static di app main
+    BASE_DIR / "static"        # static global di root project
+    # BASE_DIR / "main" / "static",  # static di app main
 ]
 
 # Folder tempat Django ngumpulin semua file static pas deploy
 STATIC_ROOT = BASE_DIR / "staticfiles"
+CSRF_TRUSTED_ORIGINS = [
+    'https://ainur-fadhil-sportpedia.pbp.cs.ui.ac.id'
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -178,3 +193,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Redirect to home page after login
 LOGIN_REDIRECT_URL = '/'
+
+# LOGIN_URL = '/accounts/login/'
+# LOGIN_REDIRECT_URL = '/videos/'
+# LOGOUT_REDIRECT_URL = '/videos/'

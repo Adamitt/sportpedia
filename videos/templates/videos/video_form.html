@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if video %}Edit Video{% else %}Add Video{% endif %} - SPORTPEDIA{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-8 sm:p-10 rounded-3xl shadow-xl mt-12 mb-16 border border-gray-200">
+  <h2 class="text-3xl font-bold mb-8 text-[#1E3A5F]">
+    {% if video %}✏️ Edit Video{% else %}🎥 Add New Video{% endif %}
+  </h2>
+  
+  <form method="POST" class="space-y-6">
+    {% csrf_token %}
+
+    {# Tampilkan error non-field jika ada #}
+    {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {# Loop melalui setiap field di form #}
+    {% for field in form %}
+      <div>
+        <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+          {{ field.label }}
+          {% if field.field.required %}
+            <span class="text-red-600">*</span>
+          {% endif %}
+        </label>
+        
+        {{ field }} {# Ini akan merender widget DENGAN kelas Tailwind dari forms.py #}
+        
+        {% if field.help_text %}
+          <p class="mt-2 text-xs text-gray-500">{{ field.help_text|safe }}</p>
+        {% endif %}
+        
+        {% if field.errors %}
+          <div class="mt-2 text-sm text-red-600">
+            {% for error in field.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    {# Tombol Submit #}
+    <div class="pt-6 border-t border-gray-200 flex items-center gap-4">
+      <button type="submit" class="bg-[#1E3A5F] text-white px-6 py-3 rounded-full font-semibold hover:opacity-90 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+        {% if video %}Update Video{% else %}Save Video{% endif %}
+      </button>
+      <a href="{% if video %}{% url 'videos:video_detail' video.id %}{% else %}{% url 'videos:video_gallery' %}{% endif %}" 
+         class="text-gray-600 font-semibold hover:underline">
+         Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

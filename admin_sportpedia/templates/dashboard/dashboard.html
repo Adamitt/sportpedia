@@ -129,6 +129,23 @@
           </div>
           <span class="font-semibold text-gray-700 group-hover:text-orange-600">Kelola Gear</span>
         </a>
+
+        
+        <a href="{% url 'admin_sportpedia:manage_admin' %}" 
+          class="quick-nav-card block p-6 text-center border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-all duration-300">
+          <div class="mb-4">
+            <span class="text-5xl">🤷‍♀️</span> 
+            {% comment %} Or use an SVG/Image if you prefer {% endcomment %}
+            {% comment %} <img src="{% static 'images/gear_icon.png' %}" alt="Gear Icon" class="h-16 w-auto mx-auto mb-3 object-contain"> {% endcomment %}
+          </div>
+          <h2 class="text-xl font-semibold mb-2" style="color: #1C3264;">
+            Kelola Admin
+          </h2>
+          <p class="text-sm text-gray-500">
+            Add, edit, or delete admin accounts.
+          </p>
+        </a>
+
       </div>
     </div>
 
@@ -186,4 +203,19 @@
 
   </div>
 </section>
+
+{% endblock %}
+
+{% block head %}
+{{ block.super }}
+<style>
+  /* You can reuse some styles from home.html if needed, or define specific admin ones */
+  .quick-nav-card {
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .quick-nav-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(28, 50, 100, 0.1); /* Slightly softer shadow */
+  }
+</style>
 {% endblock %}
