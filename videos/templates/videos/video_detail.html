@@ -1,338 +1,484 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load video_filters %}
 
 {% block title %}{{ video.title }} - SPORTPEDIA{% endblock %}
 
+{% block head %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/lucide-icons@0.379.0/dist/lucide.min.js"></script>
+<style>
+    /* Style untuk tombol Like/Bookmark yang aktif */
+    #likeBtn.active {
+        background-color: #fce7f3;
+        color: #be185d;
+        border-color: #be185d !important;
+    }
+    #likeBtn.active i {
+        fill: #be185d;
+    }
+    #bookmarkBtn.active {
+        background-color: #1E3A5F;
+        color: white;
+    }
+    #bookmarkBtn.active i {
+        fill: white;
+    }
+    /* Style untuk bintang rating di form komentar */
+    #star-rating input:checked ~ label,
+    #star-rating label:hover,
+    #star-rating label:hover ~ label {
+        color: #f59e0b; /* text-yellow-500 */
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-7xl mx-auto px-8 py-12">
-    <!-- Back Button -->
-    <a href="{% url 'videos:video_gallery' %}" class="mb-6 font-semibold hover:opacity-80 flex items-center gap-2 transition-opacity text-lg inline-flex" style="color: #1E3A5F;">
-        ← Back to Gallery
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <a href="{% url 'videos:video_gallery' %}" class="mb-4 font-semibold hover:opacity-80 flex items-center gap-2 transition-opacity text-base inline-flex" style="color: #1E3A5F;">
+        <i data-lucide="arrow-left" class="h-5 w-5"></i>
+        Back to Gallery
     </a>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Main Video Section -->
-        <div class="lg:col-span-2">
-            <!-- Video Player -->
-            <div
-            class="relative mb-8 overflow-hidden rounded-3xl border-2"
-            style="border-color:#fce7f3;"
-            >
-            <div
-                class="relative aspect-video flex items-center justify-center"
-                style="background: radial-gradient(circle at center, #2b5a8f 0%, #1e3a5f 70%);"
-            >
-                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <i data-lucide="play-circle" class="h-32 w-32 text-white/80 mb-8"></i>
-                <a
-                    href="{{ video.url }}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center justify-center gap-3 px-10 py-4 bg-white text-[#1E3A5F] rounded-full font-bold text-xl hover:bg-[#F4D160] hover:scale-105 transition-all shadow-[0_12px_40px_rgba(0,0,0,0.25)]"
-                >
-                    <i data-lucide="external-link" class="h-6 w-6"></i>
-                    Watch Video
-                </a>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Content - YouTube Style Layout -->
+        <div class="lg:col-span-2 space-y-4">
+            <!-- Video Player - Full Width -->
+            <div class="relative w-full aspect-video bg-gray-900 rounded-xl overflow-hidden">
+                {% if video.thumbnail_url %}
+                <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}" class="w-full h-full object-cover">
+                {% elif video.thumbnail %}
+                <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
+                    <i data-lucide="video" class="h-24 w-24 text-white/50"></i>
                 </div>
-            </div>
-            </div>
-
-
-
-            <!-- Video Info -->
-            <div class="bg-white rounded-3xl p-8 mb-8 border-2" style="border-color: #fce7f3;">
-                <div class="mb-6">
-                    <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ video.title }}</h1>
-                    <div class="flex items-center gap-3 flex-wrap mb-6">
-                        <span class="px-4 py-2 rounded-full text-sm font-semibold text-white" style="background-color: #1E3A5F;">Sport {{ video.sport_id }}</span>
-                        <span class="px-4 py-2 rounded-full text-sm font-semibold" style="background-color: #F4D160; color: #1E3A5F;">{{ video.difficulty }}</span>
-                        <div class="flex items-center gap-2 text-gray-600">
-                            <i data-lucide="eye" class="h-5 w-5"></i>
-                            <span class="text-sm font-medium">{{ video.views }} views</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="star" class="h-5 w-5 text-[#F4D160] fill-[#F4D160]"></i>
-                            <span class="text-sm font-bold text-gray-800">{{ video.rating }}</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-gray-600">
-                            <i data-lucide="clock" class="h-5 w-5"></i>
-                            <span class="text-sm font-medium">{{ video.duration }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex items-center gap-3 pb-6 border-b-2 border-gray-100 flex-wrap">
-                {% if user.is_authenticated %}
-                    <button id="likeBtn" class="flex items-center gap-2 px-6 py-3 text-white rounded-full hover:opacity-90 transition-opacity font-semibold" style="background-color: #A33B3B;">
-                        <i data-lucide="heart" class="h-5 w-5"></i>
-                        Like
-                    </button>
-                    <button id="bookmarkBtn" class="flex items-center gap-2 px-6 py-3 rounded-full hover:bg-gray-50 transition-colors font-semibold border-2" style="border-color: #1E3A5F; color: #1E3A5F;">
-                        <i data-lucide="bookmark" class="h-5 w-5"></i>
-                        Save
-                    </button>
-                    <button class="flex items-center gap-2 px-6 py-3 rounded-full hover:bg-gray-50 transition-colors font-semibold border-2" style="border-color: #1E3A5F; color: #1E3A5F;" id="shareBtn">
-                        <i data-lucide="share-2" class="h-5 w-5"></i>
-                        Share
-                    </button>
-                    {% if user.is_staff %}
-                    <a href="{% url 'videos:video_update' video.id %}" class="flex items-center gap-2 px-6 py-3 rounded-full hover:bg-gray-50 transition-colors font-semibold border-2" style="border-color: #1E3A5F; color: #1E3A5F;">
-                        <i data-lucide="edit" class="h-5 w-5"></i>
-                        Edit
+                {% endif %}
+                
+                <!-- Single Play Button - Centered (YouTube Style) -->
+                {% if video.video_url %}
+                <div class="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <a href="{{ video.video_url }}" target="_blank" rel="noopener noreferrer" 
+                       class="group flex items-center justify-center w-20 h-20 bg-red-600 rounded-full hover:bg-red-700 transition-all transform hover:scale-110 shadow-2xl">
+                        <svg class="w-10 h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
                     </a>
-                    <button onclick="confirmDelete({{ video.id }})" class="flex items-center gap-2 px-6 py-3 rounded-full hover:bg-red-50 transition-colors font-semibold border-2 border-red-600 text-red-600">
-                        <i data-lucide="trash-2" class="h-5 w-5"></i>
-                        Delete
-                    </button>
-                    {% endif %}
-                {% else %}
-                    <p class="text-gray-500 font-semibold italic">
-                        Please <a href="{% url 'login' %}" class="text-[#1E3A5F] hover:underline">log in</a> to like, save, or comment.
-                    </p>
+                </div>
                 {% endif %}
-                </div>
-
-
-                <!-- Description -->
-                <div class="pt-6">
-                    <h3 class="font-bold text-lg mb-3" style="color: #1E3A5F;">Description</h3>
-                    <p class="text-gray-600 leading-relaxed mb-6">
-                        {{ video.description }}
-                    </p>
-
-                    <div class="flex items-center gap-6 text-sm text-gray-500 flex-wrap">
-                        <span>📅 Uploaded {{ video.upload_date }}</span>
-                        <span>👤 By: {{ video.instructor }}</span>
-                    </div>
-
-                    {% if video.tags %}
-                    <div class="mt-4 flex items-center gap-2 flex-wrap">
-                        <span class="text-sm font-semibold text-gray-600">Tags:</span>
-                        {% for tag in video.tags %}
-                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">{{ tag }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </div>
             </div>
 
-            <!-- Comments Section -->
-            <div class="bg-white rounded-3xl p-8 border-2" style="border-color: #fce7f3;">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="font-bold text-2xl flex items-center gap-3" style="color: #1E3A5F;">
-                        <i data-lucide="message-square" class="h-6 w-6"></i>
-                        Comments & Ratings ({{ comments|length }})
-                    </h3>
+            <!-- Video Info Section - YouTube Style -->
+            <div class="space-y-4">
+                <!-- Title -->
+                <h1 class="text-xl font-semibold text-gray-900 leading-tight">{{ video.title }}</h1>
+                
+                <!-- Stats & Actions Row - YouTube Style -->
+                <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-gray-200">
+                    <!-- Left: Stats -->
+                    <div class="flex items-center gap-4 flex-wrap text-sm text-gray-600">
+                        <span class="font-medium">{{ video.views_count|default:0 }} views</span>
+                        <span>•</span>
+                        <span>{{ video.created_at|date:"M d, Y" }}</span>
+                        <div class="flex items-center gap-1">
+                            <i data-lucide="star" class="h-4 w-4 text-yellow-500 fill-yellow-500"></i>
+                            <span class="font-medium">{{ video.average_rating|floatformat:1|default:"0.0" }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Action Buttons - YouTube Style -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                        {% if user.is_authenticated %}
+                        <button id="likeBtn" data-video-id="{{ video.id }}" 
+                                class="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 transition-colors font-medium text-sm border border-gray-300
+                                {% if is_liked %}bg-pink-50 text-pink-700 border-pink-300{% else %}text-gray-700{% endif %}">
+                            <i data-lucide="thumbs-up" class="h-5 w-5 {% if is_liked %}fill-current{% endif %}"></i>
+                            <span id="likeCount">{{ video.likes.count }}</span>
+                        </button>
+                        
+                        <button id="bookmarkBtn" data-video-id="{{ video.id }}" 
+                                class="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 transition-colors font-medium text-sm border border-gray-300 text-gray-700">
+                            <i data-lucide="bookmark" class="h-5 w-5 {% if is_bookmarked %}fill-current{% endif %}"></i>
+                            Save
+                        </button>
+                        
+                        <button id="shareBtn" class="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 transition-colors font-medium text-sm border border-gray-300 text-gray-700">
+                            <i data-lucide="share-2" class="h-5 w-5"></i>
+                            Share
+                        </button>
+                        {% endif %}
+                    </div>
                 </div>
 
-                <!-- Add Comment Form -->
-                {% if user.is_authenticated %}
-                <div class="mb-8">
-                    <textarea id="commentInput" placeholder="Share your thoughts..." class="w-full border-2 rounded-2xl p-4 focus:outline-none focus:ring-2 mb-3 resize-none" rows="3" style="border-color: #1E3A5F;"></textarea>
-                    <button id="submitComment" class="px-8 py-3 text-white rounded-full hover:opacity-90 transition-opacity font-semibold" style="background-color: #1E3A5F;">Submit</button>
+                <!-- Channel/Uploader Info - YouTube Style -->
+                <div class="flex items-start gap-4 pb-4 border-b border-gray-200">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                        {{ video.instructor|default:video.uploader.username|default:"A"|first|upper }}
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-semibold text-gray-900 mb-1">{{ video.instructor|default:video.uploader.username|default:"Admin" }}</div>
+                        <div class="text-sm text-gray-600">{{ video.views_count|default:0 }} subscribers</div>
+                    </div>
+                    {% if user.is_staff %}
+                    <div class="flex gap-2">
+                        <a href="{% url 'videos:video_update' video.id %}" class="px-4 py-2 rounded-full hover:bg-gray-100 transition-colors font-medium text-sm border border-gray-300 text-gray-700">
+                            Edit
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
-                {% else %}
-                <p class="text-gray-500 italic mb-6">
-                    Please <a href="{% url 'login' %}" class="text-[#1E3A5F] hover:underline">log in</a> to comment.
-                </p>
-                {% endif %}
 
-                <!-- Comments List -->
-                <div id="commentList" class="space-y-6">
-                    {% for comment in comments %}
-                    <div class="border-b-2 border-gray-100 pb-6 last:border-0">
-                        <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg" style="background-color: #1E3A5F;">
-                                {{ comment.user.first_name|first|upper }}
+                <!-- Description Card - YouTube Style -->
+                <div class="bg-gray-50 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold text-white" style="background-color: #1E3A5F;">
+                            {{ video.sport.name|default:"Umum" }}
+                        </span>
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold capitalize" style="background-color: #F4D160; color: #1E3A5F;">
+                            {{ video.difficulty }}
+                        </span>
+                        <span class="text-sm text-gray-600">
+                            <i data-lucide="clock" class="h-4 w-4 inline"></i> {{ video.duration }}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{{ video.description|default:"No description available." }}</p>
+                    </div>
+                </div>
+
+                <!-- Comments Section - YouTube Style -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2 mb-4">
+                        <h3 class="font-semibold text-lg text-gray-900">{{ comments.count }} Comments</h3>
+                    </div>
+
+                    {% if user.is_authenticated %}
+                    <form id="commentForm" class="mb-6">
+                        {% csrf_token %}
+                        <div class="flex gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold flex-shrink-0">
+                                {{ user.username|first|upper }}
                             </div>
                             <div class="flex-1">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <span class="font-bold text-gray-800">{{ comment.user.get_full_name }}</span>
-                                    <span class="text-sm text-gray-500">{{ comment.created_at|timesince }} ago</span>
+                                <textarea id="commentInput" name="comment" placeholder="Add a comment..." 
+                                    class="w-full border-b-2 border-gray-300 pb-2 focus:outline-none focus:border-gray-500 resize-none text-sm" 
+                                    rows="1" style="min-height: 24px;"></textarea>
+                                <div class="flex items-center justify-between mt-2">
+                                    <div class="flex flex-row-reverse justify-end items-center gap-1" id="star-rating">
+                                        {% for i in "54321"|make_list %}
+                                        <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="hidden peer" {% if user_rating == i|add:0 %}checked{% endif %}>
+                                        <label for="star{{ i }}" class="text-gray-300 peer-hover:text-yellow-400 hover:text-yellow-400 peer-checked:text-yellow-400 cursor-pointer text-lg" title="{{ i }} stars">★</label>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button type="button" onclick="document.getElementById('commentForm').reset();" 
+                                            class="px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-full">
+                                            Cancel
+                                        </button>
+                                        <button id="submitComment" type="submit" 
+                                            class="px-4 py-1.5 text-sm font-medium text-white rounded-full hover:opacity-90 transition-opacity" 
+                                            style="background-color: #1E3A5F;">
+                                            Comment
+                                        </button>
+                                    </div>
                                 </div>
-                                <p class="text-gray-700 leading-relaxed">{{ comment.text }}</p>
-                                <div class="flex items-center gap-4 mt-3 text-sm">
-                                    <button class="helpfulBtn hover:opacity-80 transition-opacity" data-id="{{ comment.id }}" style="color: #1E3A5F;">👍 Helpful ({{ comment.helpful_count }})</button>
+                                <div id="commentError" class="text-red-600 text-xs mt-2 hidden"></div>
+                            </div>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg text-center">
+                        <p class="text-sm text-gray-600">
+                            <a href="{% url 'accounts:login' %}" class="text-blue-600 hover:underline font-medium">Sign in</a> to comment
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <div id="commentList" class="space-y-4">
+                        {% for comment in comments %}
+                        <div class="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0" id="comment-{{ comment.id }}">
+                            {% if comment.user.profile.foto_profil %}
+                            <img src="{{ comment.user.profile.foto_profil }}" alt="Foto Profil" class="w-10 h-10 rounded-full object-cover flex-shrink-0">
+                            {% else %}
+                            <div class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold text-sm bg-gradient-to-br from-blue-500 to-blue-700">
+                                {{ comment.user.first_name.0|default:comment.user.username.0|upper }}
+                            </div>
+                            {% endif %}
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                    <span class="font-semibold text-sm text-gray-900">{{ comment.user.username }}</span>
+                                    <span class="text-xs text-gray-500">{{ comment.created_at|timesince }} ago</span>
+                                    {% if comment.rating %}
+                                    <div class="flex items-center text-xs">
+                                        <i data-lucide="star" class="h-3 w-3 text-yellow-500 fill-yellow-500 mr-0.5"></i>
+                                        <span class="font-medium">{{ comment.rating }}/5</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <p class="text-sm text-gray-800 leading-relaxed mb-2">{{ comment.text|linebreaksbr }}</p>
+                                <div class="flex items-center gap-4 text-xs">
+                                    <button class="helpfulBtn hover:opacity-80 transition-opacity text-gray-600 hover:text-gray-900" data-id="{{ comment.id }}">
+                                        👍 <span id="helpful-count-{{ comment.id }}">{{ comment.helpful_count }}</span>
+                                    </button>
+                                    <button class="text-gray-600 hover:text-gray-900">Reply</button>
                                 </div>
                             </div>
                         </div>
+                        {% empty %}
+                        <div id="noComments" class="text-center py-12">
+                            <i data-lucide="message-square" class="h-16 w-16 text-gray-300 mx-auto mb-4"></i>
+                            <p class="text-gray-500 text-sm">No comments yet. Be the first to comment!</p>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% empty %}
-                    <p class="text-center text-gray-500 py-8">No comments yet. Be the first to comment!</p>
-                    {% endfor %}
                 </div>
             </div>
         </div>
 
-        <!-- Sidebar: Related Videos -->
+        <!-- Sidebar - Related Videos - YouTube Style -->
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-3xl p-6 border-2" style="border-color: #fce7f3;">
-                <h3 class="font-bold text-xl mb-6" style="color: #1E3A5F;">Related Videos</h3>
-                <div class="space-y-5">
-                    {% for related_video in related_videos %}
-                    <a href="{% url 'videos:video_detail' related_video.id %}" class="flex gap-3 hover:bg-gray-50 p-3 rounded-2xl transition-colors">
-                        <div class="relative w-32 h-20 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-gray-100 to-gray-50">
-                            {% if related_video.thumbnail %}
-                                <img src="{{ related_video.thumbnail }}" alt="{{ related_video.title }}" class="w-full h-full object-cover rounded-xl">
-                            {% else %}
-                                <span class="text-2xl">🎾</span>
-                            {% endif %}
-                            <div class="absolute bottom-1 right-1 text-white text-xs px-2 py-1 rounded-full font-semibold" style="background-color: #1E3A5F;">
-                                {{ related_video.duration }}
-                            </div>
+            <div class="space-y-3">
+                {% for video in related_videos %}
+                <a href="{% url 'videos:video_detail' video.id %}" class="flex gap-3 group hover:bg-gray-50 p-2 rounded-lg transition-colors">
+                    <div class="relative w-40 h-24 rounded-lg flex items-center justify-center flex-shrink-0 bg-gray-200 overflow-hidden">
+                        {% if video.thumbnail_url %}
+                        <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                        {% elif video.thumbnail %}
+                        <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                        {% else %}
+                        <div class="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600"></div>
+                        {% endif %}
+                        <div class="absolute bottom-1 right-1 text-white text-xs px-1.5 py-0.5 rounded bg-black/80 font-medium">
+                            {{ video.duration|default:"0:00" }}
                         </div>
-                        <div class="flex-1">
-                            <h4 class="font-semibold text-sm text-gray-800 line-clamp-2 mb-2">{{ related_video.title }}</h4>
-                            <div class="flex items-center gap-2 text-xs text-gray-500">
-                                <span>{{ related_video.views }}</span>
-                                <span>•</span>
-                                <div class="flex items-center gap-1">
-                                    <i data-lucide="star" class="h-3 w-3 text-[#F4D160] fill-[#F4D160]"></i>
-                                    <span class="font-semibold">{{ related_video.rating }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                    {% endfor %}
-                </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-medium text-sm text-gray-900 line-clamp-2 mb-1 group-hover:text-blue-600 transition-colors">{{ video.title }}</h4>
+                        <div class="text-xs text-gray-600 mb-1">{{ video.instructor|default:video.uploader.username|default:"Admin" }}</div>
+                        <div class="text-xs text-gray-500">{{ video.views_count|default:0 }} views</div>
+                    </div>
+                </a>
+                {% empty %}
+                <p class="text-sm text-gray-500 text-center py-8">No related videos found.</p>
+                {% endfor %}
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
-{% block extra_js %}
+
+{% block scripts %}
+{{ block.super }}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // --- helpers ---
-  function getCookie(name){
-    const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-    return m ? m.pop() : '';
-  }
-  const csrftoken = getCookie('csrftoken');
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 
-  function showToast(message, color = "#1E3A5F") {
-    const toast = document.createElement("div");
-    toast.textContent = message;
-    toast.className = "fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl text-white font-semibold shadow-lg transition-all";
-    toast.style.backgroundColor = color;
-    toast.style.opacity = "0";
-    toast.style.zIndex = "9999";
-    document.body.appendChild(toast);
-    requestAnimationFrame(() => { toast.style.opacity = "1"; });
-    setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 350); }, 2000);
-  }
+    function getCookie(name){
+        const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+        return m ? m.pop() : '';
+    }
+    const csrftoken = getCookie('csrftoken');
 
-  // --- delete (POST) ---
-  function confirmDelete(videoId) {
-    if (!confirm("Are you sure you want to delete this video?")) return;
-    fetch(`/videos/${videoId}/delete/`, {
-      method: "POST",
-      headers: { "X-CSRFToken": csrftoken }
-    }).then(res => {
-      if (res.ok) window.location.href = "{% url 'videos:video_gallery' %}";
-      else alert("Failed to delete video");
-    }).catch(() => alert("Error deleting video."));
-  }
-  window.confirmDelete = confirmDelete;
+    function showToast(message, color = "#1E3A5F") {
+        // ... (Implementasi showToast Anda di sini) ...
+    }
 
-  // --- like (POST) ---
-  const likeBtn = document.getElementById("likeBtn");
-  if (likeBtn) {
-    likeBtn.addEventListener("click", async () => {
-      const res = await fetch("{% url 'videos:like_video' video.id %}", {
-        method: "POST",
-        headers: { "X-CSRFToken": csrftoken }
-      });
-      const data = await res.json();
-      if (data.success) {
-        likeBtn.innerHTML = `<i data-lucide='heart' class='h-5 w-5'></i> Liked (${data.likes})`;
-        showToast("You liked this video ❤️", "#A33B3B");
-      }
+    // --- delete (Form Submission) ---
+    // (Tidak perlu JS kustom, form HTML biasa sudah menangani)
+    // Jika Anda ingin AJAX, Anda perlu event listener
+    
+    // --- like (POST) ---
+    const likeBtn = document.getElementById("likeBtn");
+    if (likeBtn) {
+        likeBtn.addEventListener("click", async () => {
+            const videoId = likeBtn.dataset.videoId;
+            // --- FIX: Gunakan URL tag yang benar ---
+            const url = "{% url 'videos:like_video' video.id %}"; 
+            
+            try {
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: { "X-CSRFToken": csrftoken, "Accept": "application/json" }
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    const likeCountEl = likeBtn.querySelector('#likeCount'); // Target span
+                    if (data.is_liked) {
+                        likeBtn.classList.add('active');
+                        likeBtn.innerHTML = `<i data-lucide='heart' class='h-5 w-5 fill-current'></i> Liked (<span id="likeCount">${data.total_likes}</span>)`;
+                    } else {
+                        likeBtn.classList.remove('active');
+                        likeBtn.innerHTML = `<i data-lucide='heart' class='h-5 w-5'></i> Like (<span id="likeCount">${data.total_likes}</span>)`;
+                    }
+                    lucide.createIcons();
+                } else { showToast(data.error || "Failed to like video", "#b91c1c"); }
+            } catch (e) { showToast("Network error. Please try again.", "#b91c1c"); }
+        });
+    }
+
+    // --- bookmark/save (POST toggle) ---
+    const bookmarkBtn = document.getElementById("bookmarkBtn");
+    if (bookmarkBtn) {
+        bookmarkBtn.addEventListener("click", async () => {
+            const videoId = bookmarkBtn.dataset.videoId;
+            // --- FIX: Gunakan URL tag yang benar ---
+            const url = "{% url 'videos:bookmark_video' video.id %}"; 
+
+            try {
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: { "X-CSRFToken": csrftoken, "Accept": "application/json" }
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    if (data.bookmarked) {
+                        bookmarkBtn.classList.add('active');
+                        bookmarkBtn.innerHTML = `<i data-lucide='bookmark' class='h-5 w-5 fill-current'></i> Saved ✓`;
+                    } else {
+                        bookmarkBtn.classList.remove('active');
+                        bookmarkBtn.innerHTML = `<i data-lucide='bookmark' class='h-5 w-5'></i> Save`;
+                    }
+                    showToast(data.message, "#1E3A5F");
+                    lucide.createIcons();
+                } else { showToast(data.error || "Failed to bookmark", "#b91c1c"); }
+            } catch (e) { showToast("Network error. Please try again.", "#b91c1c"); }
+        });
+    }
+
+    // --- share ---
+    const shareBtn = document.getElementById("shareBtn");
+    if (shareBtn) {
+        shareBtn.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                showToast("Link copied to clipboard 🔗");
+            } catch { showToast("Copy failed. Please copy the URL manually.", "#b91c1c"); }
+        });
+    }
+
+    // --- add comment (POST) ---
+    const commentForm = document.getElementById("commentForm");
+    const commentList = document.getElementById("commentList");
+    const noComments = document.getElementById("noComments");
+    const commentError = document.getElementById("commentError");
+
+    if (commentForm) {
+        commentForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(commentForm);
+            const commentText = formData.get('comment').trim();
+            
+            if (!commentText) {
+                commentError.textContent = "Komentar tidak boleh kosong.";
+                commentError.classList.remove('hidden');
+                return;
+            }
+            
+            commentError.classList.add('hidden');
+            const submitBtn = document.getElementById('submitComment');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                const res = await fetch("{% url 'videos:add_comment' video.id %}", {
+                    method: "POST",
+                    headers: { "X-CSRFToken": csrftoken, "Accept": "application/json" },
+                    body: formData // Kirim semua data form (termasuk rating)
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    const c = data.comment;
+                    const div = document.createElement("div");
+                    div.className = "border-b-2 border-gray-100 pb-6 last:border-0";
+                    div.id = `comment-${c.id}`; // Tambahkan ID ke elemen baru
+                    
+                    const profilePicHTML = c.user_profile_pic
+                        ? `<img src="${c.user_profile_pic}" alt="Foto Profil" class="w-12 h-12 rounded-full object-cover shadow-sm">`
+                        : `<div class="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold text-lg" style="background-color: #1E3A5F;">${c.user_initial}</div>`;
+
+                    const ratingHTML = c.rating
+                        ? `<div class="flex items-center text-sm font-semibold"><i data-lucide="star" class="h-4 w-4 text-[#F4D160] fill-[#F4D160] mr-1"></i> ${c.rating}/5</div>`
+                        : "";
+
+                    div.innerHTML = `
+                      <div class="flex items-start gap-4">
+                        ${profilePicHTML}
+                        <div class='flex-1'>
+                          <div class='flex items-center gap-3 mb-2 flex-wrap'>
+                            <span class='font-bold text-gray-800'>${c.user}</span>
+                            <span class='text-sm text-gray-500'>just now</span>
+                            ${ratingHTML}
+                          </div>
+                          <p class='text-gray-700 leading-relaxed'>${c.text.replace(/\n/g, '<br>')}</p>
+                          <div class='flex items-center gap-4 mt-3 text-sm'>
+                            <button class='helpfulBtn hover:opacity-80 transition-opacity' data-id='${c.id}' style='color:#1E3A5F;'>👍 Helpful (<span id="helpful-count-${c.id}">${c.helpful_count}</span>)</button>
+                          </div>
+                        </div>
+                      </div>`;
+                    
+                    if (noComments) noComments.remove();
+                    commentList.prepend(div);
+                    commentForm.reset();
+                    lucide.createIcons(); // Render ikon bintang
+                    // Tambahkan listener ke tombol helpful yang BARU dibuat
+                    div.querySelector('.helpfulBtn').addEventListener('click', handleHelpfulClick);
+                    showToast("Komentar ditambahkan 💬");
+                } else {
+                    commentError.textContent = data.message || "Gagal menambah komentar.";
+                    commentError.classList.remove('hidden');
+                }
+            } catch (e) {
+                 {% comment %} commentError.textContent = "Terjadi kesalahan jaringan."; {% endcomment %}
+                 commentError.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit';
+            }
+        });
+    }
+
+    // --- mark helpful (POST) ---
+    async function handleHelpfulClick(event) {
+        const btn = event.currentTarget;
+        const id = btn.dataset.id;
+        // --- FIX: Gunakan URL tag yang benar ---
+        const url = "{% url 'videos:helpful_comment' 0 %}".replace('0', id);
+        
+        try {
+            const res = await fetch(url, {
+                method: "POST", // <-- FIX: Gunakan POST
+                headers: { "X-CSRFToken": csrftoken, "Accept": "application/json" }
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                const countEl = document.getElementById(`helpful-count-${id}`);
+                if(countEl) countEl.textContent = data.helpful_count;
+                btn.disabled = true; // Cegah klik ganda
+                btn.style.opacity = '0.6';
+                showToast("Marked as helpful 👍");
+            } else {
+                showToast(data.error || "Gagal menandai.", "#b91c1c");
+            }
+        } catch (e) {
+            showToast("Network error.", "#b91c1c");
+        }
+    }
+    
+    document.querySelectorAll(".helpfulBtn").forEach(btn => {
+        btn.addEventListener("click", handleHelpfulClick);
     });
-  }
 
-  // --- bookmark/save (POST toggle) ---
-  const bookmarkBtn = document.getElementById("bookmarkBtn");
-  if (bookmarkBtn) {
-    bookmarkBtn.addEventListener("click", async () => {
-      const res = await fetch("{% url 'videos:bookmark_video' video.id %}", {
-        method: "POST",
-        headers: { "X-CSRFToken": csrftoken }
-      });
-      const data = await res.json();
-      if (data.success) {
-        bookmarkBtn.innerHTML = `<i data-lucide='bookmark' class='h-5 w-5'></i> ${data.bookmarked ? "Saved ✓" : "Save"}`;
-        showToast(data.bookmarked ? "Video saved!" : "Bookmark removed.", "#1E3A5F");
-      }
-    });
-  }
-
-  // --- share: copy current page URL ---
-  const shareBtn = document.querySelector("button i[data-lucide='share-2']")?.parentElement;
-  if (shareBtn) {
-    shareBtn.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        showToast("Link copied to clipboard 🔗");
-      } catch {
-        showToast("Copy failed. Long-press URL.", "#b91c1c");
-      }
-    });
-  }
-
-  // --- add comment (POST) ---
-  const commentInput = document.getElementById("commentInput");
-  const submitComment = document.getElementById("submitComment");
-  const commentList = document.getElementById("commentList");
-
-  if (submitComment && commentInput) {
-    submitComment.addEventListener("click", async () => {
-      const comment = commentInput.value.trim();
-      if (!comment) return showToast("Komentar tidak boleh kosong.", "#b91c1c");
-
-      const res = await fetch("{% url 'videos:add_comment' video.id %}", {
-        method: "POST",
-        headers: { "X-CSRFToken": csrftoken, "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ username: "{{ user.username|default:'Anonymous' }}", comment })
-      });
-      const data = await res.json();
-      if (data.success) {
-        const c = data.comment;
-        const div = document.createElement("div");
-        div.className = "border-b-2 border-gray-100 pb-6";
-        div.innerHTML = `
-          <div class='flex items-start gap-4'>
-            <div class='w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg' style='background-color:#1E3A5F;'>${c.user.charAt(0).toUpperCase()}</div>
-            <div class='flex-1'>
-              <div class='flex items-center gap-3 mb-2'><span class='font-bold text-gray-800'>${c.user}</span><span class='text-sm text-gray-500'>just now</span></div>
-              <p class='text-gray-700 leading-relaxed'>${c.text}</p>
-              <div class='flex items-center gap-4 mt-3 text-sm'>
-                <button class='helpfulBtn hover:opacity-80 transition-opacity' data-id='${c.id}' style='color:#1E3A5F;'>👍 Helpful (0)</button>
-              </div>
-            </div>
-          </div>`;
-        commentList.prepend(div);
-        commentInput.value = "";
-        showToast("Komentar ditambahkan 💬");
-      }
-    });
-  }
-
-  // --- mark helpful (GET ok) ---
-  document.querySelectorAll(".helpfulBtn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const id = btn.dataset.id;
-      const res = await fetch(`/videos/comment/${id}/helpful/`);
-      const data = await res.json();
-      if (data.success) {
-        const num = parseInt(btn.textContent.match(/\d+/)) + 1;
-        btn.innerHTML = `👍 Helpful (${num})`;
-        showToast("Marked as helpful 👍");
-      }
-    });
-  });
+    // Panggil lucide.createIcons() sekali lagi di akhir jika ada ikon yg belum ter-render
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 });
 </script>
-{% endblock %}
 {% endblock %}

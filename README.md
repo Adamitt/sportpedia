@@ -172,3 +172,6 @@ Wikipedia. Sebagai sumber utama tentang deskripsi cabang olahraga.
 
 ## Link figma
 Link figma : https://www.figma.com/design/8EefBJOriHpUdaWKzYXzsz/Sportpedia?node-id=0-1&t=3s0Bh9IsCShGBRHh-1
+
+## Link Website
+Link Website : https://ainur-fadhil-sportpedia.pbp.cs.ui.ac.id

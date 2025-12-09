@@ -1,3 +1,4 @@
+# metrics/utils.py
 from django.db.models import F
 from django.utils import timezone
 from .models import ViewCounter
@@ -5,7 +6,7 @@ from .models import ViewCounter
 def bump_view(key, *, title, url, category, image=None, request=None, dedupe_seconds=900):
     """
     Tambah 1 view utk suatu 'key' (halaman).
-    Dedupe per-session (default 15 menit) supaya nggak ke-spam refresh.
+    Dedupe per-session (default 15 menit).
     """
     if request is not None and hasattr(request, "session"):
         sess_key = f"hit:{key}"
@@ -20,7 +21,7 @@ def bump_view(key, *, title, url, category, image=None, request=None, dedupe_sec
         defaults={
             "title": title[:200],
             "url": url[:300],
-            "category": category[:50],
+            "category": category[:50],  # konsisten: "Library" | "Gear"
             "image": (image or "")[:500],
         },
     )

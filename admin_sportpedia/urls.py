@@ -22,6 +22,5 @@ urlpatterns = [
     path('dashboard/admins/', views.manage_admin, name='manage_admin'),
     path('dashboard/admins/add/', views.add_admin, name='add_admin'),
     path('dashboard/admins/edit/<int:admin_id>/', views.edit_admin, name='edit_admin'),
-    path('dashboard/admins/delete/<int:admin_id>/', views.delete_admin, name='delete_admin'),
     path('api/admin-data/<int:admin_id>/', views.get_admin_data, name='get_admin_data'),
 ]

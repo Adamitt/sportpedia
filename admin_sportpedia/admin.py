@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from sportlibrary.models import Sport
 from gearguide.models import Gear
-from profile_app.models import UserProfile, ActivityLog, SportProgress
+from profile_app.models import UserProfile, ActivityLog
 
 # --- Read-Only Admin untuk Model yang Sudah Ada ---
 
@@ -40,13 +40,6 @@ class ActivityLogReadOnlyAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
     list_filter = ('action_type', 'timestamp')
     search_fields = ('user__username', 'description')
     
-@admin.register(SportProgress)
-class SportProgressReadOnlyAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
-    """Menampilkan SportProgress di admin site (read-only)."""
-    list_display = ('user', 'sport', 'time_spent', 'percent', 'completed', 'last_accessed')
-    list_filter = ('completed', 'sport')
-    search_fields = ('user__username', 'sport__name')
-
 # --- Kustomisasi Tampilan User Admin ---
 
 # Definisikan inline untuk UserProfile

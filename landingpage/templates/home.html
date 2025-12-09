@@ -7,55 +7,303 @@
 <style>
   html { scroll-behavior: smooth; }
 
-  .t-chip {
-    border: 1.8px solid #17356B; color: #1C3264; padding: 6px 16px; border-radius: 9999px;
-    font-weight: 500; font-size: 14px; transition: all .3s cubic-bezier(0.4,0,0.2,1);
-    position:relative; overflow:hidden;
+  /* Animated gradient backgrounds */
+  @keyframes gradientMove {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
   }
-  .t-chip::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;
-    background:#17356B;transform:translate(-50%,-50%);transition:width .4s ease,height .4s ease;z-index:-1}
-  .t-chip:hover::before,.t-chip.active::before{width:200%;height:200%}
-  .t-chip:hover,.t-chip.active{color:#fff;box-shadow:0 4px 12px rgba(23,53,107,.3);transform:translateY(-2px)}
 
-  #t-viewport{overflow:hidden;padding:20px 0}
-  #t-track{display:flex;gap:32px;transition:transform .6s cubic-bezier(0.4,0,0.2,1)}
-  .testimonial-card{flex:0 0 calc((100% - 64px) / 3)}
-  .t-arrow-disabled{opacity:.4;pointer-events:none}
+  /* Filter Chips dengan efek lebih mewah */
+  .t-chip {
+    border: 2px solid #17356B;
+    color: #1C3264;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all .3s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    box-shadow: 0 2px 8px rgba(23, 53, 107, 0.1);
+  }
+  .t-chip::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #17356B 0%, #1C3264 100%);
+    transform: translate(-50%, -50%);
+    transition: width .4s ease, height .4s ease;
+    z-index: -1;
+  }
+  .t-chip:hover::before,
+  .t-chip.active::before {
+    width: 250%;
+    height: 250%;
+  }
+  .t-chip:hover,
+  .t-chip.active {
+    color: #fff;
+    border-color: #1C3264;
+    box-shadow: 0 6px 20px rgba(23, 53, 107, 0.4);
+    transform: translateY(-3px);
+  }
 
-  #toast-stack{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.75rem;pointer-events:none}
+  /* Carousel */
+  #t-viewport { overflow: hidden; padding: 20px 0; }
+  #t-track { display: flex; gap: 32px; transition: transform .6s cubic-bezier(0.4,0,0.2,1); }
+  .testimonial-card { flex: 0 0 calc((100% - 64px) / 3); }
+  .t-arrow-disabled { opacity: .4; pointer-events: none; }
 
-  .greeting-text{background:linear-gradient(135deg,#992626 0%,#C94A4A 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:fadeInDown .8s ease}
-  @keyframes fadeInDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+  /* Toast stack */
+  #toast-stack {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+    pointer-events: none;
+  }
 
-  .hero-overlay{background:linear-gradient(135deg,rgba(0,0,0,.5) 0%,rgba(28,50,100,.4) 100%);animation:fadeIn 1s ease}
-  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-  .hero-title{animation:slideInUp 1s ease}
-  @keyframes slideInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-  .hero-btn{position:relative;overflow:hidden;transition:all .3s ease}
-  .hero-btn::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,.2);transform:translate(-50%,-50%);transition:width .5s,height .5s}
-  .hero-btn:hover::before{width:300%;height:300%}
-  .hero-btn:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(28,50,100,.4)}
+  /* Greeting dengan efek shimmer */
+  .greeting-text {
+    background: linear-gradient(135deg, #992626 0%, #C94A4A 50%, #992626 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInDown .8s ease, shimmerText 3s linear infinite;
+  }
+  @keyframes shimmerText {
+    to { background-position: 200% center; }
+  }
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-  .whats-hot-section{background:linear-gradient(180deg,#fff 0%,#fef5f5 100%)}
-  .hot-card{position:relative;display:flex;flex-direction:column;transition:all .4s cubic-bezier(0.4,0,0.2,1)}
-  .hot-card:hover{transform:translateY(-8px);box-shadow:0 20px 40px rgba(201,74,74,.15)}
-  .hot-media{height:14rem;border-radius:18px;overflow:hidden;margin-bottom:.75rem;position:relative}
-  .hot-media::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.1) 100%);opacity:0;transition:opacity .3s}
-  .hot-card:hover .hot-media::after{opacity:1}
-  .hot-img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(0.4,0,0.2,1)}
-  .hot-card:hover .hot-img{transform:scale(1.08)}
-  .hot-media--text{display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(135deg,#fff5f5 0%,#ffe5e5 50%,#ffd5d5 100%);border:1px solid #f3caca;padding:14px;position:relative;overflow:hidden}
-  .hot-media--text::before{content:'';position:absolute;top:-50%;right:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,255,255,.3) 0%,transparent 70%);animation:shimmer 3s infinite}
-  @keyframes shimmer{0%,100%{transform:translate(0,0)}50%{transform:translate(-30%,-30%)}}
-  .hot-badge{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9B2C2C;background:linear-gradient(135deg,#fdecec 0%,#ffd5d5 100%);border:1px solid #f4caca;padding:4px 8px;border-radius:9999px;display:inline-block;margin-bottom:8px;box-shadow:0 2px 4px rgba(155,44,44,.1)}
-  .hot-title{font-size:15px;font-weight:700;color:#1f2937;line-height:1.25;position:relative;z-index:1}
-  .hot-excerpt{font-size:12px;color:#4b5563;margin-top:6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;position:relative;z-index:1}
-  .hot-cta{margin-top:auto;display:flex;justify-content:center}
-  .hot-btn{padding:8px 18px;border-radius:9999px;font-size:12px;font-weight:600;background:linear-gradient(135deg,#C94A4A 0%,#992626 100%);color:#fff;box-shadow:0 6px 15px rgba(201,74,74,.3);transition:all .3s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
-  .hot-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);transition:left .5s}
-  .hot-btn:hover::before{left:100%}
-  .hot-btn:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 10px 25px rgba(201,74,74,.4)}
+  /* Hero section dengan overlay dinamis */
+  .hero-overlay {
+    background: linear-gradient(135deg, rgba(0,0,0,.5) 0%, rgba(28,50,100,.4) 100%);
+    animation: fadeIn 1s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .hero-title {
+    animation: slideInUp 1s ease;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  }
+  @keyframes slideInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all .3s ease;
+    box-shadow: 0 8px 24px rgba(28, 50, 100, 0.3);
+  }
+  .hero-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transform: translate(-50%, -50%);
+    transition: width .5s ease, height .5s ease;
+  }
+  .hero-btn:hover::before {
+    width: 300%;
+    height: 300%;
+  }
+  .hero-btn:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 32px rgba(28, 50, 100, 0.5);
+  }
 
+  /* What's Hot section dengan background lebih colorful */
+  .whats-hot-section {
+    background: linear-gradient(180deg, #ffffff 0%, #fff5f5 50%, #fef0f0 100%);
+    position: relative;
+  }
+  .whats-hot-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(circle at 20% 50%, rgba(201, 74, 74, 0.05) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 80%, rgba(201, 74, 74, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .hot-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition: all .4s cubic-bezier(0.4,0,0.2,1);
+    background: linear-gradient(135deg, #fff8f8 0%, #ffffff 100%);
+  }
+  .hot-card::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, #C94A4A, #992626);
+    border-radius: 28px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity .4s ease;
+    filter: blur(15px);
+  }
+  .hot-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(201, 74, 74, 0.2);
+  }
+  .hot-card:hover::after {
+    opacity: 0.4;
+  }
+
+  .hot-media {
+    height: 14rem;
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: .75rem;
+    position: relative;
+  }
+  .hot-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.2) 100%);
+    opacity: 0;
+    transition: opacity .3s ease;
+  }
+  .hot-card:hover .hot-media::after {
+    opacity: 1;
+  }
+
+  .hot-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .hot-card:hover .hot-img {
+    transform: scale(1.12) rotate(2deg);
+  }
+
+  /* Text mode (Library) dengan shimmer effect */
+  .hot-media--text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 50%, #ffd8d8 100%);
+    border: 2px solid rgba(201, 74, 74, 0.2);
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hot-media--text::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, transparent 70%);
+    animation: shimmer 4s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(-30%, -30%) rotate(180deg); }
+  }
+
+  .hot-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #9B2C2C;
+    background: linear-gradient(135deg, #fdecec 0%, #ffd5d5 100%);
+    border: 1px solid #f4caca;
+    padding: 5px 10px;
+    border-radius: 9999px;
+    display: inline-block;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 6px rgba(155, 44, 44, 0.15);
+  }
+
+  .hot-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.25;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hot-excerpt {
+    font-size: 12px;
+    color: #4b5563;
+    margin-top: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hot-cta {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .hot-btn {
+    padding: 10px 22px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #C94A4A 0%, #992626 100%);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(201, 74, 74, 0.35);
+    transition: all .3s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .hot-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: left .6s ease;
+  }
+  .hot-btn:hover::before {
+    left: 100%;
+  }
+  .hot-btn:hover {
+    transform: translateY(-3px) scale(1.08);
+    box-shadow: 0 12px 30px rgba(201, 74, 74, 0.45);
+  }
+
+  
   .quick-nav-card{transition:all .4s cubic-bezier(0.4,0,0.2,1);border-radius:20px;background:linear-gradient(135deg,#fff 0%,#f9fafb 100%);border:1px solid #e5e7eb}
   .quick-nav-card:hover{transform:translateY(-8px);box-shadow:0 15px 35px rgba(28,50,100,.15);background:linear-gradient(135deg,#fff 0%,#eff6ff 100%)}
   .quick-nav-card img{transition:transform .4s cubic-bezier(0.4,0,0.2,1)}
@@ -63,37 +311,220 @@
   .quick-nav-btn{transition:all .3s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
   .quick-nav-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#1e40af 0%,#1e3a8a 100%);transform:scaleX(0);transform-origin:left;transition:transform .3s;z-index:-1}
   .quick-nav-btn:hover::before{transform:scaleX(1)}
+  /* Testimonial header dengan gradient animasi */
+  .testimonial-header {
+    background: linear-gradient(135deg, #1C3264 0%, #2d4a8f 50%, #1C3264 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientMove 4s linear infinite;
+  }
 
-  .testimonial-header{background:linear-gradient(135deg,#1C3264 0%,#2d4a8f 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:0 2px 10px rgba(28,50,100,.1)}
-  .testimonial-frame{background:linear-gradient(135deg,rgba(28,50,100,.08) 0%,rgba(28,50,100,.12) 100%);backdrop-filter:blur(10px);border:2px solid rgba(28,50,100,.2);box-shadow:0 8px 32px rgba(28,50,100,.1)}
-  .testimonial-card{background:linear-gradient(135deg,#fff 0%,#f8f9fa 100%);border-radius:24px;padding:24px;box-shadow:0 4px 20px rgba(28,50,100,.08);border:1px solid rgba(28,50,100,.1);transition:all .4s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
-  .testimonial-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#1C3264 0%,#3b5998 50%,#1C3264 100%);transform:scaleX(0);transition:transform .4s}
-  .testimonial-card:hover{transform:translateY(-8px);box-shadow:0 12px 40px rgba(28,50,100,.15)}
-  .testimonial-card:hover::before{transform:scaleX(1)}
+  /* Frame testimonial dengan glassmorphism */
+  .testimonial-frame {
+    background: linear-gradient(135deg, rgba(28, 50, 100, 0.08) 0%, rgba(28, 50, 100, 0.12) 100%);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(28, 50, 100, 0.2);
+    box-shadow: 0 10px 40px rgba(28, 50, 100, 0.15);
+  }
 
-  .t-arrow{transition:all .3s cubic-bezier(0.4,0,0.2,1);background:linear-gradient(135deg,#fff 0%,#f9fafb 100%);box-shadow:0 4px 12px rgba(0,0,0,.1)}
-  .t-arrow:hover{transform:translateY(-50%) scale(1.1);box-shadow:0 8px 20px rgba(0,0,0,.15);background:linear-gradient(135deg,#1C3264 0%,#2d4a8f 100%);color:#fff}
+  /* Testimonial Card dengan efek lebih mewah */
+  .testimonial-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 6px 24px rgba(28, 50, 100, 0.1);
+    border: 2px solid rgba(28, 50, 100, 0.1);
+    transition: all .4s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .testimonial-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #1C3264 0%, #3b5998 50%, #1C3264 100%);
+    background-size: 200% auto;
+    transform: scaleX(0);
+    transition: transform .4s ease;
+    animation: gradientMove 3s linear infinite;
+  }
+  .testimonial-card::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, #1C3264, #3b5998);
+    border-radius: 24px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity .4s ease;
+    filter: blur(20px);
+  }
+  .testimonial-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 15px 50px rgba(28, 50, 100, 0.2);
+  }
+  .testimonial-card:hover::before {
+    transform: scaleX(1);
+  }
+  .testimonial-card:hover::after {
+    opacity: 0.3;
+  }
 
-  .share-btn{transition:all .3s cubic-bezier(0.4,0,0.2,1);position:relative;background:linear-gradient(135deg,#fff 0%,#f0f9ff 100%)}
-  .share-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(23,53,107,.3)}
+  /* Arrow buttons dengan efek glow */
+  .t-arrow {
+    transition: all .3s cubic-bezier(0.4,0,0.2,1);
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 2px solid #e5e7eb;
+  }
+  .t-arrow:hover {
+    transform: translateY(-50%) scale(1.15);
+    box-shadow: 0 8px 24px rgba(28, 50, 100, 0.3);
+    background: linear-gradient(135deg, #1C3264 0%, #2d4a8f 100%);
+    color: #fff;
+    border-color: #1C3264;
+  }
 
-  .testimonial-modal{animation:modalFadeIn .3s ease}
-  @keyframes modalFadeIn{from{opacity:0}to{opacity:1}}
-  .testimonial-modal-content{animation:modalSlideUp .4s cubic-bezier(0.4,0,0.2,1);background:linear-gradient(135deg,#fff 0%,#f8f9fa 100%);box-shadow:0 20px 60px rgba(0,0,0,.3)}
-  @keyframes modalSlideUp{from{opacity:0;transform:translateY(50px)}to{opacity:1;transform:translateY(0)}}
-  .modal-header{padding-bottom:16px;border-bottom:2px solid #e5e7eb;margin-bottom:20px}
-  .modal-title{font-size:24px;font-weight:700;background:linear-gradient(135deg,#1C3264 0%,#3b5998 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-  .modal-close{width:32px;height:32px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:24px;transition:all .3s;border:none;cursor:pointer}
-  .modal-close:hover{background:#ef4444;color:#fff;transform:rotate(90deg)}
-  .modal-label{font-weight:600;color:#374151;margin-bottom:8px;font-size:14px}
-  .modal-select,.modal-textarea,.modal-file-input{transition:all .3s;border:2px solid #e5e7eb}
-  .modal-select:focus,.modal-textarea:focus{border-color:#1C3264;outline:none;box-shadow:0 0 0 3px rgba(28,50,100,.1)}
-  .modal-submit-btn{background:linear-gradient(135deg,#1C3264 0%,#2d4a8f 100%);transition:all .3s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
-  .modal-submit-btn::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,.3);transform:translate(-50%,-50%);transition:width .5s,height .5s}
-  .modal-submit-btn:hover::before{width:300%;height:300%}
-  .modal-submit-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(28,50,100,.4)}
+  /* Share button dengan animasi */
+  .share-btn {
+    transition: all .3s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    box-shadow: 0 4px 12px rgba(23, 53, 107, 0.15);
+  }
+  .share-btn::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, #17356B, #1C3264);
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity .3s ease;
+    filter: blur(8px);
+  }
+  .share-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(23, 53, 107, 0.35);
+  }
+  .share-btn:hover::before {
+    opacity: 0.3;
+  }
 
-  .footer{background:linear-gradient(180deg,#fff 0%,#f9fafb 100%)}
+  /* Modal dengan animasi smooth */
+  .testimonial-modal {
+    animation: modalFadeIn .3s ease;
+  }
+  @keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .testimonial-modal-content {
+    animation: modalSlideUp .4s cubic-bezier(0.4,0,0.2,1);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(28, 50, 100, 0.1);
+  }
+  @keyframes modalSlideUp {
+    from { opacity: 0; transform: translateY(50px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 20px;
+  }
+
+  .modal-title {
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #1C3264 0%, #3b5998 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: all .3s ease;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  .modal-close:hover {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #fff;
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+  }
+
+  .modal-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .modal-select,
+  .modal-textarea {
+    transition: all .3s ease;
+    border: 2px solid #e5e7eb;
+    background: #ffffff;
+  }
+  .modal-select:focus,
+  .modal-textarea:focus {
+    border-color: #1C3264;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(28, 50, 100, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .modal-submit-btn {
+    background: linear-gradient(135deg, #1C3264 0%, #2d4a8f 100%);
+    transition: all .3s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(28, 50, 100, 0.3);
+  }
+  .modal-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width .5s ease, height .5s ease;
+  }
+  .modal-submit-btn:hover::before {
+    width: 300%;
+    height: 300%;
+  }
+  .modal-submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(28, 50, 100, 0.45);
+  }
+
+  /* Footer dengan subtle gradient */
+  .footer {
+    background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+  }
 </style>
 {% endblock %}
 
@@ -188,29 +619,181 @@
 
 <!-- QUICK NAV -->
 <section id="quick-nav" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t scroll-mt-24">
+  <!-- Section Header dengan icon dan deskripsi -->
+  <div class="text-center mb-10">
+    <div class="inline-flex items-center gap-3 mb-3">
+      <div class="w-12 h-1 bg-gradient-to-r from-transparent via-blue-600 to-transparent"></div>
+      <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-900 to-blue-600 bg-clip-text text-transparent">Explore Features</h2>
+      <div class="w-12 h-1 bg-gradient-to-r from-transparent via-blue-600 to-transparent"></div>
+    </div>
+    <p class="text-gray-600 text-sm">Choose your path to sports excellence</p>
+  </div>
+
   <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 text-center">
-    <div class="quick-nav-card p-6">
-      <img src="{% static 'images/sportlibrary.png' %}" alt="Sports Library" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" />
+    <!-- Sports Library Card -->
+    <div class="quick-nav-card p-6 group">
+      <!-- Stat badge -->
+      <div class="absolute top-4 right-4 bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        50+ Sports
+      </div>
+      
+      <div class="relative inline-block mb-3">
+        <img src="{% static 'images/sportlibrary.png' %}" alt="Sports Library" class="h-16 w-auto mx-auto object-contain select-none" draggable="false" />
+        <!-- Floating dots decoration -->
+        <div class="absolute -top-2 -right-2 w-3 h-3 bg-blue-400 rounded-full animate-ping opacity-75"></div>
+        <div class="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-600 rounded-full"></div>
+      </div>
+      
+      <h3 class="font-bold text-lg text-gray-800 mb-2">Sports Library</h3>
       <p class="text-sm text-gray-600 mb-4">Explore sports fundamentals — history, rules, and beginner guides.</p>
-      <a href="{% url 'sportlibrary:show_sports' %}" class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white hover:bg-blue-800 transition-colors duration-200">Sports Library</a>
+      
+      <!-- Progress bar -->
+      <div class="w-full bg-gray-200 rounded-full h-1.5 mb-4 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-400 to-blue-600 h-1.5 rounded-full transition-all duration-700 group-hover:w-full" style="width: 0%"></div>
+      </div>
+      
+      <a href="{% url 'sportlibrary:show_sports' %}" class="quick-nav-btn mt-3 inline-flex items-center gap-2 rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white hover:bg-blue-800 transition-colors duration-200">
+        <span>Explore</span>
+        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+        </svg>
+      </a>
     </div>
 
-    <div class="quick-nav-card p-6">
-      <img src="{% static 'images/community.png' %}" alt="Community" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" />
-      <p class="text-sm text-gray-600 mb-4">A space to share tips, stories, and motivation with fellow sports lovers.</p>
-      <a href="/forum/" class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white hover:bg-blue-800 transition-colors duration-200">Community</a>
+    <!-- Community Card -->
+    <div class="quick-nav-card p-6 group">
+      <!-- Live indicator -->
+      <div class="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+        <span class="text-xs text-green-600 font-semibold">Active</span>
+      </div>
+      
+      <div class="relative inline-block mb-3">
+        <img src="{% static 'images/community.png' %}" alt="Community" class="h-16 w-auto mx-auto object-contain select-none" draggable="false" />
+        <!-- Notification badge -->
+        <div class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center animate-bounce">
+          3
+        </div>
+      </div>
+      
+      <h3 class="font-bold text-lg text-gray-800 mb-2">Community</h3>
+      <p class="text-sm text-gray-600 mb-4">A space to share tips, and motivation with sports lovers.</p>
+      
+      <!-- User avatars stack -->
+      <div class="flex justify-center -space-x-2 mb-4">
+        <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-2 border-white flex items-center justify-center text-white text-xs font-bold">A</div>
+        <div class="w-7 h-7 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 border-2 border-white flex items-center justify-center text-white text-xs font-bold">B</div>
+        <div class="w-7 h-7 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 border-2 border-white flex items-center justify-center text-white text-xs font-bold">C</div>
+        <div class="w-7 h-7 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-gray-600 text-xs font-bold">+9</div>
+      </div>
+      
+      <a href="/forum/" class="quick-nav-btn mt-3 inline-flex items-center gap-2 rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white hover:bg-blue-800 transition-colors duration-200">
+        <span>Join Now</span>
+        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+        </svg>
+      </a>
     </div>
 
-    <div class="quick-nav-card p-6">
-      <img src="{% static 'images/gearguide.png' %}" alt="Gear Guide" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" />
+    <!-- Gear Guide Card -->
+    <div class="quick-nav-card p-6 group">
+      <!-- New badge -->
+      <div class="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg">
+        ⭐ Guide
+      </div>
+      
+      <div class="relative inline-block mb-3">
+        <img src="{% static 'images/gearguide.png' %}" alt="Gear Guide" class="h-16 w-auto mx-auto object-contain select-none" draggable="false" />
+        <!-- Sparkle effect -->
+        <div class="absolute top-0 right-0 text-yellow-400 text-xl animate-pulse">✨</div>
+      </div>
+      
+      <h3 class="font-bold text-lg text-gray-800 mb-2">Gear Guide</h3>
       <p class="text-sm text-gray-600 mb-4">Find the right equipment for your game, choose, and play smarter.</p>
-      <a href="{% url 'gearguide:show_all_gears' %}" class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white hover:bg-blue-800 transition-colors duration-200">Gear Guide</a>
+      
+      <!-- Rating stars -->
+      <div class="flex justify-center gap-1 mb-4">
+        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+        </svg>
+        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+        </svg>
+        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+        </svg>
+        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+        </svg>
+        <svg class="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20">
+          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+        </svg>
+      </div>
+      
+      <a href="{% url 'gearguide:show_all_gears' %}" class="quick-nav-btn mt-3 inline-flex items-center gap-2 rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white hover:bg-blue-800 transition-colors duration-200">
+        <span>Browse Gear</span>
+        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+        </svg>
+      </a>
     </div>
 
-    <div class="quick-nav-card p-6">
-      <img src="{% static 'images/video.png' %}" alt="Video Gallery" class="h-16 w-auto mx-auto mb-3 object-contain select-none" draggable="false" />
+    <!-- Video Gallery Card -->
+    <div class="quick-nav-card p-6 group">
+      <!-- Video count badge -->
+      <div class="absolute top-4 right-4 bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        📹 40+ Videos
+      </div>
+      
+      <div class="relative inline-block mb-3">
+        <img src="{% static 'images/video.png' %}" alt="Video Gallery" class="h-16 w-auto mx-auto object-contain select-none" draggable="false" />
+        <!-- Play button overlay -->
+        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+            <svg class="w-4 h-4 text-white fill-current ml-0.5" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="font-bold text-lg text-gray-800 mb-2">Video Gallery</h3>
       <p class="text-sm text-gray-600 mb-4">Learn visually with step-by-step sports tutorials for every level.</p>
-      <a href="/videos/" class="quick-nav-btn mt-3 inline-block rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white hover:bg-blue-800 transition-colors duration-200">Video Gallery</a>
+      
+      <!-- Duration info -->
+      <div class="flex items-center justify-center gap-2 text-xs text-gray-500 mb-4">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>5-15 min tutorials</span>
+      </div>
+      
+      <a href="/videos/" class="quick-nav-btn mt-3 inline-flex items-center gap-2 rounded-full border border-blue-800 text-blue-800 px-4 py-2 font-medium hover:text-white hover:bg-blue-800 transition-colors duration-200">
+        <span>Watch Now</span>
+        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Fun facts section -->
+  <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="text-center p-4 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200">
+      <div class="text-3xl font-bold text-blue-600 mb-1">50+</div>
+      <div class="text-xs text-gray-600">Sports Covered</div>
+    </div>
+    <div class="text-center p-4 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200">
+      <div class="text-3xl font-bold text-purple-600 mb-1">200+</div>
+      <div class="text-xs text-gray-600">Active Members</div>
+    </div>
+    <div class="text-center p-4 rounded-xl bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200">
+      <div class="text-3xl font-bold text-yellow-600 mb-1">300+</div>
+      <div class="text-xs text-gray-600">Gear Reviews</div>
+    </div>
+    <div class="text-center p-4 rounded-xl bg-gradient-to-br from-red-50 to-red-100 border border-red-200">
+      <div class="text-3xl font-bold text-red-600 mb-1">100+</div>
+      <div class="text-xs text-gray-600">Video Tutorials</div>
     </div>
   </div>
 </section>
@@ -246,7 +829,7 @@
 </section>
 
 {% if request.user.is_authenticated %}
-<!-- CREATE MODAL (pakai URL, bukan upload file) -->
+<!-- CREATE MODAL -->
 <div id="t-create" class="testimonial-modal fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 backdrop-blur-sm">
   <form id="t-create-form" class="testimonial-modal-content rounded-3xl w-full max-w-lg mx-4 p-8 relative">
     <button type="button" id="t-create-close" class="modal-close absolute right-5 top-5">×</button>
@@ -269,16 +852,15 @@
       <textarea name="text" rows="5" class="modal-textarea w-full border rounded-xl px-4 py-3 text-gray-700 resize-none" required placeholder="Share your thoughts, experiences, or feedback here..."></textarea>
     </div>
     <div class="mb-6">
-  <label class="modal-label block">Image URL (Optional)</label>
-  <input type="url" name="image_url" placeholder="https://example.com/image.jpg"
-         class="modal-textarea w-full border rounded-xl px-4 py-3 text-gray-700" />
-</div>
-
+      <label class="modal-label block">Image URL (Optional)</label>
+      <input type="url" name="image_url" placeholder="https://example.com/image.jpg"
+             class="modal-textarea w-full border rounded-xl px-4 py-3 text-gray-700" />
+    </div>
     <button type="submit" class="modal-submit-btn w-full text-white py-3 rounded-xl font-semibold text-base">Submit Testimonial</button>
   </form>
 </div>
 
-<!-- EDIT MODAL (pakai URL juga) -->
+<!-- EDIT MODAL -->
 <div id="t-edit" class="testimonial-modal fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 backdrop-blur-sm">
   <form id="t-edit-form" class="testimonial-modal-content rounded-3xl w-full max-w-lg mx-4 p-8 relative">
     <button type="button" id="t-edit-close" class="modal-close absolute right-5 top-5">×</button>
@@ -302,11 +884,10 @@
       <textarea name="text" id="edit-text" rows="5" class="modal-textarea w-full border rounded-xl px-4 py-3 text-gray-700 resize-none" required></textarea>
     </div>
     <div class="mb-6">
-  <label class="modal-label block">Image URL (Optional)</label>
-  <input type="url" name="image_url" id="edit-image-url" placeholder="https://example.com/image.jpg"
-         class="modal-textarea w-full border rounded-xl px-4 py-3 text-gray-700" />
-</div>
-
+      <label class="modal-label block">Image URL (Optional)</label>
+      <input type="url" name="image_url" id="edit-image-url" placeholder="https://example.com/image.jpg"
+             class="modal-textarea w-full border rounded-xl px-4 py-3 text-gray-700" />
+    </div>
     <button type="submit" class="modal-submit-btn w-full text-white py-3 rounded-xl font-semibold text-base">Save Changes</button>
   </form>
 </div>

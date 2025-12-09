@@ -4,6 +4,7 @@ from gearguide.models import Gear
 import json
 from pathlib import Path
 
+
 class Command(BaseCommand):
     help = "Sinkronisasi data gear dari JSON ke database berdasarkan mapping sport_id → sport_name"
 
@@ -42,13 +43,29 @@ class Command(BaseCommand):
         with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
+        # mapping level dari JSON → level di model Gear
+        level_map = {
+            'Pemula': 'beginner',
+            'Menengah': 'intermediate',
+            'Lanjutan': 'advanced',
+            # kalau di JSON ada huruf kecil:
+            'pemula': 'beginner',
+            'menengah': 'intermediate',
+            'lanjutan': 'advanced',
+        }
+
         created, skipped = 0, 0
+
         for gear_data in data:
             try:
                 sport_id = gear_data.get("sport_id")
                 sport_name = SPORT_MAP.get(sport_id, "Tidak diketahui")
 
-                # Cari sport by name (buat kalau udah ada di DB)
+                # ambil level mentah dari JSON, map ke value yang valid buat Gear.level
+                level_raw = gear_data.get("level", "Pemula")
+                level_db = level_map.get(level_raw, 'beginner')
+
+                # cari Sport berdasarkan nama (kalau belum ada, auto-create simple)
                 sport_obj = Sport.objects.filter(name__iexact=sport_name).first()
                 if not sport_obj:
                     sport_obj, _ = Sport.objects.get_or_create(
@@ -56,17 +73,19 @@ class Command(BaseCommand):
                         defaults={
                             "category": "Umum",
                             "difficulty": "beginner",
-                            "description": "Auto-created from gear sync"
+                            "description": "Auto-created from gear sync",
                         }
                     )
 
+                # buat / update Gear
                 Gear.objects.update_or_create(
                     name=gear_data["name"],
                     defaults={
                         "sport": sport_obj,
                         "function": gear_data.get("function", ""),
                         "description": gear_data.get("description", ""),
-                        "level": gear_data.get("level", "Pemula").lower(),
+                        "required": True,
+                        "level": level_db,
                         "price_range": gear_data.get("price_range", "-"),
                         "recommended_brands": gear_data.get("recommended_brands", []),
                         "materials": gear_data.get("materials", []),

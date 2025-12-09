@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{# {% load widget_tweaks %} <-- REMOVED #}
+{% load form_filters %}
 
 {% block title %}{% if edit_mode %}Edit Admin{% else %}Add Admin{% endif %} - Sportpedia Admin{% endblock %}
 
@@ -101,7 +101,6 @@
        outline: none;
         box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
    }
-   /* Remove widget_tweaks specific CSS */
 </style>
 {% endblock %}
 

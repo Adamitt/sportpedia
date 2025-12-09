@@ -1,27 +1,32 @@
+# videos/models.py
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
-from sportlibrary.models import Sport  
+from sportlibrary.models import Sport
+from django.conf import settings
 
 class Video(models.Model):
     DIFFICULTY_CHOICES = [
-        ('beginner', 'Beginner'),
-        ('intermediate', 'Intermediate'),
-        ('advanced', 'Advanced'),
+        ('beginner', 'Pemula'),
+        ('intermediate', 'Menengah'),
+        ('advanced', 'Lanjutan'),
     ]
     
     title = models.CharField(max_length=255)
-    description = models.TextField()
-    sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name='videos')  # ⬅️ Foreign Key ke Sport dari sportlibrary
-    difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES)
+    description = models.TextField(blank=True, null=True)
+    sport = models.ForeignKey(Sport, on_delete=models.SET_NULL, null=True, blank=True, related_name='videos')
+    difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, default='beginner')
     
-    video_url = models.URLField(blank=True, null=True)
-    video_file = models.FileField(upload_to='videos/files/', blank=True, null=True)
-    thumbnail = models.ImageField(upload_to='videos/thumbnails/', blank=True, null=True)
+    video_url = models.URLField(max_length=500, blank=True, null=True)
     
-    duration = models.CharField(max_length=10)
-    uploader = models.ForeignKey(User, on_delete=models.CASCADE, related_name='uploaded_videos')
+    thumbnail_url = models.URLField(max_length=500, blank=True, null=True)
+    instructor = models.CharField(max_length=100, blank=True, null=True)
+    tags = models.JSONField(default=list, blank=True)
+    
+    duration = models.CharField(max_length=10, blank=True, null=True)
+    uploader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='uploaded_videos')
     views_count = models.IntegerField(default=0)
+    total_likes = models.PositiveIntegerField(default=0)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -42,7 +47,7 @@ class Video(models.Model):
 
 class VideoRating(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name='ratings')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -54,10 +59,11 @@ class VideoRating(models.Model):
 
 class Comment(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     text = models.TextField()
     rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
     helpful_count = models.IntegerField(default=0)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -66,10 +72,14 @@ class Comment(models.Model):
     
     def __str__(self):
         return f"Comment by {self.user.username} on {self.video.title}"
+    
+    @property
+    def is_reply(self):
+        return self.parent is not None
 
 class VideoLike(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name='likes')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -77,7 +87,7 @@ class VideoLike(models.Model):
 
 class VideoBookmark(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name='bookmarks')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
