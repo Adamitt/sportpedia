@@ -18,7 +18,8 @@ urlpatterns = [
     path('videos/', include('videos.urls')),
     # path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('forum/', include('sportforum.urls'))
+    path('forum/', include('sportforum.urls')),
+    path('admin_sportpedia/', include('admin_sportpedia.urls')),
 ]
 
 if settings.DEBUG:

@@ -370,3 +370,25 @@ def get_admin_data(request, admin_id):
     except Exception as e:
          # Log error jika perlu: print(f"Error in get_admin_data: {e}")
          return JsonResponse({'error': 'Internal server error'}, status=500)
+    
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+
+@login_required
+@csrf_exempt
+def check_admin_status(request):
+    """
+    API endpoint buat cek apakah user adalah admin/staff
+    Return: {'is_admin': True/False, 'username': 'namauser'}
+    """
+    user = request.user
+    
+    is_admin = user.is_staff or user.is_superuser
+    
+    return JsonResponse({
+        'is_admin': is_admin,
+        'username': user.username,
+        'is_staff': user.is_staff,
+        'is_superuser': user.is_superuser
+    })
