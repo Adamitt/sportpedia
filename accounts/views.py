@@ -20,8 +20,17 @@ USERS_PATH = BASE_DIR / 'database' / 'users.json'
 def api_login(request):
     """API login untuk Flutter"""
     if request.method == 'POST':
+        # Accept form-encoded POST (request.POST) or JSON body.
         username = request.POST.get('username')
         password = request.POST.get('password')
+        if not username:
+            try:
+                payload = json.loads(request.body.decode('utf-8') or '{}')
+                username = payload.get('username')
+                password = payload.get('password')
+            except Exception:
+                username = None
+                password = None
         user = authenticate(username=username, password=password)
 
         if user is not None:

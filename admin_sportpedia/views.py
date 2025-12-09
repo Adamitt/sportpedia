@@ -502,7 +502,7 @@ def api_add_admin(request):
         }, status=403)
     
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode('utf-8') or '{}')
         username = data.get('username')
         email = data.get('email', '')
         password = data.get('password')
@@ -598,7 +598,7 @@ def api_edit_admin(request, admin_id):
                 'message': 'Anda tidak dapat mengedit akun Anda sendiri.'
             }, status=403)
         
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode('utf-8') or '{}')
         
         # Update fields
         if 'username' in data and data['username']:
