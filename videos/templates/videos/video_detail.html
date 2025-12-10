@@ -34,225 +34,233 @@
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <a href="{% url 'videos:video_gallery' %}" class="mb-6 font-semibold hover:opacity-80 flex items-center gap-2 transition-opacity text-lg inline-flex" style="color: #1E3A5F;">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <a href="{% url 'videos:video_gallery' %}" class="mb-4 font-semibold hover:opacity-80 flex items-center gap-2 transition-opacity text-base inline-flex" style="color: #1E3A5F;">
         <i data-lucide="arrow-left" class="h-5 w-5"></i>
         Back to Gallery
     </a>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="lg:col-span-2">
-            <div class="relative mb-8 overflow-hidden rounded-3xl border-2" style="border-color:#fce7f3;">
-                <div class="relative aspect-video flex items-center justify-center" style="background: #1e3a5f;">
-                    
-                    {% if video.video_url %}
-                      <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-                      <i data-lucide="play-circle" class="h-32 w-32 text-white/80 mb-8"></i>
-                      <a
-                          href="{{ video.video_url }}"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="inline-flex items-center justify-center gap-3 px-10 py-4 bg-white text-[#1E3A5F] rounded-full font-bold text-xl hover:bg-[#F4D160] hover:scale-105 transition-all shadow-[0_12px_40px_rgba(0,0,0,0.25)]"
-                      >
-                          <i data-lucide="{{ video.video_url}}" class="h-6 w-6"></i>
-                          Watch Video
-                      </a>
-                      </div>
-                    {% else %}
-                        <div class="p-4 text-white text-center">Video tidak tersedia.</div>
-                    {% endif %}
-
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Content - YouTube Style Layout -->
+        <div class="lg:col-span-2 space-y-4">
+            <!-- Video Player - Full Width -->
+            <div class="relative w-full aspect-video bg-gray-900 rounded-xl overflow-hidden">
+                {% if video.thumbnail_url %}
+                <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}" class="w-full h-full object-cover">
+                {% elif video.thumbnail %}
+                <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
+                    <i data-lucide="video" class="h-24 w-24 text-white/50"></i>
                 </div>
+                {% endif %}
+                
+                <!-- Single Play Button - Centered (YouTube Style) -->
+                {% if video.video_url %}
+                <div class="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <a href="{{ video.video_url }}" target="_blank" rel="noopener noreferrer" 
+                       class="group flex items-center justify-center w-20 h-20 bg-red-600 rounded-full hover:bg-red-700 transition-all transform hover:scale-110 shadow-2xl">
+                        <svg class="w-10 h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </a>
+                </div>
+                {% endif %}
             </div>
 
-            <div class="bg-white rounded-3xl p-6 sm:p-8 mb-8 border-2" style="border-color: #fce7f3;">
-                <div class="mb-6">
-                    <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ video.title }}</h1>
-                    <div class="flex items-center gap-3 flex-wrap mb-6">
-                        <span class="px-4 py-2 rounded-full text-sm font-semibold text-white" style="background-color: #1E3A5F;">
-                            {{ video.sport.name|default:"Umum" }}
-                        </span>
-                        <span class="px-4 py-2 rounded-full text-sm font-semibold capitalize" style="background-color: #F4D160; color: #1E3A5F;">
-                            {{ video.difficulty }}
-                        </span>
-                        <div class="flex items-center gap-2 text-gray-600">
-                            <i data-lucide="eye" class="h-5 w-5"></i>
-                            <span class="text-sm font-medium">{{ video.views_count }} views</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="star" class="h-5 w-5 text-[#F4D160] fill-[#F4D160]"></i>
-                            <span class="text-sm font-bold text-gray-800">{{ video.average_rating|floatformat:1 }}</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-gray-600">
-                            <i data-lucide="clock" class="h-5 w-5"></i>
-                            <span class="text-sm font-medium">{{ video.duration }}</span>
+            <!-- Video Info Section - YouTube Style -->
+            <div class="space-y-4">
+                <!-- Title -->
+                <h1 class="text-xl font-semibold text-gray-900 leading-tight">{{ video.title }}</h1>
+                
+                <!-- Stats & Actions Row - YouTube Style -->
+                <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-gray-200">
+                    <!-- Left: Stats -->
+                    <div class="flex items-center gap-4 flex-wrap text-sm text-gray-600">
+                        <span class="font-medium">{{ video.views_count|default:0 }} views</span>
+                        <span>•</span>
+                        <span>{{ video.created_at|date:"M d, Y" }}</span>
+                        <div class="flex items-center gap-1">
+                            <i data-lucide="star" class="h-4 w-4 text-yellow-500 fill-yellow-500"></i>
+                            <span class="font-medium">{{ video.average_rating|floatformat:1|default:"0.0" }}</span>
                         </div>
                     </div>
-                </div>
-
-                <div class="flex items-center gap-3 pb-6 border-b-2 border-gray-100 flex-wrap">
-                    {% if user.is_authenticated %}
+                    
+                    <!-- Right: Action Buttons - YouTube Style -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                        {% if user.is_authenticated %}
                         <button id="likeBtn" data-video-id="{{ video.id }}" 
-                                class="flex items-center gap-2 px-6 py-3 rounded-full hover:opacity-90 transition-all font-semibold border-2 border-transparent 
-                                {% if is_liked %}active bg-pink-100 text-pink-700 border-pink-300{% else %}bg-[#A33B3B] text-white{% endif %}">
-                            <i data-lucide="heart" class="h-5 w-5 {% if is_liked %}fill-current{% endif %}"></i>
-                            {% if is_liked %}
-                                Liked (<span id="likeCount">{{ video.likes.count }}</span>)
-                            {% else %}
-                                Like (<span id="likeCount">{{ video.likes.count }}</span>)
-                            {% endif %}
+                                class="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 transition-colors font-medium text-sm border border-gray-300
+                                {% if is_liked %}bg-pink-50 text-pink-700 border-pink-300{% else %}text-gray-700{% endif %}">
+                            <i data-lucide="thumbs-up" class="h-5 w-5 {% if is_liked %}fill-current{% endif %}"></i>
+                            <span id="likeCount">{{ video.likes.count }}</span>
                         </button>
                         
                         <button id="bookmarkBtn" data-video-id="{{ video.id }}" 
-                                class="flex items-center gap-2 px-6 py-3 rounded-full transition-colors font-semibold border-2 
-                                {% if is_bookmarked %}active{% else %}hover:bg-gray-50 text-[#1E3A5F]{% endif %}" 
-                                style="border-color: #1E3A5F;">
+                                class="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 transition-colors font-medium text-sm border border-gray-300 text-gray-700">
                             <i data-lucide="bookmark" class="h-5 w-5 {% if is_bookmarked %}fill-current{% endif %}"></i>
-                            {% if is_bookmarked %}Saved ✓{% else %}Save{% endif %}
+                            Save
                         </button>
                         
-                        <button id="shareBtn" class="flex items-center gap-2 px-6 py-3 rounded-full hover:bg-gray-50 transition-colors font-semibold border-2" style="border-color: #1E3A5F; color: #1E3A5F;">
+                        <button id="shareBtn" class="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 transition-colors font-medium text-sm border border-gray-300 text-gray-700">
                             <i data-lucide="share-2" class="h-5 w-5"></i>
                             Share
                         </button>
-                        
-                        {% if user.is_staff %}
-                        <a href="{% url 'videos:video_update' video.id %}" class="flex items-center gap-2 px-6 py-3 rounded-full hover:bg-gray-50 transition-colors font-semibold border-2" style="border-color: #1E3A5F; color: #1E3A5F;">
-                            <i data-lucide="edit" class="h-5 w-5"></i>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Channel/Uploader Info - YouTube Style -->
+                <div class="flex items-start gap-4 pb-4 border-b border-gray-200">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                        {{ video.instructor|default:video.uploader.username|default:"A"|first|upper }}
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-semibold text-gray-900 mb-1">{{ video.instructor|default:video.uploader.username|default:"Admin" }}</div>
+                        <div class="text-sm text-gray-600">{{ video.views_count|default:0 }} subscribers</div>
+                    </div>
+                    {% if user.is_staff %}
+                    <div class="flex gap-2">
+                        <a href="{% url 'videos:video_update' video.id %}" class="px-4 py-2 rounded-full hover:bg-gray-100 transition-colors font-medium text-sm border border-gray-300 text-gray-700">
                             Edit
                         </a>
-                        <form action="{% url 'videos:video_delete' video.id %}" method="POST" class="inline-block" onsubmit="return confirm('Anda yakin ingin menghapus video ini?');">
-                            {% csrf_token %}
-                            <button type="submit" class="flex items-center gap-2 px-6 py-3 rounded-full hover:bg-red-50 transition-colors font-semibold border-2 border-red-600 text-red-600">
-                                <i data-lucide="trash-2" class="h-5 w-5"></i>
-                                Delete
-                            </button>
-                        </form>
-                        {% endif %}
-                    {% else %}
-                        <p class="text-gray-500 font-semibold italic">
-                            Silakan <a href="{% url 'accounts:login_register' %}" class="text-[#1E3A5F] hover:underline">masuk</a> untuk Like, Simpan, atau Komentar.
-                        </p>
-                    {% endif %}
-                </div>
-
-                <div class="pt-6">
-                    <h3 class="font-bold text-lg mb-3" style="color: #1E3A5F;">Description</h3>
-                    <p class="text-gray-600 leading-relaxed mb-6">
-                        {{ video.description|linebreaksbr }}
-                    </p>
-                    <div class="flex items-center gap-6 text-sm text-gray-500 flex-wrap">
-                        <span>📅 Uploaded {{ video.created_at|date:"d M Y" }}</span>
-                        <span>👤 By: {{ video.instructor|default:video.uploader.username|default:"Admin" }}</span>
-                    </div>
-                    {% if video.tags %}
-                    <div class="mt-4 flex items-center gap-2 flex-wrap">
-                        <span class="text-sm font-semibold text-gray-600">Tags:</span>
-                        {% for tag in video.tags %}
-                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">{{ tag }}</span>
-                        {% endfor %}
                     </div>
                     {% endif %}
                 </div>
-            </div>
 
-            <div class="bg-white rounded-3xl p-6 sm:p-8 border-2" style="border-color: #fce7f3;">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="font-bold text-2xl flex items-center gap-3" style="color: #1E3A5F;">
-                        <i data-lucide="message-square" class="h-6 w-6"></i>
-                        Comments & Ratings ({{ comments.count }})
-                    </h3>
+                <!-- Description Card - YouTube Style -->
+                <div class="bg-gray-50 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold text-white" style="background-color: #1E3A5F;">
+                            {{ video.sport.name|default:"Umum" }}
+                        </span>
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold capitalize" style="background-color: #F4D160; color: #1E3A5F;">
+                            {{ video.difficulty }}
+                        </span>
+                        <span class="text-sm text-gray-600">
+                            <i data-lucide="clock" class="h-4 w-4 inline"></i> {{ video.duration }}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{{ video.description|default:"No description available." }}</p>
+                    </div>
                 </div>
 
-                {% if user.is_authenticated %}
-                <form id="commentForm" class="mb-8">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Beri rating Anda (opsional):</label>
-                        <div class="flex flex-row-reverse justify-end items-center" id="star-rating">
-                            {% for i in "54321"|make_list %}
-                            <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="hidden peer" {% if user_rating == i|add:0 %}checked{% endif %}>
-                            <label for="star{{ i }}" class="text-gray-300 peer-hover:text-yellow-400 hover:text-yellow-400 peer-checked:text-yellow-400 cursor-pointer text-3xl" title="{{ i }} stars">★</label>
-                            {% endfor %}
+                <!-- Comments Section - YouTube Style -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2 mb-4">
+                        <h3 class="font-semibold text-lg text-gray-900">{{ comments.count }} Comments</h3>
+                    </div>
+
+                    {% if user.is_authenticated %}
+                    <form id="commentForm" class="mb-6">
+                        {% csrf_token %}
+                        <div class="flex gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold flex-shrink-0">
+                                {{ user.username|first|upper }}
+                            </div>
+                            <div class="flex-1">
+                                <textarea id="commentInput" name="comment" placeholder="Add a comment..." 
+                                    class="w-full border-b-2 border-gray-300 pb-2 focus:outline-none focus:border-gray-500 resize-none text-sm" 
+                                    rows="1" style="min-height: 24px;"></textarea>
+                                <div class="flex items-center justify-between mt-2">
+                                    <div class="flex flex-row-reverse justify-end items-center gap-1" id="star-rating">
+                                        {% for i in "54321"|make_list %}
+                                        <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="hidden peer" {% if user_rating == i|add:0 %}checked{% endif %}>
+                                        <label for="star{{ i }}" class="text-gray-300 peer-hover:text-yellow-400 hover:text-yellow-400 peer-checked:text-yellow-400 cursor-pointer text-lg" title="{{ i }} stars">★</label>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button type="button" onclick="document.getElementById('commentForm').reset();" 
+                                            class="px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-full">
+                                            Cancel
+                                        </button>
+                                        <button id="submitComment" type="submit" 
+                                            class="px-4 py-1.5 text-sm font-medium text-white rounded-full hover:opacity-90 transition-opacity" 
+                                            style="background-color: #1E3A5F;">
+                                            Comment
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="commentError" class="text-red-600 text-xs mt-2 hidden"></div>
+                            </div>
                         </div>
+                    </form>
+                    {% else %}
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg text-center">
+                        <p class="text-sm text-gray-600">
+                            <a href="{% url 'accounts:login' %}" class="text-blue-600 hover:underline font-medium">Sign in</a> to comment
+                        </p>
                     </div>
-                    <textarea id="commentInput" name="comment" placeholder="Bagikan pendapat Anda..." class="w-full border-2 rounded-2xl p-4 focus:outline-none focus:ring-2 mb-3 resize-none" rows="3" style="border-color: #1E3A5F;"></textarea>
-                    <button id="submitComment" type="submit" class="px-8 py-3 text-white rounded-full hover:opacity-90 transition-opacity font-semibold" style="background-color: #1E3A5F;">Submit</button>
-                    <div id="commentError" class="text-red-600 text-sm mt-2 hidden"></div>
-                </form>
-                {% else %}
-                <p class="text-gray-500 italic mb-6">
-                    Silakan <a href="{% url 'accounts:login_register' %}" class="text-[#1E3A5F] hover:underline">masuk</a> untuk komentar.
-                </p>
-                {% endif %}
+                    {% endif %}
 
-                <div id="commentList" class="space-y-6">
-                    {% for comment in comments %}
-                    <div class="border-b-2 border-gray-100 pb-6 last:border-0" id="comment-{{ comment.id }}">
-                        <div class="flex items-start gap-4">
+                    <div id="commentList" class="space-y-4">
+                        {% for comment in comments %}
+                        <div class="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0" id="comment-{{ comment.id }}">
                             {% if comment.user.profile.foto_profil %}
-                            <img src="{{ comment.user.profile.foto_profil }}" alt="Foto Profil" class="w-12 h-12 rounded-full object-cover shadow-sm">
+                            <img src="{{ comment.user.profile.foto_profil }}" alt="Foto Profil" class="w-10 h-10 rounded-full object-cover flex-shrink-0">
                             {% else %}
-                            <div class="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold text-lg" style="background-color: #1E3A5F;">
+                            <div class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold text-sm bg-gradient-to-br from-blue-500 to-blue-700">
                                 {{ comment.user.first_name.0|default:comment.user.username.0|upper }}
                             </div>
                             {% endif %}
-                            <div class="flex-1">
-                                <div class="flex items-center gap-3 mb-2 flex-wrap">
-                                    <span class="font-bold text-gray-800">{{ comment.user.username }}</span>
-                                    <span class="text-sm text-gray-500">{{ comment.created_at|timesince }} ago</span>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                    <span class="font-semibold text-sm text-gray-900">{{ comment.user.username }}</span>
+                                    <span class="text-xs text-gray-500">{{ comment.created_at|timesince }} ago</span>
                                     {% if comment.rating %}
-                                    <div class="flex items-center text-sm font-semibold">
-                                        <i data-lucide="star" class="h-4 w-4 text-[#F4D160] fill-[#F4D160] mr-1"></i>
-                                        {{ comment.rating }}/5
+                                    <div class="flex items-center text-xs">
+                                        <i data-lucide="star" class="h-3 w-3 text-yellow-500 fill-yellow-500 mr-0.5"></i>
+                                        <span class="font-medium">{{ comment.rating }}/5</span>
                                     </div>
                                     {% endif %}
                                 </div>
-                                <p class="text-gray-700 leading-relaxed">{{ comment.text|linebreaksbr }}</p>
-                                <div class="flex items-center gap-4 mt-3 text-sm">
-                                    <button class="helpfulBtn hover:opacity-80 transition-opacity" data-id="{{ comment.id }}" style="color: #1E3A5F;">
-                                        👍 Helpful (<span id="helpful-count-{{ comment.id }}">{{ comment.helpful_count }}</span>)
+                                <p class="text-sm text-gray-800 leading-relaxed mb-2">{{ comment.text|linebreaksbr }}</p>
+                                <div class="flex items-center gap-4 text-xs">
+                                    <button class="helpfulBtn hover:opacity-80 transition-opacity text-gray-600 hover:text-gray-900" data-id="{{ comment.id }}">
+                                        👍 <span id="helpful-count-{{ comment.id }}">{{ comment.helpful_count }}</span>
                                     </button>
+                                    <button class="text-gray-600 hover:text-gray-900">Reply</button>
                                 </div>
                             </div>
                         </div>
+                        {% empty %}
+                        <div id="noComments" class="text-center py-12">
+                            <i data-lucide="message-square" class="h-16 w-16 text-gray-300 mx-auto mb-4"></i>
+                            <p class="text-gray-500 text-sm">No comments yet. Be the first to comment!</p>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% empty %}
-                    <p id="noComments" class="text-center text-gray-500 py-8">No comments yet. Be the first to comment!</p>
-                    {% endfor %}
                 </div>
             </div>
         </div>
 
+        <!-- Sidebar - Related Videos - YouTube Style -->
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-3xl p-6 border-2" style="border-color: #fce7f3;">
-                <h3 class="font-bold text-xl mb-6" style="color: #1E3A5F;">Related Videos</h3>
-                <div class="space-y-5">
-                    {% for video in related_videos %} {# Ganti nama variabel agar tidak bentrok #}
-                    <a href="{% url 'videos:video_detail' video.id %}" class="flex gap-3 hover:bg-gray-50 p-3 rounded-2xl transition-colors">
-                        <div class="relative w-32 h-20 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 overflow-hidden">
-                            {% if video.thumbnail_url %}
-                            <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}" class="w-full h-full object-cover">
-                            {% elif video.thumbnail %} {# Hapus ini jika model Anda tidak lagi punya 'thumbnail' #}
-                            <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="w-full h-full object-cover">
-                            {% else %}
-                            <img src="https://source.unsplash.com/featured/320x180/?{{ video.sport.name|lower }},sport" alt="{{ video.title }}" class="w-full h-full object-cover">
-                            {% endif %}
-                            <div class="absolute bottom-1 right-1 text-white text-xs px-2 py-1 rounded-full font-semibold" style="background-color: #1E3A5F;">
-                                {{ video.duration }}
-                            </div>
+            <div class="space-y-3">
+                {% for video in related_videos %}
+                <a href="{% url 'videos:video_detail' video.id %}" class="flex gap-3 group hover:bg-gray-50 p-2 rounded-lg transition-colors">
+                    <div class="relative w-40 h-24 rounded-lg flex items-center justify-center flex-shrink-0 bg-gray-200 overflow-hidden">
+                        {% if video.thumbnail_url %}
+                        <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                        {% elif video.thumbnail %}
+                        <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                        {% else %}
+                        <div class="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600"></div>
+                        {% endif %}
+                        <div class="absolute bottom-1 right-1 text-white text-xs px-1.5 py-0.5 rounded bg-black/80 font-medium">
+                            {{ video.duration|default:"0:00" }}
                         </div>
-                        <div class="flex-1">
-                            <h4 class="font-semibold text-sm text-gray-800 line-clamp-2 mb-2">{{ video.title }}</h4>
-                            <div class="flex items-center gap-2 text-xs text-gray-500">
-                                <span>{{ video.views_count }} views</span>
-                            </div>
-                        </div>
-                    </a>
-                    {% empty %}
-                    <p class="text-sm text-gray-500">No related videos found.</p>
-                    {% endfor %}
-                </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-medium text-sm text-gray-900 line-clamp-2 mb-1 group-hover:text-blue-600 transition-colors">{{ video.title }}</h4>
+                        <div class="text-xs text-gray-600 mb-1">{{ video.instructor|default:video.uploader.username|default:"Admin" }}</div>
+                        <div class="text-xs text-gray-500">{{ video.views_count|default:0 }} views</div>
+                    </div>
+                </a>
+                {% empty %}
+                <p class="text-sm text-gray-500 text-center py-8">No related videos found.</p>
+                {% endfor %}
             </div>
         </div>
     </div>

@@ -1,3 +1,4 @@
+
 """
 Django settings for sportpedia project.
 
@@ -183,7 +184,9 @@ STATICFILES_DIRS = [
 # Folder tempat Django ngumpulin semua file static pas deploy
 STATIC_ROOT = BASE_DIR / "staticfiles"
 CSRF_TRUSTED_ORIGINS = [
-    'https://ainur-fadhil-sportpedia.pbp.cs.ui.ac.id'
+    'https://ainur-fadhil-sportpedia.pbp.cs.ui.ac.id',
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
 ]
 
 # Default primary key field type
