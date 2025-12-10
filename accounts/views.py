@@ -1,48 +1,51 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from profile_app.models import UserProfile
 from .forms import RegisterForm, LoginForm
-from pathlib import Path
 import json
-
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-USERS_PATH = BASE_DIR / 'database' / 'users.json'
-
 
 # ===================== API Views untuk Flutter =====================
 
 @csrf_exempt
 def api_login(request):
-    """API login untuk Flutter"""
+    """
+    API login untuk Flutter.
+    Menerima username & password, mengembalikan status login & role user.
+    """
     if request.method == 'POST':
-        # Accept form-encoded POST (request.POST) or JSON body.
+        # Coba ambil dari POST data (Form-data) atau JSON Body
         username = request.POST.get('username')
         password = request.POST.get('password')
+        
+        # Jika tidak ada di POST, coba ambil dari raw JSON body
         if not username:
             try:
-                payload = json.loads(request.body.decode('utf-8') or '{}')
-                username = payload.get('username')
-                password = payload.get('password')
+                data = json.loads(request.body.decode('utf-8'))
+                username = data.get('username')
+                password = data.get('password')
             except Exception:
-                username = None
-                password = None
+                pass
+
+        # Autentikasi user
         user = authenticate(username=username, password=password)
 
         if user is not None:
             if user.is_active:
                 auth_login(request, user)
-                profile, created = UserProfile.objects.get_or_create(user=user)
+                
+                # Pastikan UserProfile ada (buat baru jika belum ada)
+                UserProfile.objects.get_or_create(user=user)
+                
                 return JsonResponse({
-                    "username": user.username,
                     "status": True,
                     "message": "Login berhasil!",
-                    "is_staff": user.is_staff,
-                    "is_superuser": user.is_superuser,
+                    "username": user.username,
+                    "is_staff": user.is_staff,       # Penting untuk logika Admin di Flutter
+                    "is_superuser": user.is_superuser # Penting untuk logika Admin di Flutter
                 }, status=200)
             else:
                 return JsonResponse({
@@ -52,7 +55,7 @@ def api_login(request):
         else:
             return JsonResponse({
                 "status": False,
-                "message": "Login gagal, periksa username atau password."
+                "message": "Username atau password salah."
             }, status=401)
     
     return JsonResponse({
@@ -63,52 +66,70 @@ def api_login(request):
 
 @csrf_exempt
 def api_register(request):
-    """API register untuk Flutter"""
+    """
+    API register untuk Flutter.
+    Menerima data JSON untuk membuat user baru.
+    """
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)
-            username = data.get('username')
-            password1 = data.get('password1')
-            password2 = data.get('password2')
-            email = data.get('email', '')
+            # Accept form-encoded POST or JSON body
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            email = request.POST.get('email', '')
 
-            if password1 != password2:
+            if not username:
+                try:
+                    payload = json.loads(request.body.decode('utf-8') or '{}')
+                except Exception:
+                    payload = {}
+                username = payload.get('username')
+                password = payload.get('password')
+                email = payload.get('email', '')
+
+            # Validasi input
+            if not username or not password:
                 return JsonResponse({
                     "status": False,
-                    "message": "Password tidak cocok."
+                    "message": "Username dan password harus diisi."
                 }, status=400)
 
+            # Cek duplikasi username/email
             if User.objects.filter(username=username).exists():
                 return JsonResponse({
                     "status": False,
                     "message": "Username sudah digunakan."
                 }, status=400)
-
             if email and User.objects.filter(email=email).exists():
                 return JsonResponse({
                     "status": False,
                     "message": "Email sudah digunakan."
                 }, status=400)
 
-            user = User.objects.create_user(username=username, password=password1, email=email)
+            # Buat User Baru
+            user = User.objects.create_user(username=username, password=password, email=email)
             user.save()
+
+            # Buat UserProfile otomatis
             UserProfile.objects.create(user=user)
 
-            return JsonResponse({
-                "username": user.username,
-                "status": "success",
-                "message": "User berhasil dibuat!"
-            }, status=200)
+            # Auto-login (creates session cookie) - optional for mobile
+            try:
+                auth_login(request, user)
+            except Exception:
+                pass
 
-        except json.JSONDecodeError:
             return JsonResponse({
-                "status": False,
-                "message": "Invalid JSON data."
-            }, status=400)
+                "status": True,
+                "message": "Akun berhasil dibuat!",
+                "username": user.username,
+                "is_staff": user.is_staff,
+                "is_superuser": user.is_superuser,
+            }, status=201)
+
         except Exception as e:
             return JsonResponse({
                 "status": False,
-                "message": str(e)
+                "message": f"Terjadi kesalahan: {str(e)}"
             }, status=500)
 
     return JsonResponse({
@@ -119,43 +140,43 @@ def api_register(request):
 
 @csrf_exempt
 def api_logout(request):
-    """API logout untuk Flutter"""
-    username = request.user.username
-    try:
-        auth_logout(request)
-        return JsonResponse({
-            "username": username,
-            "status": True,
-            "message": "Logout berhasil!"
-        }, status=200)
-    except Exception as e:
-        return JsonResponse({
-            "status": False,
-            "message": f"Logout gagal: {str(e)}"
-        }, status=401)
+    """
+    API logout untuk Flutter.
+    """
+    if request.user.is_authenticated:
+        username = request.user.username
+        try:
+            auth_logout(request)
+            return JsonResponse({
+                "status": True,
+                "message": f"Logout berhasil! Sampai jumpa, {username}."
+            }, status=200)
+        except Exception as e:
+            return JsonResponse({
+                "status": False,
+                "message": f"Logout gagal: {str(e)}"
+            }, status=500)
+            
+    return JsonResponse({
+        "status": True, # Tetap true agar flutter tidak error
+        "message": "User sudah logout sebelumnya."
+    }, status=200)
 
 
 # ===================== Web Views (HTML) =====================
 
 def register(request):
+    """View Register untuk Web (HTML)"""
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            profile = UserProfile.objects.create(user=user)
+            # Buat profile
+            UserProfile.objects.create(user=user)
             
-            try:
-                if USERS_PATH.exists():
-                    with open(USERS_PATH, 'r', encoding='utf-8') as f:
-                        data = json.load(f)
-                else:
-                    data = []
-                data.append(profile.to_json())
-                with open(USERS_PATH, 'w', encoding='utf-8') as f:
-                    json.dump(data, f, indent=2, ensure_ascii=False)
-            except Exception as e:
-                print(f"Gagal simpan ke users.json: {e}")
-
+            # CATATAN: Kode penyimpanan ke 'users.json' dihapus 
+            # karena menyebabkan error dan tidak diperlukan (data sudah masuk DB).
+            
             messages.success(request, 'Akun berhasil dibuat! Silakan login.')
             return redirect('accounts:login')
     else:
@@ -163,29 +184,23 @@ def register(request):
     return render(request, 'accounts/register.html', {'form': form})
 
 
-
 def login_view(request):
+    """View Login untuk Web (HTML)"""
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            login(request, user)
+            auth_login(request, user)
             
-            # --- START: Added Check ---
-            # Check if the user is staff or superuser
+            # Redirect Logic: Admin ke Dashboard, User Biasa ke Home
             if user.is_staff or user.is_superuser:
-                # Redirect them to the admin dashboard
-                # Make sure 'admin_sportpedia:dashboard' is the correct URL name!
                 messages.success(request, f'Selamat datang kembali, Admin {user.username}!')
+                # Pastikan URL name 'admin_sportpedia:dashboard' benar ada di urls.py admin
                 return redirect('admin_sportpedia:dashboard') 
             else:
-                # Redirect regular users to the homepage
                 messages.success(request, f'Selamat datang kembali, {user.username}!')
                 return redirect('/') 
-            # --- END: Added Check ---
-
         else:
-            # Keep the error message generic for security
             messages.error(request, 'Username atau password salah.')
     else:
         form = LoginForm()
@@ -193,7 +208,7 @@ def login_view(request):
 
 
 def logout_view(request):
-    logout(request)
-    storage = messages.get_messages(request)
-    storage.used = True
+    """View Logout untuk Web (HTML)"""
+    auth_logout(request)
+    messages.success(request, "Berhasil logout.")
     return redirect('accounts:login')

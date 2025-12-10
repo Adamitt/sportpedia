@@ -9,6 +9,7 @@ class Sport(models.Model):
     difficulty = models.CharField(max_length=20)
     description = models.TextField()
     history = models.TextField()
+    image = models.ImageField(upload_to='sports/', blank=True, null=True)
 
     rules = models.JSONField(default=list)
     techniques = models.JSONField(default=list)
