@@ -15,17 +15,11 @@ from profile_app.models import ActivityLog
 from .models import Gear
 
 
-# =========================
-# Helper functions
-# =========================
-
 def admin_only(user):
-    """Return True kalau user adalah staff/superuser (admin)."""
     return user.is_staff or user.is_superuser
 
 
 def _log_activity(request, gear_name):
-    """Catat log aktivitas kalau user login."""
     if request.user.is_authenticated:
         ActivityLog.objects.create(
             user=request.user,
@@ -35,12 +29,6 @@ def _log_activity(request, gear_name):
 
 
 def _normalize_list_field(value):
-    """
-    Normalisasi field list:
-    - kalau None/empty -> []
-    - kalau list -> strip semua item
-    - kalau string "Nike, Adidas" -> ["Nike", "Adidas"]
-    """
     if not value:
         return []
     if isinstance(value, list):
@@ -51,7 +39,6 @@ def _normalize_list_field(value):
 
 
 def _gear_to_json(gear: Gear):
-    """Konversi object Gear ke dict JSON-friendly."""
     return {
         "id": str(gear.id),
         "sport_id": str(gear.sport.id) if gear.sport else None,
@@ -76,16 +63,10 @@ def _gear_to_json(gear: Gear):
     }
 
 
-# =========================
-# HTML / WEB VIEWS
-# =========================
-
 def show_all_gears(request):
-    """Halaman utama Gear Guide (HTML)."""
     gears = Gear.objects.select_related("sport").all()
     all_sports = Sport.objects.all().order_by("name")
 
-    # filter sport
     selected_sport = request.GET.get("sport", "").strip().lower()
     if selected_sport:
         gears = [
@@ -93,12 +74,10 @@ def show_all_gears(request):
             if g.sport and g.sport.name.lower() == selected_sport
         ]
 
-    # filter level
     selected_level = request.GET.get("level", "").strip().lower()
     if selected_level:
         gears = [g for g in gears if g.level.lower() == selected_level]
 
-    # filter: your gears
     view_filter = request.GET.get("view", "all")
     if view_filter == "your" and request.user.is_authenticated:
         gears = [
@@ -147,12 +126,7 @@ def show_gear_detail(request, gear_id):
 
 @login_required(login_url="/accounts/login/")
 def add_gear(request):
-    """
-    Tambah gear baru via form HTML (web).
-    HANYA boleh admin (staff/superuser).
-    """
     if not admin_only(request.user):
-        # User biasa yang nekat akses URL langsung
         return HttpResponseForbidden("❌ Hanya admin yang boleh menambahkan gear.")
 
     sports = Sport.objects.all()
@@ -216,7 +190,6 @@ def add_gear(request):
 
 @login_required(login_url="/accounts/login/")
 def edit_gear(request, gear_id):
-    """Edit gear (hanya admin atau pemilik) via web (AJAX)."""
     gear = get_object_or_404(Gear, id=gear_id)
 
     if not (admin_only(request.user) or gear.owner == request.user):
@@ -282,7 +255,6 @@ def edit_gear(request, gear_id):
 @login_required(login_url="/accounts/login/")
 @csrf_exempt
 def delete_gear(request, gear_id):
-    """Hapus gear (hanya admin/superuser) via web (AJAX)."""
     gear = get_object_or_404(Gear, id=gear_id)
 
     if not admin_only(request.user):
@@ -315,7 +287,6 @@ def delete_gear(request, gear_id):
 
 @require_http_methods(["GET"])
 def get_gear_json(request, gear_id):
-    """Endpoint JSON ambil 1 gear (web/AJAX)."""
     try:
         gear = Gear.objects.filter(id=gear_id).first()
         if not gear:
@@ -339,7 +310,6 @@ def get_gear_json(request, gear_id):
 
 
 def get_all_gears_json(request):
-    """JSON list semua gear (web)."""
     gears = Gear.objects.select_related("sport").all()
     data = [_gear_to_json(g) for g in gears]
 
@@ -350,10 +320,6 @@ def get_all_gears_json(request):
     }
     return JsonResponse(response)
 
-# =========================
-# FLUTTER JSON API
-# =========================
-
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
@@ -361,10 +327,6 @@ import traceback
 
 @csrf_exempt
 def list_gears_flutter(request):
-    """
-    GET /gearguide/flutter/gears/
-    Public, balikin JSON list gear untuk Flutter.
-    """
     if request.method != "GET":
         return JsonResponse(
             {"ok": False, "error": "Method not allowed. Gunakan GET."},
@@ -387,18 +349,13 @@ def add_gear_flutter(request):
     if not request.user.is_authenticated:
         return JsonResponse({"ok": False, "error": "Unauthenticated. Silakan login dulu."}, status=401)
 
-    # =================================================================
-    # 🔒 PENGECEKAN ADMIN (HANYA ADMIN BOLEH ADD)
-    # =================================================================
     if not admin_only(request.user):
         return JsonResponse(
             {"ok": False, "error": "Forbidden. Hanya admin yang boleh menambah gear."},
             status=403,
         )
-    # =================================================================
 
     try:
-        # ... (Logika parsing data JSON/POST sama seperti sebelumnya) ...
         try:
             raw_body = request.body.decode("utf-8") or "{}"
             data = json.loads(raw_body)
@@ -433,7 +390,6 @@ def add_gear_flutter(request):
             {"ok": True, "message": "Gear berhasil dibuat", "data": _gear_to_json(gear)},
             status=201,
         )
-    # ... (Exception handling sama) ...
     except Exception as e:
         return JsonResponse({"ok": False, "error": str(e)}, status=500)
     
@@ -447,36 +403,28 @@ def edit_gear_flutter(request, gear_id):
 
     gear = get_object_or_404(Gear, id=gear_id)
 
-    # =================================================================
-    # 🔒 PENGECEKAN ADMIN (STRICT)
-    # Hapus "or gear.owner == request.user" agar pemilik biasa tidak bisa edit
-    # =================================================================
     if not admin_only(request.user):
         return JsonResponse(
             {"ok": False, "error": "Forbidden. Hanya admin yang boleh mengedit gear."},
             status=403,
         )
-    # =================================================================
 
     try:
-        # ... (Sisa logika update sama persis seperti kodemu sebelumnya) ...
         try:
             raw_body = request.body.decode("utf-8") or "{}"
             data = json.loads(raw_body)
         except json.JSONDecodeError:
             data = request.POST.dict()
 
-        # Update fields
         sport_id = data.get("sport")
         if sport_id:
              try:
                 gear.sport = Sport.objects.get(id=sport_id)
              except Sport.DoesNotExist:
-                pass # Atau handle error
+                pass
         
         gear.name = data.get("name", gear.name)
         gear.description = data.get("description", gear.description)
-        # ... (update field lainnya) ...
         gear.save()
 
         return JsonResponse(
@@ -496,15 +444,12 @@ def delete_gear_flutter(request, gear_id):
 
     gear = get_object_or_404(Gear, id=gear_id)
 
-    # =================================================================
-    # 🔒 PENGECEKAN ADMIN (STRICT)
-    # =================================================================
+
     if not admin_only(request.user):
         return JsonResponse(
             {"ok": False, "error": "Forbidden. Hanya admin yang boleh menghapus gear."},
             status=403,
         )
-    # =================================================================
 
     gear_name = gear.name
     gear.delete()
@@ -519,18 +464,12 @@ def delete_gear_flutter(request, gear_id):
 
 @require_http_methods(["GET"])
 def get_all_sports_json(request):
-    """
-    GET /gearguide/flutter/sports/
-    Public, balikin JSON list semua sport (id & name) untuk Flutter.
-    """
     try:
-        # Ambil semua objek Sport
         sports = Sport.objects.all().order_by("name")
 
-        # Konversi ke format yang dibutuhkan Flutter: List of {id: "1", name: "Sport Name"}
         data = [
             {
-                "id": str(s.id),  # Penting: ubah ID menjadi string
+                "id": str(s.id), 
                 "name": s.name,
             }
             for s in sports
@@ -539,7 +478,7 @@ def get_all_sports_json(request):
         return JsonResponse(
             {"ok": True, "count": len(data), "data": data},
             status=200,
-            safe=False  # Gunakan safe=False jika Anda hanya mengirim List (bukan dict utama)
+            safe=False  
         )
 
     except Exception as e:
