@@ -185,13 +185,28 @@ def _serialize(t, request):
         if request.user.is_superuser or (t.user and t.user_id == request.user.id):
             is_owner = True
 
+    # Convert image_url to absolute URL if it's a relative path
+    image_url = t.image_url or ""
+    if image_url and image_url.strip():
+        image_url = image_url.strip()
+        # If it's already an absolute URL (starts with http:// or https://), use it as is
+        if image_url.startswith('http://') or image_url.startswith('https://'):
+            pass  # Already absolute, use as is
+        # If it's a relative path (starts with /), make it absolute
+        elif image_url.startswith('/'):
+            image_url = request.build_absolute_uri(image_url)
+        # Otherwise, keep the URL as is (might be a valid relative path without leading /)
+        # Only set to empty if it's truly empty or just whitespace
+    else:
+        image_url = ""
+
     return {
         "id": t.id,
         "title": t.title,
         "text": t.text,
         "user": (t.user.get_full_name() or t.user.username) if t.user else "Guest",
         "category": t.category,
-        "image_url": t.image_url or "",
+        "image_url": image_url,
         "created_at": t.created_at.strftime("%Y-%m-%d %H:%M"),
         "is_owner": is_owner,
     }
@@ -459,8 +474,17 @@ def api_search(request):
                 sport_results.append({
                     "id": sport.id,
                     "name": sport.name,
+                    "category": sport.category,
+                    "difficulty": sport.difficulty,
                     "description": sport.description or "",
                     "history": sport.history or "",
+                    "rules": sport.rules or [],
+                    "techniques": sport.techniques or [],
+                    "benefits": sport.benefits or [],
+                    "popular_countries": sport.popular_countries or [],
+                    "tags": sport.tags or [],
+                    "image": str(sport.image.url) if sport.image else "",
+                    "is_saved": False,
                 })
     
     response = JsonResponse({

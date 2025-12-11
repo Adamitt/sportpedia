@@ -27,6 +27,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "10.0.2.2",  # chevinka: Android Emulator
+    "192.168.0.25",  # chevinka: IP komputer untuk device fisik
     "ainur-fadhil-sportpedia.pbp.cs.ui.ac.id",
 ]
 

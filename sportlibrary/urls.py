@@ -12,4 +12,6 @@ urlpatterns = [
     # path('<str:sport_id>/', views.sport_detail, name='sport_detail'),
     # Pakai <str:> supaya bisa angka biasa (e.g. "5") dan UUID-like (e.g. "0000...00a")
     path('<int:sport_id>/', views.sport_detail, name='sport_detail'),
+    # API endpoints for Flutter
+    path('api/show-sports-json/', views.show_sports_json, name='show_sports_json'),
 ]

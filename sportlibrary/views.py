@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from django.views.decorators.http import require_http_methods, require_GET
 from pathlib import Path
 import json
 from profile_app.models import ActivityLog
@@ -176,3 +176,40 @@ def clear_all_sports(request):
     messages.success(request, 'Semua olahraga berhasil dihapus dari simpanan')
     
     return redirect('sportlibrary:saved_sports')
+
+# -------------------------------------------------
+# API Endpoints for Flutter
+# -------------------------------------------------
+from django.conf import settings
+
+@csrf_exempt
+@require_GET
+def show_sports_json(request):
+    """API endpoint untuk Flutter: return semua sports dalam format JSON"""
+    sports = Sport.objects.all()
+    
+    # Get saved sports for current user (if authenticated)
+    saved_sport_ids = []
+    if request.user.is_authenticated:
+        saved_sports = SavedSport.objects.filter(user=request.user).values_list('sport_id', flat=True)
+        saved_sport_ids = list(saved_sports)
+    
+    data = []
+    for sport in sports:
+        data.append({
+            "id": sport.id,
+            "name": sport.name,
+            "category": sport.category,
+            "difficulty": sport.difficulty,
+            "description": sport.description,
+            "history": sport.history,
+            "rules": sport.rules or [],
+            "techniques": sport.techniques or [],
+            "benefits": sport.benefits or [],
+            "popular_countries": sport.popular_countries or [],
+            "tags": sport.tags or [],
+            "image": str(sport.image.url) if sport.image else "",
+            "is_saved": sport.id in saved_sport_ids,
+        })
+    
+    return JsonResponse(data, safe=False)
