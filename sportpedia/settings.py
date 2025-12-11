@@ -167,6 +167,13 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://ainur-fadhil-sportpedia\.pbp\.cs\.ui\.ac\.id$",
 ]
 
+# CORS settings untuk Flutter web
+# IMPORTANT: Jika menggunakan CORS_ALLOW_ALL_ORIGINS = True, 
+# jangan set CORS_ALLOWED_ORIGINS (akan conflict)
+CORS_ALLOW_ALL_ORIGINS = True  # Untuk development, allow semua origin
+CORS_ALLOW_CREDENTIALS = True  # Allow cookies untuk session (PENTING!)
+# CORS_ALLOWED_ORIGINS tidak perlu jika CORS_ALLOW_ALL_ORIGINS = True
+
 # Origin yang dipercaya untuk CSRF (HTML form / API non-@csrf_exempt)
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
@@ -174,11 +181,13 @@ CSRF_TRUSTED_ORIGINS = [
     "https://ainur-fadhil-sportpedia.pbp.cs.ui.ac.id",
 ]
 
-# Cookie settings (dev friendly)
-SESSION_COOKIE_SAMESITE = "Lax"
-CSRF_COOKIE_SAMESITE = "Lax"
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+# Session cookie settings untuk Flutter Web
+# Untuk Flutter Web (cross-origin), perlu 'None' dengan Secure=False untuk development
+SESSION_COOKIE_SAMESITE = "None"  # Allow cross-site cookies (required for Flutter Web)
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access (security)
+CSRF_COOKIE_SAMESITE = "None"  # Allow cross-site CSRF cookies
+CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

@@ -1,10 +1,11 @@
 import json
+import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
 from django.http import JsonResponse, Http404
-from django.db.models import F, Q, Avg, Count # <-- Import Avg dan Count
+from django.db.models import F, Q, Avg, Count # <-- Import Avg, Count
 from django.views.decorators.http import require_POST
 from django.utils import timezone # Untuk rating/comment
 
@@ -13,6 +14,20 @@ from .forms import VideoForm # Asumsi Anda punya ini
 from sportlibrary.models import Sport
 from metrics.utils import bump_view
 from profile_app.models import UserProfile
+
+from django.http import JsonResponse
+from django.contrib.auth import authenticate, login
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
+from django.http import JsonResponse, Http404
+from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.db.models import Avg, Count, F
+from django.shortcuts import get_object_or_404
+from .models import Video, Comment, VideoRating
 
 # ==================================
 # Helper
@@ -27,55 +42,86 @@ def staff_required(user):
 
 def video_gallery(request):
     """Menampilkan galeri video dari DATABASE"""
-    
-    videos_qs = Video.objects.select_related('sport', 'uploader').annotate(
-        avg_rating=Avg('ratings__rating'),
-        like_count=Count('likes')
-    )
-    
-    sports = Sport.objects.all().order_by('name')
-    
-    # Search
-    search_query = request.GET.get('search', '').strip()
-    if search_query:
-        videos_qs = videos_qs.filter(
-            Q(title__icontains=search_query) |
-            Q(description__icontains=search_query) |
-            Q(instructor__icontains=search_query) | # <-- SEKARANG BERFUNGSI
-            Q(tags__icontains=search_query)       # <-- SEKARANG BERFUNGSI
+    try:
+        # Query dengan annotate untuk rating dan likes
+        videos_qs = Video.objects.select_related('sport', 'uploader').annotate(
+            avg_rating=Avg('ratings__rating'),
+            like_count=Count('likes', distinct=True)
         )
+        
+        sports = Sport.objects.all().order_by('name')
+        
+        # Search
+        search_query = request.GET.get('search', '').strip()
+        if search_query:
+            videos_qs = videos_qs.filter(
+                Q(title__icontains=search_query) |
+                Q(description__icontains=search_query) |
+                Q(instructor__icontains=search_query) |
+                Q(tags__icontains=search_query)
+            )
 
-    # Filter by sport
-    sport_filter = request.GET.get('sport')
-    if sport_filter:
-        videos_qs = videos_qs.filter(sport__id=sport_filter)
-    
-    # Filter by difficulty
-    difficulty_filter = request.GET.get('difficulty')
-    if difficulty_filter:
-        videos_qs = videos_qs.filter(difficulty=difficulty_filter)
-    
-    # Sorting
-    sort_by = request.GET.get('sort', 'popular')
-    if sort_by == 'rating':
-        # Urutkan berdasarkan anotasi avg_rating
-        videos_qs = videos_qs.order_by('-avg_rating', '-views_count') 
-    elif sort_by == 'newest':
-        videos_qs = videos_qs.order_by('-created_at', '-views_count') # Ganti ke created_at
-    elif sort_by == 'shortest':
-        videos_qs = videos_qs.order_by('duration')
-    else: # popular (default)
-        videos_qs = videos_qs.order_by('-views_count')
-    
-    context = {
-        'videos': videos_qs, # Tidak perlu list() jika me-looping di template
-        'sports': sports,
-        'search_query': search_query,
-        'selected_sport': sport_filter,
-        'selected_difficulty': difficulty_filter,
-        'sort_by': sort_by,
-    }
-    return render(request, 'videos/video_gallery.html', context)
+        # Filter by sport
+        sport_filter = request.GET.get('sport')
+        if sport_filter:
+            try:
+                videos_qs = videos_qs.filter(sport__id=int(sport_filter))
+            except (ValueError, TypeError):
+                pass  # Ignore invalid sport filter
+        
+        # Filter by difficulty
+        difficulty_filter = request.GET.get('difficulty')
+        if difficulty_filter:
+            videos_qs = videos_qs.filter(difficulty=difficulty_filter)
+        
+        # Sorting
+        sort_by = request.GET.get('sort', 'popular')
+        if sort_by == 'rating':
+            videos_qs = videos_qs.order_by('-avg_rating', '-views_count') 
+        elif sort_by == 'newest':
+            videos_qs = videos_qs.order_by('-created_at', '-views_count')
+        elif sort_by == 'shortest':
+            videos_qs = videos_qs.order_by('duration', '-views_count')
+        else: # popular (default)
+            videos_qs = videos_qs.order_by('-views_count', '-created_at')
+        
+        # Evaluate queryset menjadi list untuk template
+        videos_list = list(videos_qs)
+        
+        # Auto-generate thumbnail dari YouTube URL jika thumbnail_url kosong
+        import re
+        for video in videos_list:
+            if not video.thumbnail_url and video.video_url:
+                # Extract YouTube video ID
+                youtube_pattern = r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})'
+                match = re.search(youtube_pattern, video.video_url)
+                if match:
+                    video_id = match.group(1)
+                    video.thumbnail_url = f'https://img.youtube.com/vi/{video_id}/hqdefault.jpg'
+                    # Save ke database untuk next time
+                    Video.objects.filter(id=video.id).update(thumbnail_url=video.thumbnail_url)
+        
+        context = {
+            'videos': videos_list,
+            'sports': sports,
+            'search_query': search_query,
+            'selected_sport': sport_filter,
+            'selected_difficulty': difficulty_filter,
+            'sort_by': sort_by,
+        }
+        return render(request, 'videos/video_gallery.html', context)
+    except Exception as e:
+        # Log error untuk debugging
+        import traceback
+        print(f"Error di video_gallery: {e}")
+        print(traceback.format_exc())
+        # Return empty context dengan error message
+        context = {
+            'videos': [],
+            'sports': Sport.objects.all().order_by('name'),
+            'error_message': f'Error loading videos: {str(e)}',
+        }
+        return render(request, 'videos/video_gallery.html', context)
 
 def video_detail(request, video_id):
     """Menampilkan detail video dari DATABASE"""
@@ -299,6 +345,8 @@ def add_comment(request, video_id):
     })
 
 @require_POST
+@csrf_exempt
+@require_POST
 def helpful_comment(request, comment_id):
     """Menambah 'helpful' ke komentar di DATABASE"""
     try:
@@ -321,3 +369,642 @@ def helpful_comment(request, comment_id):
         })
     except Comment.DoesNotExist:
          return JsonResponse({'success': False, 'error': 'Comment not found'}, status=404)
+
+# ============================================
+# API LOGIN ENDPOINT
+# ============================================
+
+@csrf_exempt
+@require_POST
+def api_login(request):
+    """API endpoint untuk login."""
+    try:
+        data = json.loads(request.body)
+        username = data.get('username', '').strip()
+        password = data.get('password', '')
+        
+        if not username or not password:
+            return JsonResponse({
+                'message': 'Username dan password harus diisi'
+            }, status=400)
+        
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            return JsonResponse({
+                'message': 'Login berhasil',
+                'username': user.username,
+                'is_staff': user.is_staff,
+                'is_superuser': user.is_superuser,
+            }, status=200)
+        else:
+            return JsonResponse({
+                'message': 'Username atau password salah'
+            }, status=401)
+            
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'message': 'Invalid JSON format'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'message': f'Terjadi kesalahan: {str(e)}'
+        }, status=500)
+
+
+# ============================================
+# VIDEO API ENDPOINTS
+# ============================================
+
+# Mapping difficulty dari model ke Flutter
+DIFFICULTY_MAPPING = {
+    'beginner': 'Pemula',
+    'intermediate': 'Menengah',
+    'advanced': 'Lanjutan',
+}
+
+# Mapping sebaliknya (dari Flutter ke model)
+DIFFICULTY_REVERSE = {
+    'Pemula': 'beginner',
+    'Menengah': 'intermediate',
+    'Lanjutan': 'advanced',
+}
+
+@require_GET
+def api_video_list(request):
+    """GET /videos/api/ - List semua video dengan filter optional"""
+    videos_qs = Video.objects.select_related('sport', 'uploader').annotate(
+        avg_rating=Avg('ratings__rating'),
+        like_count=Count('likes')
+    )
+    
+    # Search
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        videos_qs = videos_qs.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(instructor__icontains=search_query) |
+            Q(tags__icontains=search_query)
+        )
+    
+    # Filter by sport
+    sport_id = request.GET.get('sport')
+    if sport_id:
+        try:
+            sport_id = int(sport_id)
+            videos_qs = videos_qs.filter(sport__id=sport_id)
+        except ValueError:
+            pass
+    
+    # Filter by difficulty (convert dari Flutter ke model format)
+    difficulty = request.GET.get('difficulty')
+    if difficulty:
+        # Convert 'Pemula' -> 'beginner', dll
+        difficulty_key = DIFFICULTY_REVERSE.get(difficulty, difficulty)
+        videos_qs = videos_qs.filter(difficulty=difficulty_key)
+    
+    # Sorting
+    sort_by = request.GET.get('sort', 'popular')
+    if sort_by == 'rating':
+        videos_qs = videos_qs.order_by('-avg_rating', '-views_count')
+    elif sort_by == 'newest':
+        videos_qs = videos_qs.order_by('-created_at', '-views_count')
+    elif sort_by == 'views':
+        videos_qs = videos_qs.order_by('-views_count', '-created_at')
+    elif sort_by == 'shortest':
+        videos_qs = videos_qs.order_by('duration', '-views_count')
+    else:  # popular (default)
+        videos_qs = videos_qs.order_by('-views_count', '-created_at')
+    
+    # Convert ke format JSON sesuai Flutter
+    videos_data = []
+    for video in videos_qs:
+        # Convert difficulty dari model ke Flutter format
+        difficulty_display = DIFFICULTY_MAPPING.get(video.difficulty, video.difficulty)
+        
+        videos_data.append({
+            'id': video.id,
+            'title': video.title,
+            'description': video.description or '',
+            'thumbnail': video.thumbnail_url or '',
+            'url': video.video_url or '',
+            'difficulty': difficulty_display,
+            'sport_name': video.sport.name if video.sport else '',
+            'duration': video.duration or '',
+            'rating': float(video.avg_rating) if video.avg_rating else 0.0,
+            'views': video.views_count or 0,
+            'instructor': video.instructor or '',
+            'tags': video.tags or [],
+        })
+    
+    return JsonResponse(videos_data, safe=False)
+
+
+@require_GET
+def api_video_detail(request, video_id):
+    """GET /videos/api/{id}/ - Detail satu video"""
+    try:
+        video = Video.objects.select_related('sport', 'uploader').annotate(
+            avg_rating=Avg('ratings__rating'),
+            like_count=Count('likes')
+        ).get(pk=video_id)
+    except Video.DoesNotExist:
+        return JsonResponse({
+            'error': 'Video tidak ditemukan'
+        }, status=404)
+    
+    # Convert difficulty dari model ke Flutter format
+    difficulty_display = DIFFICULTY_MAPPING.get(video.difficulty, video.difficulty)
+    
+    # Convert ke format JSON sesuai Flutter
+    video_data = {
+        'id': video.id,
+        'title': video.title,
+        'description': video.description or '',
+        'thumbnail': video.thumbnail_url or '',
+        'url': video.video_url or '',
+        'difficulty': difficulty_display,
+        'sport_name': video.sport.name if video.sport else '',
+        'duration': video.duration or '',
+        'rating': float(video.avg_rating) if video.avg_rating else 0.0,
+        'views': video.views_count or 0,
+    }
+    
+    return JsonResponse(video_data)
+
+
+@require_GET
+def api_video_comments(request, video_id):
+    """GET /videos/api/{id}/comments/ - List komentar video dengan replies"""
+    try:
+        video = get_object_or_404(Video, pk=video_id)
+    except Video.DoesNotExist:
+        return JsonResponse({
+            'error': 'Video tidak ditemukan'
+        }, status=404)
+    
+    # Hanya ambil top-level comments (yang tidak punya parent)
+    top_comments = Comment.objects.filter(
+        video=video,
+        parent__isnull=True
+    ).select_related('user').prefetch_related('replies__user').order_by('-created_at')
+    
+    def serialize_comment(comment):
+        """Helper function untuk serialize comment dengan replies"""
+        replies_data = []
+        for reply in comment.replies.all().order_by('created_at'):
+            replies_data.append({
+                'id': reply.id,
+                'user': reply.user.username if reply.user else 'Anonymous',
+                'text': reply.text,
+                'rating': reply.rating,
+                'helpful_count': reply.helpful_count or 0,
+                'created_at': reply.created_at.strftime('%Y-%m-%d %H:%M:%S') if reply.created_at else '',
+                'parent_id': reply.parent.id if reply.parent else None,
+            })
+        
+        return {
+            'id': comment.id,
+            'user': comment.user.username if comment.user else 'Anonymous',
+            'text': comment.text,
+            'rating': comment.rating,
+            'helpful_count': comment.helpful_count or 0,
+            'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S') if comment.created_at else '',
+            'replies': replies_data,
+        }
+    
+    # Convert ke format JSON sesuai Flutter
+    comments_data = [serialize_comment(comment) for comment in top_comments]
+    
+    return JsonResponse(comments_data, safe=False)
+
+
+@csrf_exempt
+@require_POST
+def api_video_add_comment(request, video_id):
+    """POST /videos/api/{id}/comment/ - Tambah komentar"""
+    # Debug: print user info
+    print(f"[DEBUG] api_video_add_comment - User: {request.user}, Authenticated: {request.user.is_authenticated}")
+    print(f"[DEBUG] Session key: {request.session.session_key}")
+    print(f"[DEBUG] Cookies: {request.COOKIES}")
+    print(f"[DEBUG] Headers: {dict(request.headers)}")
+    print(f"[DEBUG] Method: {request.method}")
+    print(f"[DEBUG] Body: {request.body}")
+    
+    if not request.user.is_authenticated:
+        print(f"[DEBUG] User NOT authenticated - returning 401")
+        return JsonResponse({
+            'error': 'Anda harus login terlebih dahulu',
+            'debug': {
+                'user': str(request.user),
+                'is_authenticated': request.user.is_authenticated,
+                'session_key': request.session.session_key,
+                'cookies': dict(request.COOKIES),
+            }
+        }, status=401)
+    
+    print(f"[DEBUG] User authenticated - proceeding with comment creation")
+    
+    try:
+        video = get_object_or_404(Video, pk=video_id)
+    except Video.DoesNotExist:
+        return JsonResponse({
+            'error': 'Video tidak ditemukan'
+        }, status=404)
+    
+    try:
+        data = json.loads(request.body)
+        text = data.get('text', '').strip()
+        rating = data.get('rating')
+        
+        if not text:
+            return JsonResponse({
+                'error': 'Text komentar harus diisi'
+            }, status=400)
+        
+        # Handle rating jika ada
+        if rating:
+            try:
+                rating = int(rating)
+                if 1 <= rating <= 5:
+                    VideoRating.objects.update_or_create(
+                        video=video,
+                        user=request.user,
+                        defaults={'rating': rating}
+                    )
+                else:
+                    rating = None
+            except ValueError:
+                rating = None
+        
+        # Buat komentar
+        new_comment = Comment.objects.create(
+            video=video,
+            user=request.user,
+            text=text,
+            rating=rating
+        )
+        
+        # Return dalam format JSON sesuai Flutter
+        return JsonResponse({
+            'id': new_comment.id,
+            'user': new_comment.user.username,
+            'text': new_comment.text,
+            'rating': new_comment.rating,
+            'helpful_count': new_comment.helpful_count or 0,
+            'created_at': new_comment.created_at.strftime('%Y-%m-%d %H:%M:%S') if new_comment.created_at else '',
+            'replies': [],  # New comment has no replies yet
+        }, status=201)
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Gagal menambah komentar: {str(e)}'
+        }, status=500)
+
+
+@csrf_exempt
+@require_POST
+def api_comment_reply(request, comment_id):
+    """POST /videos/api/comment/{comment_id}/reply/ - Reply to a comment"""
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'error': 'Anda harus login terlebih dahulu'
+        }, status=401)
+    
+    try:
+        parent_comment = get_object_or_404(Comment, pk=comment_id)
+    except Comment.DoesNotExist:
+        return JsonResponse({
+            'error': 'Komentar tidak ditemukan'
+        }, status=404)
+    
+    try:
+        data = json.loads(request.body)
+        text = data.get('text', '').strip()
+        
+        if not text:
+            return JsonResponse({
+                'error': 'Text reply harus diisi'
+            }, status=400)
+        
+        # Buat reply (komentar dengan parent)
+        new_reply = Comment.objects.create(
+            video=parent_comment.video,
+            user=request.user,
+            text=text,
+            parent=parent_comment,
+            rating=None  # Replies don't have ratings
+        )
+        
+        # Return dalam format JSON sesuai Flutter
+        return JsonResponse({
+            'id': new_reply.id,
+            'user': new_reply.user.username,
+            'text': new_reply.text,
+            'rating': None,
+            'helpful_count': new_reply.helpful_count or 0,
+            'created_at': new_reply.created_at.strftime('%Y-%m-%d %H:%M:%S') if new_reply.created_at else '',
+            'parent_id': parent_comment.id,
+        }, status=201)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Gagal menambah reply: {str(e)}'
+        }, status=500)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON format'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Terjadi kesalahan: {str(e)}'
+        }, status=500)
+
+
+@csrf_exempt
+@require_POST
+def api_video_rate(request, video_id):
+    """POST /videos/api/{id}/rate/ - Rate video"""
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'error': 'Anda harus login terlebih dahulu'
+        }, status=401)
+    
+    try:
+        video = get_object_or_404(Video, pk=video_id)
+    except Video.DoesNotExist:
+        return JsonResponse({
+            'error': 'Video tidak ditemukan'
+        }, status=404)
+    
+    try:
+        data = json.loads(request.body)
+        rating = data.get('rating')
+        
+        if rating is None or not (1 <= rating <= 5):
+            return JsonResponse({
+                'error': 'Rating harus antara 1-5'
+            }, status=400)
+        
+        # Simpan rating
+        VideoRating.objects.update_or_create(
+            video=video,
+            user=request.user,
+            defaults={'rating': rating}
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Rating berhasil disimpan'
+        }, status=200)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON format'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Terjadi kesalahan: {str(e)}'
+        }, status=500)
+
+
+# ============================================
+# ADMIN API ENDPOINTS (CRUD)
+# ============================================
+
+@csrf_exempt
+@require_POST
+def api_video_create(request):
+    """POST /videos/api/create/ - Create video (Admin only)"""
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'error': 'Anda harus login terlebih dahulu'
+        }, status=401)
+    
+    if not request.user.is_staff:
+        return JsonResponse({
+            'error': 'Hanya admin yang dapat membuat video'
+        }, status=403)
+    
+    try:
+        data = json.loads(request.body)
+        
+        # Validate required fields
+        required_fields = ['title', 'description', 'sport', 'difficulty', 'video_url']
+        for field in required_fields:
+            if not data.get(field):
+                return JsonResponse({
+                    'error': f'Field {field} harus diisi'
+                }, status=400)
+        
+        # Get sport
+        try:
+            sport_id = int(data['sport'])
+            sport = Sport.objects.get(id=sport_id)
+        except (ValueError, Sport.DoesNotExist):
+            return JsonResponse({
+                'error': 'Sport tidak valid'
+            }, status=400)
+        
+        # Convert difficulty from Flutter format to model format
+        difficulty = data.get('difficulty', 'Pemula')
+        difficulty_key = DIFFICULTY_REVERSE.get(difficulty, 'beginner')
+        
+        # Auto-generate thumbnail from YouTube URL if not provided
+        thumbnail_url = data.get('thumbnail_url', '')
+        video_url = data.get('video_url', '')
+        if not thumbnail_url and video_url:
+            youtube_pattern = r'(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})'
+            match = re.search(youtube_pattern, video_url)
+            if match:
+                video_id = match.group(1)
+                thumbnail_url = f'https://img.youtube.com/vi/{video_id}/hqdefault.jpg'
+        
+        # Create video
+        video = Video.objects.create(
+            title=data['title'],
+            description=data.get('description', ''),
+            sport=sport,
+            difficulty=difficulty_key,
+            video_url=video_url,
+            thumbnail_url=thumbnail_url,
+            instructor=data.get('instructor', ''),
+            duration=data.get('duration', ''),
+            tags=data.get('tags', []),
+            uploader=request.user,
+        )
+        
+        # Return in Flutter format
+        difficulty_display = DIFFICULTY_MAPPING.get(video.difficulty, video.difficulty)
+        return JsonResponse({
+            'id': video.id,
+            'title': video.title,
+            'description': video.description or '',
+            'thumbnail': video.thumbnail_url or '',
+            'url': video.video_url or '',
+            'difficulty': difficulty_display,
+            'sport_name': video.sport.name if video.sport else '',
+            'duration': video.duration or '',
+            'rating': 0.0,
+            'views': video.views_count,
+        }, status=201)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON format'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Terjadi kesalahan: {str(e)}'
+        }, status=500)
+
+
+@csrf_exempt
+@require_POST
+def api_video_update(request, video_id):
+    """POST /videos/api/{id}/update/ - Update video (Admin only)"""
+    # Debug logging
+    print(f'[DEBUG] api_video_update - User: {request.user}, Authenticated: {request.user.is_authenticated}, Staff: {request.user.is_staff if request.user.is_authenticated else False}')
+    print(f'[DEBUG] api_video_update - Session key: {request.session.session_key if hasattr(request, "session") else "No session"}')
+    print(f'[DEBUG] api_video_update - Cookies: {dict(request.COOKIES)}')
+    print(f'[DEBUG] api_video_update - Headers: {dict(request.headers)}')
+    
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'error': 'Anda harus login terlebih dahulu',
+            'debug': {
+                'user': str(request.user),
+                'is_authenticated': request.user.is_authenticated,
+                'session_key': request.session.session_key if hasattr(request, 'session') else None,
+                'cookies': dict(request.COOKIES),
+            }
+        }, status=401)
+    
+    if not request.user.is_staff:
+        return JsonResponse({
+            'error': 'Hanya admin yang dapat mengupdate video'
+        }, status=403)
+    
+    try:
+        video = get_object_or_404(Video, pk=video_id)
+        data = json.loads(request.body)
+        
+        # Update fields
+        if 'title' in data:
+            video.title = data['title']
+        if 'description' in data:
+            video.description = data.get('description', '')
+        if 'sport' in data:
+            try:
+                sport_id = int(data['sport'])
+                sport = Sport.objects.get(id=sport_id)
+                video.sport = sport
+            except (ValueError, Sport.DoesNotExist):
+                return JsonResponse({
+                    'error': 'Sport tidak valid'
+                }, status=400)
+        if 'difficulty' in data:
+            difficulty = data['difficulty']
+            difficulty_key = DIFFICULTY_REVERSE.get(difficulty, 'beginner')
+            video.difficulty = difficulty_key
+        if 'video_url' in data:
+            video.video_url = data['video_url']
+        if 'thumbnail_url' in data:
+            video.thumbnail_url = data['thumbnail_url']
+        if 'instructor' in data:
+            video.instructor = data.get('instructor', '')
+        if 'duration' in data:
+            video.duration = data.get('duration', '')
+        if 'tags' in data:
+            video.tags = data.get('tags', [])
+        
+        # Auto-generate thumbnail if video_url changed and thumbnail_url is empty
+        if 'video_url' in data and not video.thumbnail_url:
+            youtube_pattern = r'(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})'
+            match = re.search(youtube_pattern, video.video_url or '')
+            if match:
+                video_id = match.group(1)
+                video.thumbnail_url = f'https://img.youtube.com/vi/{video_id}/hqdefault.jpg'
+        
+        video.save()
+        
+        # Return in Flutter format
+        difficulty_display = DIFFICULTY_MAPPING.get(video.difficulty, video.difficulty)
+        return JsonResponse({
+            'id': video.id,
+            'title': video.title,
+            'description': video.description or '',
+            'thumbnail': video.thumbnail_url or '',
+            'url': video.video_url or '',
+            'difficulty': difficulty_display,
+            'sport_name': video.sport.name if video.sport else '',
+            'duration': video.duration or '',
+            'rating': video.average_rating,
+            'views': video.views_count,
+        }, status=200)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON format'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Terjadi kesalahan: {str(e)}'
+        }, status=500)
+
+
+@require_GET
+def api_sports_list(request):
+    """GET /videos/api/sports/ - Get list of all sports"""
+    from sportlibrary.models import Sport
+    
+    sports = Sport.objects.all().order_by('name')
+    sports_data = [
+        {
+            'id': sport.id,
+            'name': sport.name,
+        }
+        for sport in sports
+    ]
+    
+    return JsonResponse(sports_data, safe=False)
+
+
+@csrf_exempt
+@require_POST
+def api_video_delete(request, video_id):
+    """POST /videos/api/{id}/delete/ - Delete video (Admin only)"""
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'error': 'Anda harus login terlebih dahulu'
+        }, status=401)
+    
+    if not request.user.is_staff:
+        return JsonResponse({
+            'error': 'Hanya admin yang dapat menghapus video'
+        }, status=403)
+    
+    try:
+        video = get_object_or_404(Video, pk=video_id)
+        video_title = video.title
+        video.delete()
+        
+        return JsonResponse({
+            'message': f'Video "{video_title}" berhasil dihapus'
+        }, status=200)
+        
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Terjadi kesalahan: {str(e)}'
+        }, status=500)
+

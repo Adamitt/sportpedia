@@ -1,0 +1,137 @@
+[1mdiff --git a/accounts/views.py b/accounts/views.py[m
+[1mindex 8e8c1da..d25f532 100644[m
+[1m--- a/accounts/views.py[m
+[1m+++ b/accounts/views.py[m
+[36m@@ -1,6 +1,10 @@[m
+ from django.shortcuts import render, redirect[m
+ from django.contrib.auth import authenticate, login, logout[m
+[32m+[m[32mfrom django.contrib.auth import login as auth_login, logout as auth_logout[m
+ from django.contrib import messages[m
+[32m+[m[32mfrom django.contrib.auth.models import User[m
+[32m+[m[32mfrom django.http import JsonResponse[m
+[32m+[m[32mfrom django.views.decorators.csrf import csrf_exempt[m
+ from profile_app.models import UserProfile[m
+ from .forms import RegisterForm, LoginForm[m
+ from pathlib import Path[m
+[36m@@ -9,6 +13,121 @@[m [mimport json[m
+ BASE_DIR = Path(__file__).resolve().parent.parent.parent[m
+ USERS_PATH = BASE_DIR / 'database' / 'users.json'[m
+ [m
+[32m+[m
+[32m+[m[32m# ===================== API Views untuk Flutter =====================[m
+[32m+[m
+[32m+[m[32m@csrf_exempt[m
+[32m+[m[32mdef api_login(request):[m
+[32m+[m[32m    """API login untuk Flutter"""[m
+[32m+[m[32m    if request.method == 'POST':[m
+[32m+[m[32m        username = request.POST.get('username')[m
+[32m+[m[32m        password = request.POST.get('password')[m
+[32m+[m[32m        user = authenticate(username=username, password=password)[m
+[32m+[m
+[32m+[m[32m        if user is not None:[m
+[32m+[m[32m            if user.is_active:[m
+[32m+[m[32m                auth_login(request, user)[m
+[32m+[m[32m                profile, created = UserProfile.objects.get_or_create(user=user)[m
+[32m+[m[32m                return JsonResponse({[m
+[32m+[m[32m                    "username": user.username,[m
+[32m+[m[32m                    "status": True,[m
+[32m+[m[32m                    "message": "Login berhasil!",[m
+[32m+[m[32m                    "is_staff": user.is_staff,[m
+[32m+[m[32m                    "is_superuser": user.is_superuser,[m
+[32m+[m[32m                }, status=200)[m
+[32m+[m[32m            else:[m
+[32m+[m[32m                return JsonResponse({[m
+[32m+[m[32m                    "status": False,[m
+[32m+[m[32m                    "message": "Login gagal, akun dinonaktifkan."[m
+[32m+[m[32m                }, status=401)[m
+[32m+[m[32m        else:[m
+[32m+[m[32m            return JsonResponse({[m
+[32m+[m[32m                "status": False,[m
+[32m+[m[32m                "message": "Login gagal, periksa username atau password."[m
+[32m+[m[32m            }, status=401)[m
+[32m+[m[41m    [m
+[32m+[m[32m    return JsonResponse({[m
+[32m+[m[32m        "status": False,[m
+[32m+[m[32m        "message": "Invalid request method."[m
+[32m+[m[32m    }, status=400)[m
+[32m+[m
+[32m+[m
+[32m+[m[32m@csrf_exempt[m
+[32m+[m[32mdef api_register(request):[m
+[32m+[m[32m    """API register untuk Flutter"""[m
+[32m+[m[32m    if request.method == 'POST':[m
+[32m+[m[32m        try:[m
+[32m+[m[32m            data = json.loads(request.body)[m
+[32m+[m[32m            username = data.get('username')[m
+[32m+[m[32m            password1 = data.get('password1')[m
+[32m+[m[32m            password2 = data.get('password2')[m
+[32m+[m[32m            email = data.get('email', '')[m
+[32m+[m
+[32m+[m[32m            if password1 != password2:[m
+[32m+[m[32m                return JsonResponse({[m
+[32m+[m[32m                    "status": False,[m
+[32m+[m[32m                    "message": "Password tidak cocok."[m
+[32m+[m[32m                }, status=400)[m
+[32m+[m
+[32m+[m[32m            if User.objects.filter(username=username).exists():[m
+[32m+[m[32m                return JsonResponse({[m
+[32m+[m[32m                    "status": False,[m
+[32m+[m[32m                    "message": "Username sudah digunakan."[m
+[32m+[m[32m                }, status=400)[m
+[32m+[m
+[32m+[m[32m            if email and User.objects.filter(email=email).exists():[m
+[32m+[m[32m                return JsonResponse({[m
+[32m+[m[32m                    "status": False,[m
+[32m+[m[32m                    "message": "Email sudah digunakan."[m
+[32m+[m[32m                }, status=400)[m
+[32m+[m
+[32m+[m[32m            user = User.objects.create_user(username=username, password=password1, email=email)[m
+[32m+[m[32m            user.save()[m
+[32m+[m[32m            UserProfile.objects.create(user=user)[m
+[32m+[m
+[32m+[m[32m            return JsonResponse({[m
+[32m+[m[32m                "username": user.username,[m
+[32m+[m[32m                "status": "success",[m
+[32m+[m[32m                "message": "User berhasil dibuat!"[m
+[32m+[m[32m            }, status=200)[m
+[32m+[m
+[32m+[m[32m        except json.JSONDecodeError:[m
+[32m+[m[32m            return JsonResponse({[m
+[32m+[m[32m                "status": False,[m
+[32m+[m[32m                "message": "Invalid JSON data."[m
+[32m+[m[32m            }, status=400)[m
+[32m+[m[32m        except Exception as e:[m
+[32m+[m[32m            return JsonResponse({[m
+[32m+[m[32m                "status": False,[m
+[32m+[m[32m                "message": str(e)[m
+[32m+[m[32m            }, status=500)[m
+[32m+[m
+[32m+[m[32m    return JsonResponse({[m
+[32m+[m[32m        "status": False,[m
+[32m+[m[32m        "message": "Invalid request method."[m
+[32m+[m[32m    }, status=400)[m
+[32m+[m
+[32m+[m
+[32m+[m[32m@csrf_exempt[m
+[32m+[m[32mdef api_logout(request):[m
+[32m+[m[32m    """API logout untuk Flutter"""[m
+[32m+[m[32m    username = request.user.username[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        auth_logout(request)[m
+[32m+[m[32m        return JsonResponse({[m
+[32m+[m[32m            "username": username,[m
+[32m+[m[32m            "status": True,[m
+[32m+[m[32m            "message": "Logout berhasil!"[m
+[32m+[m[32m        }, status=200)[m
+[32m+[m[32m    except Exception as e:[m
+[32m+[m[32m        return JsonResponse({[m
+[32m+[m[32m            "status": False,[m
+[32m+[m[32m            "message": f"Logout gagal: {str(e)}"[m
+[32m+[m[32m        }, status=401)[m
+[32m+[m
+[32m+[m
+[32m+[m[32m# ===================== Web Views (HTML) =====================[m
+[32m+[m
+ def register(request):[m
+     if request.method == 'POST':[m
+         form = RegisterForm(request.POST)[m
