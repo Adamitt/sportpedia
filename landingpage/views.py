@@ -185,13 +185,28 @@ def _serialize(t, request):
         if request.user.is_superuser or (t.user and t.user_id == request.user.id):
             is_owner = True
 
+    # Convert image_url to absolute URL if it's a relative path
+    image_url = t.image_url or ""
+    if image_url and image_url.strip():
+        image_url = image_url.strip()
+        # If it's already an absolute URL (starts with http:// or https://), use it as is
+        if image_url.startswith('http://') or image_url.startswith('https://'):
+            pass  # Already absolute, use as is
+        # If it's a relative path (starts with /), make it absolute
+        elif image_url.startswith('/'):
+            image_url = request.build_absolute_uri(image_url)
+        # Otherwise, keep the URL as is (might be a valid relative path without leading /)
+        # Only set to empty if it's truly empty or just whitespace
+    else:
+        image_url = ""
+
     return {
         "id": t.id,
         "title": t.title,
         "text": t.text,
         "user": (t.user.get_full_name() or t.user.username) if t.user else "Guest",
         "category": t.category,
-        "image_url": t.image_url or "",
+        "image_url": image_url,
         "created_at": t.created_at.strftime("%Y-%m-%d %H:%M"),
         "is_owner": is_owner,
     }
@@ -213,6 +228,16 @@ def api_testimonials_list(request):
 @csrf_exempt
 @require_POST
 def api_testimonials_create(request):
+    """
+    POST: Create testimonial (untuk Flutter).
+    
+    [FIXED BY: chevinka] - Added better error handling and logging for debugging
+    """
+    # Handle OPTIONS request for CORS preflight
+    if request.method == "OPTIONS":
+        response = HttpResponse()
+        return _add_cors_headers(response)
+    
     # Require login - sesuai logic Django template yang hanya show button jika authenticated
     if not request.user.is_authenticated:
         response = JsonResponse({"error": "You must be logged in to create a testimonial."}, status=403)
@@ -238,16 +263,21 @@ def api_testimonials_create(request):
     user = request.user  # Sudah guaranteed authenticated dari check di atas
     is_approved_status = bool(user and user.is_superuser)
 
-    t = Testimonial.objects.create(
-        user=user,
-        title=title,
-        text=text,
-        category=category,
-        image_url=image_url,        # ⬅️ simpan URL
-        is_approved=is_approved_status,
-    )
-    response = JsonResponse({"ok": True, "item": _serialize(t, request)}, status=200)
-    return _add_cors_headers(response)
+    try:
+        t = Testimonial.objects.create(
+            user=user,
+            title=title,
+            text=text,
+            category=category,
+            image_url=image_url,        # ⬅️ simpan URL
+            is_approved=is_approved_status,
+        )
+        response = JsonResponse({"ok": True, "item": _serialize(t, request)}, status=200)
+        return _add_cors_headers(response)
+    except Exception as e:
+        # Better error handling for database errors
+        response = JsonResponse({"error": f"Failed to create testimonial: {str(e)}"}, status=500)
+        return _add_cors_headers(response)
 @csrf_exempt
 @require_POST
 def api_testimonials_update(request, pk):
@@ -459,8 +489,17 @@ def api_search(request):
                 sport_results.append({
                     "id": sport.id,
                     "name": sport.name,
+                    "category": sport.category,
+                    "difficulty": sport.difficulty,
                     "description": sport.description or "",
                     "history": sport.history or "",
+                    "rules": sport.rules or [],
+                    "techniques": sport.techniques or [],
+                    "benefits": sport.benefits or [],
+                    "popular_countries": sport.popular_countries or [],
+                    "tags": sport.tags or [],
+                    "image": str(sport.image.url) if sport.image else "",
+                    "is_saved": False,
                 })
     
     response = JsonResponse({
