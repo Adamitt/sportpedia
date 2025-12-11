@@ -228,6 +228,16 @@ def api_testimonials_list(request):
 @csrf_exempt
 @require_POST
 def api_testimonials_create(request):
+    """
+    POST: Create testimonial (untuk Flutter).
+    
+    [FIXED BY: chevinka] - Added better error handling and logging for debugging
+    """
+    # Handle OPTIONS request for CORS preflight
+    if request.method == "OPTIONS":
+        response = HttpResponse()
+        return _add_cors_headers(response)
+    
     # Require login - sesuai logic Django template yang hanya show button jika authenticated
     if not request.user.is_authenticated:
         response = JsonResponse({"error": "You must be logged in to create a testimonial."}, status=403)
@@ -253,16 +263,21 @@ def api_testimonials_create(request):
     user = request.user  # Sudah guaranteed authenticated dari check di atas
     is_approved_status = bool(user and user.is_superuser)
 
-    t = Testimonial.objects.create(
-        user=user,
-        title=title,
-        text=text,
-        category=category,
-        image_url=image_url,        # ⬅️ simpan URL
-        is_approved=is_approved_status,
-    )
-    response = JsonResponse({"ok": True, "item": _serialize(t, request)}, status=200)
-    return _add_cors_headers(response)
+    try:
+        t = Testimonial.objects.create(
+            user=user,
+            title=title,
+            text=text,
+            category=category,
+            image_url=image_url,        # ⬅️ simpan URL
+            is_approved=is_approved_status,
+        )
+        response = JsonResponse({"ok": True, "item": _serialize(t, request)}, status=200)
+        return _add_cors_headers(response)
+    except Exception as e:
+        # Better error handling for database errors
+        response = JsonResponse({"error": f"Failed to create testimonial: {str(e)}"}, status=500)
+        return _add_cors_headers(response)
 @csrf_exempt
 @require_POST
 def api_testimonials_update(request, pk):
