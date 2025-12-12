@@ -63,6 +63,7 @@ class Comment(models.Model):
     text = models.TextField()
     rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
     helpful_count = models.IntegerField(default=0)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -71,6 +72,10 @@ class Comment(models.Model):
     
     def __str__(self):
         return f"Comment by {self.user.username} on {self.video.title}"
+    
+    @property
+    def is_reply(self):
+        return self.parent is not None
 
 class VideoLike(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name='likes')

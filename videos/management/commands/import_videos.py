@@ -99,30 +99,50 @@ class Command(BaseCommand):
                     video_id = video_url.split('v=')[-1].split('&')[0]
                     thumbnail_url = f'https://img.youtube.com/vi/{video_id}/hqdefault.jpg'
                 
-                # Cek apakah video sudah ada (berdasarkan judul dan sport)
-                existing = Video.objects.filter(
-                    title=video_data.get('title'),
-                    sport=sport
-                ).first()
+                # Cek apakah video sudah ada (berdasarkan ID atau judul + sport)
+                video_id = video_data.get('id')
+                existing = None
+                
+                if video_id:
+                    try:
+                        existing = Video.objects.get(id=video_id)
+                    except Video.DoesNotExist:
+                        pass
+                
+                if not existing:
+                    existing = Video.objects.filter(
+                        title=video_data.get('title'),
+                        sport=sport
+                    ).first()
                 
                 if existing:
+                    # Update video yang sudah ada (terutama thumbnail_url jika kosong)
+                    if not existing.thumbnail_url and thumbnail_url:
+                        existing.thumbnail_url = thumbnail_url
+                    if not existing.video_url and video_url:
+                        existing.video_url = video_url
+                    if not existing.instructor and video_data.get('instructor'):
+                        existing.instructor = video_data.get('instructor')
+                    if not existing.tags and video_data.get('tags'):
+                        existing.tags = video_data.get('tags', [])
+                    existing.save()
                     self.stdout.write(
-                        self.style.WARNING(f'⏭️  Video sudah ada: {video_data.get("title")}')
+                        self.style.SUCCESS(f'✅ Updated: {existing.title} (thumbnail: {thumbnail_url[:50] if thumbnail_url else "N/A"}...)')
                     )
-                    skipped_count += 1
+                    imported_count += 1
                     continue
                 
                 # Buat video baru
                 video = Video.objects.create(
-                    id=video_data.get('id'), # Asumsi ID dari JSON adalah Integer
+                    id=video_id, # Asumsi ID dari JSON adalah Integer
                     title=video_data.get('title', 'Untitled'),
                     description=video_data.get('description', ''),
                     sport=sport,
                     difficulty=difficulty,
                     video_url=video_url,
-                    thumbnail_url=thumbnail_url, # <-- TAMBAHKAN
-                    instructor=video_data.get('instructor', 'Admin'), # <-- TAMBAHKAN
-                    tags=video_data.get('tags', []), # <-- TAMBAHKAN
+                    thumbnail_url=thumbnail_url,
+                    instructor=video_data.get('instructor', 'Admin'),
+                    tags=video_data.get('tags', []),
                     duration=video_data.get('duration', '00:00'),
                     uploader=uploader,
                     views_count=video_data.get('views', 0)

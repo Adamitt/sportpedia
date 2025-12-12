@@ -10,6 +10,7 @@ from .forms import RegisterForm, LoginForm
 from pathlib import Path
 import json
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 USERS_PATH = BASE_DIR / 'database' / 'users.json'
 
