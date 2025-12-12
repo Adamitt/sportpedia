@@ -330,3 +330,16 @@ def create_forum_flutter(request):
         new_forum.tags.add(tag_obj)
 
     return JsonResponse({"status": "success", "post_id": str(new_forum.id)}, status=201)
+
+@csrf_exempt
+def delete_post_flutter(request, id):
+    """Delete forum post - hanya author yang bisa delete"""
+    post = get_object_or_404(ForumPost, pk=id)
+    
+    # Check authorization - only author can delete
+    if request.user != post.author:
+        messages.error(request, "You are not authorized to delete this post.")
+        return HttpResponseRedirect(reverse('sportforum:post_detail', args=[id]))
+    
+    post.delete()
+    return HttpResponseRedirect(reverse('sportforum:show_forum'))

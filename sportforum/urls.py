@@ -13,5 +13,6 @@ urlpatterns = [
     path("post/json/<str:id>/", views.show_json_by_id, name="show_json_by_id"),
     path("json/", views.show_json, name="show_json"),
     path("create-forum-flutter/", views.create_forum_flutter, name="create_forum_flutter"),
+    path("post/<str:id>/delete-flutter", views.delete_post_flutter, name="delete_post_flutter"),
 
 ]
