@@ -7,7 +7,7 @@ urlpatterns = [
     path('', views.show_all_gears, name='show_all_gears'),
 
     path('add/', views.add_gear, name='add_gear'),
-    path('details/<uuid:gear_id>/', views.show_gear_detail, name='card_details'),
+    path('details/<int:gear_id>/', views.show_gear_detail, name='card_details'),
 
     path('json/', views.get_all_gears_json, name="get_all_gears_json"),
     path('json/<uuid:gear_id>/', views.get_gear_json, name="get_gear_json"),
