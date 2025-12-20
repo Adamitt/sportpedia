@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import redirect, render
 from sportforum.models import ForumPost, Reply, Tag
 from django.http import HttpResponseRedirect, JsonResponse, Http404
@@ -6,10 +7,12 @@ from django.urls import reverse
 from django.template.context_processors import csrf
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from sportforum.forms import ReplyForm, ForumPostForm
 from datetime import datetime
 from django.utils import timezone
+from django.utils.html import strip_tags
 import uuid
 from django.contrib import messages
 
@@ -285,3 +288,144 @@ def show_json_by_id(request, id):
     except ForumPost.DoesNotExist:
         return JsonResponse({'detail': 'Not found'}, status=404)
 
+@csrf_exempt
+def create_forum_flutter(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": "error"}, status=401)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+
+    title = strip_tags(data.get("title", "")).strip()
+    content = strip_tags(data.get("content", "")).strip()
+    sport = (data.get("sportSlug") or data.get("sport") or "").strip()
+    tags_payload = data.get("tags", [])
+
+    if not title or not content or not sport:
+        return JsonResponse({"status": "error", "message": "Missing required fields"}, status=400)
+
+    valid_sports = {choice[0] for choice in ForumPost.SPORT_CHOICES}
+    if sport not in valid_sports:
+        return JsonResponse({"status": "error", "message": "Invalid sport value"}, status=400)
+
+    author = request.user if request.user.is_authenticated else None
+    new_forum = ForumPost(
+        title=title,
+        content=content,
+        sport=sport,
+        author=author,
+    )
+    new_forum.save()
+
+    if isinstance(tags_payload, str):
+        candidate_tags = [tag.strip() for tag in tags_payload.split(',')]
+    elif isinstance(tags_payload, list):
+        candidate_tags = [str(tag).strip() for tag in tags_payload]
+    else:
+        candidate_tags = []
+
+    for tag_name in {tag for tag in candidate_tags if tag}:
+        tag_obj, _ = Tag.objects.get_or_create(name=tag_name)
+        new_forum.tags.add(tag_obj)
+
+    return JsonResponse({"status": "success", "post_id": str(new_forum.id)}, status=201)
+
+@csrf_exempt
+@require_POST
+def toggle_like_flutter(request, id):
+    user = request.user if request.user.is_authenticated else None
+    if not user:
+        return JsonResponse({'error': 'unauthorized'}, status=401)
+
+    post = get_object_or_404(ForumPost, pk=id)
+    liked = False
+    if user in post.likes.all():
+        post.likes.remove(user)
+    else:
+        post.likes.add(user)
+        liked = True
+    return JsonResponse({'liked': liked, 'total_likes': post.total_likes})
+
+@csrf_exempt
+@require_POST
+def post_reply_flutter(request, id):
+    user = request.user if request.user.is_authenticated else None
+    if not user:
+        return JsonResponse({'error': 'unauthorized'}, status=401)
+
+    try:
+        data = json.loads(request.body or '{}')
+    except json.JSONDecodeError:
+        # fallback to form-encoded
+        data = request.POST
+
+    comment = strip_tags(data.get('comment', '')).strip()
+    if not comment:
+        return JsonResponse({'error': 'comment_required'}, status=400)
+
+    post = get_object_or_404(ForumPost, pk=id)
+    Reply.objects.create(post=post, user=user, comment=comment)
+    return JsonResponse({'ok': True})
+
+@csrf_exempt
+@require_POST
+def edit_post_flutter(request, id):
+    user = request.user if request.user.is_authenticated else None
+    if not user:
+        return JsonResponse({'error': 'unauthorized'}, status=401)
+
+    post = get_object_or_404(ForumPost, pk=id)
+    if post.author != user:
+        return JsonResponse({'error': 'forbidden'}, status=403)
+
+    try:
+        data = json.loads(request.body or '{}')
+    except json.JSONDecodeError:
+        data = request.POST
+
+    title = strip_tags(data.get('title', post.title)).strip()
+    content = strip_tags(data.get('content', post.content)).strip()
+    sport = (data.get('sportSlug') or data.get('sport') or post.sport).strip()
+    tags_payload = data.get('tags', None)
+
+    # basic validation
+    if not title or not content or not sport:
+        return JsonResponse({'error': 'missing_fields'}, status=400)
+    valid_sports = {choice[0] for choice in ForumPost.SPORT_CHOICES}
+    if sport not in valid_sports:
+        return JsonResponse({'error': 'invalid_sport'}, status=400)
+
+    post.title = title
+    post.content = content
+    post.sport = sport
+    post.save()
+
+    if tags_payload is not None:
+        post.tags.clear()
+        if isinstance(tags_payload, str):
+            candidate_tags = [t.strip() for t in tags_payload.split(',')]
+        elif isinstance(tags_payload, list):
+            candidate_tags = [str(t).strip() for t in tags_payload]
+        else:
+            candidate_tags = []
+        for tag_name in {t for t in candidate_tags if t}:
+            tag_obj, _ = Tag.objects.get_or_create(name=tag_name)
+            post.tags.add(tag_obj)
+
+    return JsonResponse({'ok': True})
+
+@csrf_exempt
+@require_POST
+def delete_post_flutter(request, id):
+    user = request.user if request.user.is_authenticated else None
+    if not user:
+        return JsonResponse({'error': 'unauthorized'}, status=401)
+
+    post = get_object_or_404(ForumPost, pk=id)
+    if post.author != user:
+        return JsonResponse({'error': 'forbidden'}, status=403)
+
+    post.delete()
+    return JsonResponse({'ok': True})

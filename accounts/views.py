@@ -1,13 +1,159 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib import messages
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from profile_app.models import UserProfile
 from .forms import RegisterForm, LoginForm
 from pathlib import Path
 import json
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 USERS_PATH = BASE_DIR / 'database' / 'users.json'
+
+
+# ===================== API Views untuk Flutter =====================
+
+@csrf_exempt
+def api_login(request):
+    """API login untuk Flutter"""
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            if user.is_active:
+                auth_login(request, user)
+                profile, created = UserProfile.objects.get_or_create(user=user)
+                return JsonResponse({
+                    "username": user.username,
+                    "status": True,
+                    "message": "Login berhasil!",
+                    "is_staff": user.is_staff,
+                    "is_superuser": user.is_superuser,
+                }, status=200)
+            else:
+                return JsonResponse({
+                    "status": False,
+                    "message": "Login gagal, akun dinonaktifkan."
+                }, status=401)
+        else:
+            return JsonResponse({
+                "status": False,
+                "message": "Login gagal, periksa username atau password."
+            }, status=401)
+    
+    return JsonResponse({
+        "status": False,
+        "message": "Invalid request method."
+    }, status=400)
+
+
+@csrf_exempt
+def api_register(request):
+    """API register untuk Flutter"""
+    if request.method == 'POST':
+        try:
+            # Support both JSON and form data
+            if request.content_type == 'application/json':
+                data = json.loads(request.body)
+                username = data.get('username')
+                password1 = data.get('password1')
+                password2 = data.get('password2')
+                email = data.get('email', '')
+            else:
+                # Form data (dari pbp_django_auth post())
+                username = request.POST.get('username')
+                password1 = request.POST.get('password1')
+                password2 = request.POST.get('password2')
+                email = request.POST.get('email', '')
+
+            if password1 != password2:
+                return JsonResponse({
+                    "status": False,
+                    "message": "Password tidak cocok."
+                }, status=400)
+
+            if User.objects.filter(username=username).exists():
+                return JsonResponse({
+                    "status": False,
+                    "message": "Username sudah digunakan."
+                }, status=400)
+
+            if email and User.objects.filter(email=email).exists():
+                return JsonResponse({
+                    "status": False,
+                    "message": "Email sudah digunakan."
+                }, status=400)
+
+            user = User.objects.create_user(username=username, password=password1, email=email)
+            user.save()
+            UserProfile.objects.create(user=user)
+
+            return JsonResponse({
+                "username": user.username,
+                "status": "success",
+                "message": "User berhasil dibuat!"
+            }, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({
+                "status": False,
+                "message": "Invalid JSON data."
+            }, status=400)
+        except Exception as e:
+            return JsonResponse({
+                "status": False,
+                "message": str(e)
+            }, status=500)
+
+    return JsonResponse({
+        "status": False,
+        "message": "Invalid request method."
+    }, status=400)
+
+
+@csrf_exempt
+def api_logout(request):
+    """API logout untuk Flutter"""
+    username = request.user.username
+    try:
+        auth_logout(request)
+        return JsonResponse({
+            "username": username,
+            "status": True,
+            "message": "Logout berhasil!"
+        }, status=200)
+    except Exception as e:
+        return JsonResponse({
+            "status": False,
+            "message": f"Logout gagal: {str(e)}"
+        }, status=401)
+
+
+@csrf_exempt
+def api_user_info(request):
+    """API untuk mendapatkan info user yang sedang login"""
+    if request.user.is_authenticated:
+        return JsonResponse({
+            "status": True,
+            "username": request.user.username,
+            "email": request.user.email,
+            "is_staff": request.user.is_staff,
+            "is_superuser": request.user.is_superuser,
+        }, status=200)
+    else:
+        return JsonResponse({
+            "status": False,
+            "message": "User not authenticated"
+        }, status=401)
+
+
+# ===================== Web Views (HTML) =====================
 
 def register(request):
     if request.method == 'POST':
