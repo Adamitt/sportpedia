@@ -13,7 +13,7 @@ from .models import Video, Comment, VideoBookmark, VideoRating, VideoLike # <-- 
 from .forms import VideoForm # Asumsi Anda punya ini
 from sportlibrary.models import Sport
 from metrics.utils import bump_view
-from profile_app.models import UserProfile
+from profile_app.models import UserProfile, ActivityLog
 
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
@@ -143,6 +143,14 @@ def video_detail(request, video_id):
         video.views_count = F('views_count') + 1
         video.save(update_fields=['views_count'])
         video.refresh_from_db() # Ambil nilai views_count terbaru
+        
+        # Log aktivitas ke history jika user login
+        if request.user.is_authenticated:
+            ActivityLog.objects.create(
+                user=request.user,
+                action_type='VIDEO_VIEW',
+                description=f'Menonton video: "{video.title[:50]}..."' if len(video.title) > 50 else f'Menonton video: "{video.title}"'
+            )
         
     except Exception as e:
         print(f"Gagal mencatat view untuk video_id {video_id}: {e}")
