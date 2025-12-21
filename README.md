@@ -175,3 +175,11 @@ Link figma : https://www.figma.com/design/8EefBJOriHpUdaWKzYXzsz/Sportpedia?node
 
 ## Link Website
 Link Website : https://ainur-fadhil-sportpedia.pbp.cs.ui.ac.id
+
+## Link Bitrise
+[![Build Status](https://app.bitrise.io/app/a4c894c7-9c73-45b9-92ff-0c26d489877c/status.svg?token=mavot0Gf0f6ZDEc3i1nGKw&branch=main)](https://app.bitrise.io/app/a4c894c7-9c73-45b9-92ff-0c26d489877c)
+
+---
+
+## Link Youtube
+Link Website : https://youtu.be/quAL_aKnEoM?si=Im7tKsNoL7y3HgDU
