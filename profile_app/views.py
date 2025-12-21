@@ -308,11 +308,19 @@ def pengaturan_akun(request):
     user = request.user
 
     if request.method == 'POST':
+        username = request.POST.get('username')
         email = request.POST.get('email')
         new_password = request.POST.get('password')
         olahraga_favorit = request.POST.get('olahraga_favorit')
         preferensi = request.POST.get('preferensi')
         foto_url = request.POST.get('foto_profil')
+
+        # Validasi dan update username
+        if username and username != user.username:
+            if User.objects.filter(username=username).exclude(pk=user.pk).exists():
+                messages.error(request, '❌ Username sudah digunakan.')
+                return redirect('profile_app:pengaturan_akun')
+            user.username = username
 
         if email and email != user.email:
             if User.objects.filter(email=email).exclude(pk=user.pk).exists():
@@ -332,6 +340,14 @@ def pengaturan_akun(request):
             profile.foto_profil = foto_url
         profile.save()
 
+        # Log aktivitas ke history
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type='MODULE_ACCESS',
+            description='Mengubah pengaturan akun'
+        )
+
+        messages.success(request, '✅ Pengaturan akun berhasil diperbarui!')
         return redirect('profile_app:profile_page')
 
     context = {

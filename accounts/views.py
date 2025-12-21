@@ -174,8 +174,17 @@ def register(request):
             except Exception as e:
                 print(f"Gagal simpan ke users.json: {e}")
 
-            messages.success(request, 'Akun berhasil dibuat! Silakan login.')
+            messages.success(request, '🎉 Akun berhasil dibuat! Silakan login.')
             return redirect('accounts:login')
+        else:
+            # Tampilkan error dari form sebagai toast
+            for field, errors in form.errors.items():
+                for error in errors:
+                    if field == '__all__':
+                        messages.error(request, f'❌ {error}')
+                    else:
+                        field_label = form.fields[field].label or field.replace('_', ' ').title()
+                        messages.error(request, f'❌ {field_label}: {error}')
     else:
         form = RegisterForm()
     return render(request, 'accounts/register.html', {'form': form})
@@ -211,7 +220,7 @@ def login_view(request):
 
 
 def logout_view(request):
+    username = request.user.username if request.user.is_authenticated else ''
     logout(request)
-    storage = messages.get_messages(request)
-    storage.used = True
+    messages.success(request, f'👋 Sampai jumpa lagi, {username}! Anda telah berhasil logout.')
     return redirect('accounts:login')

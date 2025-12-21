@@ -2,13 +2,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<<<<<<< HEAD
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}SportPedia{% endblock %}</title>
-  {% load static %}
 
-  <!-- Tailwind & Font -->
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font: Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -35,21 +36,8 @@
     }
   </style>
 
-  <!-- Django messages disiapin dalam bentuk JSON -->
-  {% if messages %}
-  <script id="django-messages" type="application/json">
-  [
-    {% for message in messages %}
-      {
-        "text": "{{ message|escapejs }}",
-        "type": "{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}"
-      }{% if not forloop.last %},{% endif %}
-    {% endfor %}
-  ]
-  </script>
-  {% else %}
-  <script id="django-messages" type="application/json">[]</script>
-  {% endif %}
+  {% block head %}{% endblock %}
+  {% block extra_head %}{% endblock extra_head %}
 </head>
 
 <body class="bg-gray-50 text-gray-900">
@@ -101,66 +89,122 @@
     </footer>
   </div>
 
-  <!-- Toast container + script bawaan -->
-  {% include 'toast.html' %}
-  <script src="{% static 'js/toast_messages.js' %}"></script>
-
-  <!-- Tambahan script tiap halaman (misal editscript) -->
-  {% block extra_scripts %}{% endblock %}
-{% comment %} =======
-  {% block meta %}
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  {% endblock meta %}
-
-  <title>{% block title %}SportPedia{% endblock %}</title>
-
-   <!-- Sportpedia Logo -->
-  <link rel="icon" href="{% static 'images/sportpedia_logo.png' %}" type="image/png">
-
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- Font: Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-[999999] flex flex-col gap-3 pointer-events-none">
+    {% if messages %}
+      {% for message in messages %}
+      <div class="toast-item transform translate-x-full opacity-0 pointer-events-auto" data-type="{{ message.tags }}">
+        <div class="flex items-center gap-3 px-5 py-4 rounded-2xl shadow-2xl backdrop-blur-md border
+            {% if message.tags == 'error' %}
+                bg-gradient-to-r from-red-500/90 to-rose-600/90 border-red-400/30 text-white
+            {% elif message.tags == 'success' %}
+                bg-gradient-to-r from-emerald-500/90 to-teal-600/90 border-emerald-400/30 text-white
+            {% elif message.tags == 'warning' %}
+                bg-gradient-to-r from-amber-500/90 to-orange-600/90 border-amber-400/30 text-white
+            {% else %}
+                bg-gradient-to-r from-blue-500/90 to-indigo-600/90 border-blue-400/30 text-white
+            {% endif %}
+            min-w-[320px] max-w-md">
+            
+            <!-- Icon -->
+            <div class="flex-shrink-0">
+                {% if message.tags == 'error' %}
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {% elif message.tags == 'success' %}
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {% elif message.tags == 'warning' %}
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                {% else %}
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {% endif %}
+            </div>
+            
+            <!-- Message -->
+            <p class="flex-1 text-sm font-medium">{{ message }}</p>
+            
+            <!-- Close Button -->
+            <button onclick="closeToast(this)" class="flex-shrink-0 p-1 rounded-full hover:bg-white/20 transition-colors cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="h-1 mt-1 rounded-full overflow-hidden bg-white/20">
+            <div class="toast-progress h-full bg-white/60 rounded-full"></div>
+        </div>
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
 
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f9fafb;
-      color: #1f2937;
+    /* Toast Animations */
+    .toast-item {
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .toast-progress {
+        width: 100%;
+    }
+
+    /* Toast hover effect - pause progress */
+    .toast-item:hover .toast-progress {
+        animation-play-state: paused;
     }
   </style>
 
-  {% block extra_head %}{% endblock extra_head %}
-</head>
-
-<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
-
-  <!-- Navbar -->
-  {% include 'navbar.html' %}
-
-  <!-- Main Content -->
-  <main class="flex-grow">
-    {% block content %}{% endblock %}
-  </main>
-
-  <!-- Footer -->
-  {% include 'footer.html' %}
-
-  <!-- JS for Lucide Icons -->
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      lucide.createIcons();
+    // Toast Animation
+    document.addEventListener('DOMContentLoaded', () => {
+        const toasts = document.querySelectorAll('.toast-item');
+        
+        toasts.forEach((toast, index) => {
+            // Animate in with stagger
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+                toast.classList.add('translate-x-0', 'opacity-100');
+            }, index * 150);
+            
+            // Progress bar animation
+            const progressBar = toast.querySelector('.toast-progress');
+            progressBar.style.transition = 'width 5s linear';
+            setTimeout(() => {
+                progressBar.style.width = '0%';
+            }, 100 + (index * 150));
+            
+            // Auto dismiss after 5 seconds
+            setTimeout(() => {
+                dismissToast(toast);
+            }, 5000 + (index * 150));
+        });
     });
+    
+    function closeToast(btn) {
+        const toast = btn.closest('.toast-item');
+        dismissToast(toast);
+    }
+    
+    function dismissToast(toast) {
+        if (!toast) return;
+        toast.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }
   </script>
 
+  <!-- Tambahan script tiap halaman -->
+  {% block extra_scripts %}{% endblock %}
   {% block extra_js %}{% endblock %}
->>>>>>> origin/kalista {% endcomment %}
 </body>
 </html>

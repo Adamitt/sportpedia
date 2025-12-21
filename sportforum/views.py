@@ -15,6 +15,7 @@ from django.utils import timezone
 from django.utils.html import strip_tags
 import uuid
 from django.contrib import messages
+from profile_app.models import ActivityLog
 
 
 # Tampilkan semua forum post
@@ -101,6 +102,13 @@ def add_post_ajax(request):
                     tag, created = Tag.objects.get_or_create(name=tag_name)
                     new_post.tags.add(tag)
             
+            # Log aktivitas ke history
+            ActivityLog.objects.create(
+                user=request.user,
+                action_type='FORUM_POST',
+                description=f'Membuat post baru di Community: "{title[:50]}..."' if len(title) > 50 else f'Membuat post baru di Community: "{title}"'
+            )
+            
             return JsonResponse({
                 'success': True,
                 'message': 'Post created successfully',
@@ -180,6 +188,14 @@ def edit_post(request, id):
                 for tag_name in tags:
                     tag, created = Tag.objects.get_or_create(name=tag_name)
                     updated_post.tags.add(tag)
+            
+            # Log aktivitas ke history
+            ActivityLog.objects.create(
+                user=request.user,
+                action_type='FORUM_POST',
+                description=f'Mengedit post di Community: "{updated_post.title[:50]}..."' if len(updated_post.title) > 50 else f'Mengedit post di Community: "{updated_post.title}"'
+            )
+            
             return HttpResponseRedirect(reverse('sportforum:post_detail', args=[id]))
     else:
         form = ForumPostForm(instance=post)
@@ -207,7 +223,17 @@ def delete_post(request, id):
         messages.error(request, "You are not authorized to delete this post.")
         return HttpResponseRedirect(reverse('sportforum:post_detail', args=[id]))
     
+    # Simpan title sebelum delete untuk log
+    post_title = post.title
     post.delete()
+    
+    # Log aktivitas ke history
+    ActivityLog.objects.create(
+        user=request.user,
+        action_type='FORUM_POST',
+        description=f'Menghapus post dari Community: "{post_title[:50]}..."' if len(post_title) > 50 else f'Menghapus post dari Community: "{post_title}"'
+    )
+    
     return HttpResponseRedirect(reverse('sportforum:show_forum'))
 
 
